@@ -1,0 +1,215 @@
+{
+ "pinned_on": "2026-10-10",
+ "repos": [
+  {
+   "repo": "asottile/pyupgrade",
+   "url": "https://github.com/asottile/pyupgrade.git",
+   "commit": "f22ea0651f4355c655cc581f67813c991c74a312",
+   "license": "MIT",
+   "split": "test"
+  },
+  {
+   "repo": "callowayproject/bump-my-version",
+   "url": "https://github.com/callowayproject/bump-my-version.git",
+   "commit": "29a5056e3fceb0565a5ec299df5eb59be252ec3c",
+   "license": "MIT",
+   "split": "dev"
+  },
+  {
+   "repo": "cookiecutter/cookiecutter",
+   "url": "https://github.com/cookiecutter/cookiecutter.git",
+   "commit": "c88fbe921c97c58b65f1883ba90a0ab53cc91b34",
+   "license": "BSD-3-Clause",
+   "split": "dev"
+  },
+  {
+   "repo": "coveragepy/coveragepy",
+   "url": "https://github.com/coveragepy/coveragepy.git",
+   "commit": "0287d5da35d9dee0f7f464ddb86321e2d0b273cd",
+   "license": "Apache-2.0",
+   "split": "test"
+  },
+  {
+   "repo": "Delgan/loguru",
+   "url": "https://github.com/Delgan/loguru.git",
+   "commit": "0412a60d6aff63a4ed009c7445993b42d294c2f1",
+   "license": "MIT",
+   "split": "dev"
+  },
+  {
+   "repo": "encode/httpx",
+   "url": "https://github.com/encode/httpx.git",
+   "commit": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
+   "license": "BSD-3-Clause",
+   "split": "dev"
+  },
+  {
+   "repo": "gleitz/howdoi",
+   "url": "https://github.com/gleitz/howdoi.git",
+   "commit": "033dd3ced06761d9d0b3a52068ea358405ab79d9",
+   "license": "MIT",
+   "split": "test"
+  },
+  {
+   "repo": "hhatto/autopep8",
+   "url": "https://github.com/hhatto/autopep8.git",
+   "commit": "d6b5b3342aac6bcf28e7533389754e472c082bc8",
+   "license": "MIT",
+   "split": "test"
+  },
+  {
+   "repo": "jazzband/pip-tools",
+   "url": "https://github.com/jazzband/pip-tools.git",
+   "commit": "4492554a38e325db6ae623bf0c81cde17138120f",
+   "license": "BSD-3-Clause",
+   "split": "dev"
+  },
+  {
+   "repo": "Kludex/uvicorn",
+   "url": "https://github.com/Kludex/uvicorn.git",
+   "commit": "31e3e00f7cd78e4381268ed6b06e8506d2a641fb",
+   "license": "BSD-3-Clause",
+   "split": "dev"
+  },
+  {
+   "repo": "mkdocs/mkdocs",
+   "url": "https://github.com/mkdocs/mkdocs.git",
+   "commit": "2862536793b3c67d9d83c33e0dd6d50a791928f8",
+   "license": "BSD-2-Clause",
+   "split": "test"
+  },
+  {
+   "repo": "nvbn/thefuck",
+   "url": "https://github.com/nvbn/thefuck.git",
+   "commit": "c7e7e1d884d3bb241ea6448f72a989434c2a35ec",
+   "license": "MIT",
+   "split": "dev"
+  },
+  {
+   "repo": "pallets/flask",
+   "url": "https://github.com/pallets/flask.git",
+   "commit": "d086db856be187255b8ec61ef409357393020f32",
+   "license": "BSD-3-Clause",
+   "split": "test"
+  },
+  {
+   "repo": "psf/black",
+   "url": "https://github.com/psf/black.git",
+   "commit": "364941e1c29909e04f933bb0e87f365fc1d4c557",
+   "license": "MIT",
+   "split": "dev"
+  },
+  {
+   "repo": "psf/requests",
+   "url": "https://github.com/psf/requests.git",
+   "commit": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+   "license": "Apache-2.0",
+   "split": "test"
+  },
+  {
+   "repo": "PyCQA/bandit",
+   "url": "https://github.com/PyCQA/bandit.git",
+   "commit": "68ebe11ef79263be27ec223184b94a4fc394a622",
+   "license": "Apache-2.0",
+   "split": "dev"
+  },
+  {
+   "repo": "PyCQA/isort",
+   "url": "https://github.com/PyCQA/isort.git",
+   "commit": "92c56855437785000527b70c1476d1ab75dd78fd",
+   "license": "MIT",
+   "split": "test"
+  },
+  {
+   "repo": "pypa/hatch",
+   "url": "https://github.com/pypa/hatch.git",
+   "commit": "7c26ebeaf8b83f5f0374a2545bb15e36c87db0d0",
+   "license": "MIT",
+   "split": "test"
+  },
+  {
+   "repo": "pypa/pipx",
+   "url": "https://github.com/pypa/pipx.git",
+   "commit": "55d2ec6af81757692ded187c42af2fc42df81fd3",
+   "license": "MIT",
+   "split": "test"
+  },
+  {
+   "repo": "pypa/twine",
+   "url": "https://github.com/pypa/twine.git",
+   "commit": "f536ac5d0c77a24a997854328e64644f576b4992",
+   "license": "Apache-2.0",
+   "split": "dev"
+  },
+  {
+   "repo": "simonw/datasette",
+   "url": "https://github.com/simonw/datasette.git",
+   "commit": "cf113a59850862125b86ce1a58c117aa21341e07",
+   "license": "Apache-2.0",
+   "split": "test"
+  },
+  {
+   "repo": "simonw/llm",
+   "url": "https://github.com/simonw/llm.git",
+   "commit": "05d7ae7dedc524b024ab463b063854e7c43fee01",
+   "license": "Apache-2.0",
+   "split": "dev"
+  },
+  {
+   "repo": "simonw/shot-scraper",
+   "url": "https://github.com/simonw/shot-scraper.git",
+   "commit": "760c11449fd3ceb2132ca1e67c70a53bde32b56b",
+   "license": "Apache-2.0",
+   "split": "dev"
+  },
+  {
+   "repo": "simonw/sqlite-utils",
+   "url": "https://github.com/simonw/sqlite-utils.git",
+   "commit": "6bc1d33d583c54bd69fbdd2071117e2d38c354a1",
+   "license": "Apache-2.0",
+   "split": "test"
+  },
+  {
+   "repo": "sqlalchemy/alembic",
+   "url": "https://github.com/sqlalchemy/alembic.git",
+   "commit": "1bc21b86dd6ddd07ac696e2d73b6cb200dd97bbd",
+   "license": "MIT",
+   "split": "test"
+  },
+  {
+   "repo": "sqlfluff/sqlfluff",
+   "url": "https://github.com/sqlfluff/sqlfluff.git",
+   "commit": "816c5f2be93e54e8b745e51470dd56408b67d039",
+   "license": "MIT",
+   "split": "test"
+  },
+  {
+   "repo": "theskumar/python-dotenv",
+   "url": "https://github.com/theskumar/python-dotenv.git",
+   "commit": "0b2880591780a426b0551436f47a17e7a76d954f",
+   "license": "BSD-3-Clause",
+   "split": "test"
+  },
+  {
+   "repo": "tldr-pages/tldr-python-client",
+   "url": "https://github.com/tldr-pages/tldr-python-client.git",
+   "commit": "85eda9793fff693caf0b5c9099950b6b1aec9982",
+   "license": "MIT",
+   "split": "dev"
+  },
+  {
+   "repo": "tox-dev/pipdeptree",
+   "url": "https://github.com/tox-dev/pipdeptree.git",
+   "commit": "7f8d0b3c37cd15115bbc5f26f2c9e2dfdca61a75",
+   "license": "MIT",
+   "split": "dev"
+  },
+  {
+   "repo": "yt-dlp/yt-dlp",
+   "url": "https://github.com/yt-dlp/yt-dlp.git",
+   "commit": "51bab8a0116f4d8004c315706d809782607d5847",
+   "license": "Unlicense",
+   "split": "dev"
+  }
+ ]
+}
