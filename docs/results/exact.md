@@ -21,19 +21,19 @@ The baseline compares the code before and after a planted change, collects the n
 
 Controls (nothing to find): 0 of 26 cases got a false alarm.
 
-## Test: 132 cases in 15 repositories, 349 expected doc lines
+## Test: 130 cases in 15 repositories, 375 expected doc lines
 
 | Kind of change | Cases | Precision | Recall | Cases with every line found | Cases with a false alarm |
 |---|---|---|---|---|---|
-| Renamed option | 37 | 100.0% | 100.0% | 37 | 0 |
-| Renamed function or class | 26 | 93.5% | 100.0% | 26 | 5 |
-| Renamed environment variable | 16 | 100.0% | 100.0% | 16 | 0 |
+| Renamed option | 37 | 97.8% | 100.0% | 37 | 1 |
+| Renamed function or class | 24 | 98.1% | 100.0% | 24 | 1 |
+| Renamed environment variable | 16 | 98.1% | 100.0% | 16 | 1 |
 | Renamed file | 14 | 100.0% | 100.0% | 14 | 0 |
 | Changed default value | 3 | n/a | 0.0% | 0 | 0 |
 | Raised minimum Python version | 8 | n/a | 0.0% | 0 | 0 |
 | Renamed private function (nothing to find) | 15 | n/a | n/a | n/a | 0 |
 | Renamed option no doc mentions (nothing to find) | 13 | n/a | n/a | n/a | 0 |
-| **The name group** (the docs still say the old name) | 93 | 97.9% | 100.0% | 93 | 5 |
+| **The name group** (the docs still say the old name) | 91 | 98.0% | 100.0% | 91 | 3 |
 | **The value group** (no name changes) | 11 | n/a | 0.0% | 0 | 0 |
 
 Controls (nothing to find): 0 of 28 cases got a false alarm.

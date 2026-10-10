@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Step 1 is done: the answer key and a baseline of exact checks, with no AI. Next is step 2, running the commands in the docs. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done, with no AI: the answer key, a baseline of exact checks, and a check of the commands in the docs against the code. Next is running those commands in a sandbox. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -10,20 +10,29 @@ Finds the lines in your docs that a code change made wrong, and proves each one:
 - **README updates are easy to miss.** In a 2026 study of pull requests from 714 repositories, only 0.8% of all pull requests changed the README, and the study's LLM approach recovered half of the README updates that had really been made (Gao et al., [arXiv:2603.00489](https://arxiv.org/abs/2603.00489)).
 
 ## The answer key
-- **248 planted changes in 30 real repositories.** Popular Python tools and libraries with permissive licenses, each pinned to a commit ([data/repos.json](data/repos.json)), are changed one realistic way at a time: a renamed option, function, environment variable, or file, a changed default, or a raised minimum Python version. Each case records the doc lines the change makes wrong ([data/cases.jsonl](data/cases.jsonl)): 576 lines in all.
-- **Split by repository:** 116 dev cases in 15 repositories, and 132 test cases in the other 15.
+- **246 planted changes in 30 real repositories.** Popular Python tools and libraries with permissive licenses, each pinned to a commit ([data/repos.json](data/repos.json)), are changed one realistic way at a time: a renamed option, function, environment variable, or file, a changed default, or a raised minimum Python version. Each case records the doc lines the change makes wrong ([data/cases.jsonl](data/cases.jsonl)): 602 lines in all.
+- **Split by repository:** 116 dev cases in 15 repositories, and 130 test cases in the other 15.
 - **Controls:** 54 cases change something no doc mentions, so nothing should be flagged.
 - **Checked by hand** ([data/hand_check.json](data/hand_check.json)):
   - every expected line in the 20 cases that change a value, with lines the rules missed added
   - samples of the rename cases: 59 of 60 lines were right on a sample drawn after the rules were final
+  - every line of the 15 rename cases that a later fix to the code reading changed: 54 of 61 were right, and the other 7 were removed
+  - every line the exact checks flag that the key leaves out: 4 of 15 named the project's own class or function through a short module name (such as `c.ListOfItems` after `config_options as c`), and were added
 
-## Results so far: exact checks, with no AI
-On the test split (15 repositories, 132 cases), a search for names the change removed ([docs/results/exact.md](docs/results/exact.md)):
-- **Renames** (93 cases, 324 lines): found all 324, with 7 false alarms (precision 97.9%).
+## Results so far, with no AI
+All on the test split (15 repositories, 130 cases).
+
+**Exact checks:** a search for names the change removed ([docs/results/exact.md](docs/results/exact.md)).
+- **Renames** (91 cases, 350 lines): found all 350, with 7 false alarms (precision 98.0%).
 - **Changed values** (11 cases, 25 lines): found 0 of 25.
 - **Controls** (28 cases): no false alarms.
 
-For renames, the expected lines are the doc lines that still mention the old name, so a search for removed names finds all of them by design. Those cases mostly test false alarms: the 7 are lines that name something else, such as another package's class. Changed values are what the next steps have to find.
+For renames, the expected lines are the doc lines that still mention the old name, so a search for removed names finds all of them by design. Those cases mostly test false alarms: the 7 are lines the change doesn't make wrong, such as another tool's option with the same name. Changed values are what the next steps have to find.
+
+**Commands in the docs:** each documented command is read the way a shell reads it, and its options are compared with the options the code declares. Nothing is run yet ([docs/results/commands.md](docs/results/commands.md)).
+- **Renamed options** (37 cases, 175 lines): flagged 48 lines in commands, with no false alarms, each with its proof, such as "`flask` declares no --host option in the code".
+- **The other 127 lines:** 122 mention the option outside a command, in help output or a sentence, where the exact checks find them. 5 are commands it doesn't read yet, such as PowerShell's `$home_dir = pipx environment --value PIPX_HOME`.
+- **An audit of the 30 repositories as they are:** 2,873 documented commands, 874 with long options. 5 use an option the code doesn't declare, and a hand check found none of them out of date: 3 are options that plugins add, 1 is another program's option, and 1 is an error the docs show on purpose.
 
 ## Reproduce
 ```bash
@@ -31,7 +40,8 @@ python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python -m pytest                       # checks the answer key and the published scores
 .venv/bin/python scripts/fetch_repos.py          # the 30 repositories at their pinned commits (about 185 MB)
 .venv/bin/python scripts/build_cases.py          # rebuilds data/cases.jsonl
-.venv/bin/python scripts/run_baseline.py         # reruns the baseline and rewrites the results
+.venv/bin/python scripts/run_baseline.py         # reruns the baseline and rewrites its results
+.venv/bin/python scripts/run_commands.py         # checks the documented commands and rewrites their results
 ```
 
 ## License

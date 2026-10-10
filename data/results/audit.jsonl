@@ -1,0 +1,5 @@
+{"repo": "pypa/pipx", "file": "docs/tutorial/run-applications.rst", "line": 45, "program": "pipx", "option": "--py", "proof": "`pipx` declares no --py option in the code"}
+{"repo": "simonw/datasette", "file": "docs/plugin_hooks.rst", "line": 438, "program": "datasette", "option": "--api_key", "proof": "`datasette` declares no --api_key option in the code"}
+{"repo": "simonw/datasette", "file": "docs/publish.rst", "line": 92, "program": "datasette", "option": "--project", "proof": "`datasette` declares no --project option in the code"}
+{"repo": "simonw/datasette", "file": "docs/publish.rst", "line": 106, "program": "datasette", "option": "--app", "proof": "`datasette` declares no --app option in the code"}
+{"repo": "simonw/llm", "file": "docs/setup.md", "line": 80, "program": "llm", "option": "--index-url", "proof": "`llm` declares no --index-url option in the code"}
