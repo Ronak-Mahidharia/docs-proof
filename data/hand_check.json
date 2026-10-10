@@ -1,0 +1,149 @@
+{
+ "checked_on": "2026-10-10",
+ "about": "Hand checks of the answer key. Every expected line of every value-group case (changed defaults and raised minimum Python versions) was read in context, and each repository's docs were searched for statements the rules missed. drop_lines: lines that aren't statements of the changed value. add_lines: statements the rules missed. drop_cases: cases left with nothing to find.",
+ "checked_cases": [
+  "Kludex/uvicorn:change_default:1",
+  "Kludex/uvicorn:change_default:2",
+  "PyCQA/bandit:raise_python:1",
+  "PyCQA/isort:raise_python:1",
+  "cookiecutter/cookiecutter:raise_python:1",
+  "coveragepy/coveragepy:raise_python:1",
+  "encode/httpx:raise_python:1",
+  "gleitz/howdoi:change_default:1",
+  "gleitz/howdoi:change_default:2",
+  "hhatto/autopep8:change_default:1",
+  "pallets/flask:raise_python:1",
+  "psf/black:raise_python:1",
+  "psf/requests:raise_python:1",
+  "pypa/pipx:raise_python:1",
+  "simonw/datasette:raise_python:1",
+  "simonw/sqlite-utils:raise_python:1",
+  "sqlalchemy/alembic:raise_python:1",
+  "sqlfluff/sqlfluff:raise_python:1",
+  "tox-dev/pipdeptree:raise_python:1",
+  "yt-dlp/yt-dlp:change_default:1",
+  "yt-dlp/yt-dlp:change_default:2",
+  "yt-dlp/yt-dlp:raise_python:1"
+ ],
+ "drop_lines": [
+  [
+   "encode/httpx:raise_python:1",
+   "docs/async.md",
+   26
+  ],
+  [
+   "PyCQA/bandit:raise_python:1",
+   "doc/source/faq.rst",
+   10
+  ],
+  [
+   "simonw/sqlite-utils:raise_python:1",
+   "docs/upgrading.rst",
+   19
+  ],
+  [
+   "sqlalchemy/alembic:raise_python:1",
+   "docs/build/front.rst",
+   80
+  ],
+  [
+   "sqlfluff/sqlfluff:raise_python:1",
+   "README.md",
+   136
+  ]
+ ],
+ "add_lines": [
+  [
+   "coveragepy/coveragepy:raise_python:1",
+   "README.rst",
+   29
+  ],
+  [
+   "coveragepy/coveragepy:raise_python:1",
+   "doc/index.rst",
+   22
+  ],
+  [
+   "pypa/pipx:raise_python:1",
+   "docs/explanation/comparisons.rst",
+   320
+  ],
+  [
+   "sqlalchemy/alembic:raise_python:1",
+   "docs/build/front.rst",
+   78
+  ],
+  [
+   "sqlfluff/sqlfluff:raise_python:1",
+   "AGENTS.md",
+   37
+  ],
+  [
+   "sqlfluff/sqlfluff:raise_python:1",
+   "CONTRIBUTING.md",
+   129
+  ],
+  [
+   "sqlfluff/sqlfluff:raise_python:1",
+   "CONTRIBUTING.md",
+   130
+  ],
+  [
+   "tox-dev/pipdeptree:raise_python:1",
+   "docs/development.rst",
+   57
+  ]
+ ],
+ "drop_cases": [
+  "PyCQA/bandit:raise_python:1",
+  "simonw/sqlite-utils:raise_python:1"
+ ],
+ "notes": {
+  "encode/httpx:raise_python:1": "docs/async.md:26 is a tip about Python's own asyncio console, not httpx's minimum version.",
+  "PyCQA/bandit:raise_python:1": "faq.rst:10 is about the Python version of the project being scanned, not Bandit's minimum.",
+  "simonw/sqlite-utils:raise_python:1": "upgrading.rst:19 is under 'Upgrading from 3.x to 4.0': a historical requirement, still true for 4.0.",
+  "sqlalchemy/alembic:raise_python:1": "front.rst:80 is a versionchanged note (history); line 78 states the current minimum and was missed because of its bold text.",
+  "sqlfluff/sqlfluff:raise_python:1": "README.md:136 is about which wheel installs, not the minimum; the minimum is stated in AGENTS.md and CONTRIBUTING.md.",
+  "coveragepy/coveragepy:raise_python:1": "PyPy3 version 3.11 implements Python 3.11, so it stops being supported when the minimum rises.",
+  "Kludex/uvicorn:change_default:1": "The matched 0 could have come from '[0, jitter]', but the line ends with '**Default:** *0*', so it is right."
+ },
+ "name_group_samples": [
+  {
+   "seed": 2026,
+   "lines": 60,
+   "right": 57,
+   "used_to": "find rule mistakes",
+   "wrong": [
+    "cookiecutter TimeExtension: a jinja2_time.TimeExtension line names another package's class",
+    "flask tests/conftest.py (2 lines): the tutorial means the reader's own project file"
+   ],
+   "rules_added": [
+    "a mention qualified by another package isn't counted",
+    "test files aren't renamed"
+   ]
+  },
+  {
+   "seed": 2027,
+   "lines": 60,
+   "right": 58,
+   "used_to": "find rule mistakes",
+   "wrong": [
+    "isort git_hook: the name is part of a link to docs/configuration/git_hook.md",
+    "loguru filter_by_level: a recipe defines its own helper; loguru's is in the private loguru/_filters.py"
+   ],
+   "rules_added": [
+    "an occurrence right after a slash is part of a path",
+    "only names defined in public modules are renamed"
+   ]
+  },
+  {
+   "seed": 2028,
+   "lines": 60,
+   "right": 59,
+   "used_to": "estimate the key's accuracy (drawn after the rules were final; no rule changed afterwards)",
+   "wrong": [
+    "hatch --fix: a hatch config example runs ruff check --fix, which is ruff's option"
+   ]
+  }
+ ]
+}

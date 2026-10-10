@@ -14,12 +14,13 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
    **A lesson from an earlier project:** an answer key that plain text search already solves can't tell better methods apart. So the key mixes changes that leave the old name in the docs, which exact search can find, with changes it can't find by name, such as a changed default described in a sentence. Each kind is scored separately.
 2. **Real history (step 6).** Pull requests in public repositories whose docs were corrected by a later commit. The correction shows which lines were wrong.
 
-**What's committed:** only repository names, commit hashes, the planted edits, and line numbers. The repositories are cloned at run time, and their licenses are recorded.
+**What's committed:** repository names, commit hashes, the planted edits, line numbers, and a hash of each expected line; the hand-check notes quote a few words where a decision needs it. The repositories are cloned at run time, and their licenses are recorded.
 
 **Not reused:** Gao et al.'s study (2026) publishes its outputs at [Haoyu-Gao/README-auto-update](https://github.com/Haoyu-Gao/README-auto-update), but that repository has no license, so its data isn't used here. Its published numbers are cited for context only.
 
 ## Steps
 1. **The answer key and an exact-check baseline, with no AI.** The baseline flags doc lines that still mention what the change removed or renamed. Measured: precision and recall for each kind of change.
+   **Done:** 248 cases in 30 repositories. On test, the baseline found all 324 rename lines with 7 false alarms, and 0 of 25 changed-value lines ([results](results/exact.md)).
 2. **Commands.** It runs the commands in the docs' code blocks before and after the change, in a sandbox with an allowlist and a time limit, and flags the ones that start failing, with their output as proof.
 3. **A model for what exact checks miss,** such as a changed default or a changed behavior:
    - **Search first:** it reads the diff and the doc sections that a search finds (RAG).
