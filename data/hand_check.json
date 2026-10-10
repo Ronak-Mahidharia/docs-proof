@@ -13,8 +13,20 @@
   "gleitz/howdoi:change_default:2",
   "hhatto/autopep8:change_default:1",
   "pallets/flask:raise_python:1",
+  "pallets/flask:rename_env_var:1",
+  "pallets/flask:rename_env_var:2",
+  "pallets/flask:rename_identifier:1",
+  "pallets/flask:rename_identifier:2",
+  "pallets/flask:rename_option:1",
+  "pallets/flask:rename_option:2",
+  "pallets/flask:rename_option:3",
   "psf/black:raise_python:1",
   "psf/requests:raise_python:1",
+  "pypa/hatch:rename_env_var:1",
+  "pypa/hatch:rename_env_var:2",
+  "pypa/hatch:rename_option:1",
+  "pypa/hatch:rename_option:2",
+  "pypa/hatch:rename_option:3",
   "pypa/pipx:raise_python:1",
   "simonw/datasette:raise_python:1",
   "simonw/sqlite-utils:raise_python:1",
@@ -50,6 +62,31 @@
    "sqlfluff/sqlfluff:raise_python:1",
    "README.md",
    136
+  ],
+  [
+   "pallets/flask:rename_option:3",
+   "docs/deploying/waitress.rst",
+   48
+  ],
+  [
+   "pallets/flask:rename_option:3",
+   "docs/deploying/waitress.rst",
+   51
+  ],
+  [
+   "pallets/flask:rename_option:3",
+   "docs/deploying/waitress.rst",
+   55
+  ],
+  [
+   "pallets/flask:rename_option:3",
+   "docs/deploying/waitress.rst",
+   71
+  ],
+  [
+   "pypa/hatch:rename_env_var:2",
+   "docs/config/environment/overview.md",
+   158
   ]
  ],
  "add_lines": [
@@ -92,11 +129,33 @@
    "tox-dev/pipdeptree:raise_python:1",
    "docs/development.rst",
    57
+  ],
+  [
+   "mkdocs/mkdocs:rename_identifier:2",
+   "docs/dev-guide/plugins.md",
+   117
+  ],
+  [
+   "mkdocs/mkdocs:rename_identifier:2",
+   "docs/dev-guide/plugins.md",
+   153
+  ],
+  [
+   "pallets/flask:rename_identifier:1",
+   "docs/cli.rst",
+   71
+  ],
+  [
+   "sqlalchemy/alembic:rename_identifier:2",
+   "docs/build/cookbook.rst",
+   1525
   ]
  ],
  "drop_cases": [
   "PyCQA/bandit:raise_python:1",
-  "simonw/sqlite-utils:raise_python:1"
+  "simonw/sqlite-utils:raise_python:1",
+  "pypa/hatch:rename_identifier:1",
+  "pypa/hatch:rename_identifier:2"
  ],
  "notes": {
   "encode/httpx:raise_python:1": "docs/async.md:26 is a tip about Python's own asyncio console, not httpx's minimum version.",
@@ -105,7 +164,14 @@
   "sqlalchemy/alembic:raise_python:1": "front.rst:80 is a versionchanged note (history); line 78 states the current minimum and was missed because of its bold text.",
   "sqlfluff/sqlfluff:raise_python:1": "README.md:136 is about which wheel installs, not the minimum; the minimum is stated in AGENTS.md and CONTRIBUTING.md.",
   "coveragepy/coveragepy:raise_python:1": "PyPy3 version 3.11 implements Python 3.11, so it stops being supported when the minimum rises.",
-  "Kludex/uvicorn:change_default:1": "The matched 0 could have come from '[0, jitter]', but the line ends with '**Default:** *0*', so it is right."
+  "Kludex/uvicorn:change_default:1": "The matched 0 could have come from '[0, jitter]', but the line ends with '**Default:** *0*', so it is right.",
+  "pallets/flask:rename_option:3": "waitress.rst:48, 51, 55, 71 describe waitress-serve's own --host option, another tool's.",
+  "pypa/hatch:rename_identifier:1": "custom.md:27 defines the user's own example class with the same name, not hatch's.",
+  "pypa/hatch:rename_identifier:2": "custom.md:28 defines the user's own example class with the same name, not hatch's.",
+  "pypa/hatch:rename_env_var:2": "environment/overview.md:158 is a generic example of setting an environment variable.",
+  "mkdocs/mkdocs:rename_identifier:2": "plugins.md:117 and 153 use c.ListOfItems after 'from mkdocs.config import base, config_options as c', so they name mkdocs's class.",
+  "pallets/flask:rename_identifier:1": "cli.rst:71 refers to cli.run_command under '.. currentmodule:: flask': flask's own function.",
+  "sqlalchemy/alembic:rename_identifier:2": "cookbook.rst:1525 uses script.ScriptDirectory after 'from alembic import config, script': alembic's own class."
  },
  "name_group_samples": [
   {
@@ -145,5 +211,112 @@
     "hatch --fix: a hatch config example runs ruff check --fix, which is ruff's option"
    ]
   }
- ]
+ ],
+ "full_checks": [
+  {
+   "what": "the 15 rename cases that the step 2 code-reading fixes changed (flask's list-style options; hatch's src/hatch/cli/test command folder), every line",
+   "checked_on": "2026-10-10",
+   "lines": 61,
+   "right": 54,
+   "wrong": "4 lines about waitress-serve's --host; 2 example classes the user writes; 1 generic environment-variable example",
+   "result": "the 7 wrong lines were removed; 2 cases were left with nothing and dropped"
+  },
+  {
+   "what": "every doc line the exact check flags that the key leaves out, in both splits: the lines the rule for a name after another name (such as jinja2_time.TimeExtension) or a hand check left out",
+   "checked_on": "2026-10-10",
+   "lines": 15,
+   "right": 11,
+   "wrong": "4 lines name the project's own class or function through a short module name: mkdocs's c.ListOfItems (2 lines), flask's cli.run_command, and alembic's script.ScriptDirectory",
+   "result": "the 4 lines were added. The 11 left out: jinja2_time.TimeExtension (4 lines, another package's class), waitress-serve's --host (4), links to isort's git_hook.md doc file (2), and a generic example of setting an environment variable (1)"
+  }
+ ],
+ "audit": {
+  "about": "Every finding of the command audit (the repositories as pinned, before any change), read in context. A finding is out of date if the documented command would really fail on this version; otherwise it's a false alarm, with the reason.",
+  "findings": [
+   {
+    "repo": "pypa/pipx",
+    "file": "docs/tutorial/run-applications.rst",
+    "line": 45,
+    "option": "--py",
+    "verdict": "false alarm",
+    "reason": "a command the docs show failing on purpose",
+    "why": "The section shows that --py is ambiguous, and line 46 is the error pipx prints."
+   },
+   {
+    "repo": "simonw/datasette",
+    "file": "docs/plugin_hooks.rst",
+    "line": 438,
+    "option": "--api_key",
+    "verdict": "false alarm",
+    "reason": "an option a plugin adds",
+    "why": "An example of a plugin someone might write: 'Let's say you want to build a plugin that adds ...'."
+   },
+   {
+    "repo": "simonw/datasette",
+    "file": "docs/publish.rst",
+    "line": 92,
+    "option": "--project",
+    "verdict": "false alarm",
+    "reason": "an option a plugin adds",
+    "why": "datasette publish vercel comes from the datasette-publish-vercel plugin, installed on the line before."
+   },
+   {
+    "repo": "simonw/datasette",
+    "file": "docs/publish.rst",
+    "line": 106,
+    "option": "--app",
+    "verdict": "false alarm",
+    "reason": "an option a plugin adds",
+    "why": "datasette publish fly comes from the datasette-publish-fly plugin, installed on the line before."
+   },
+   {
+    "repo": "simonw/llm",
+    "file": "docs/setup.md",
+    "line": 80,
+    "option": "--index-url",
+    "verdict": "false alarm",
+    "reason": "another program's option",
+    "why": "An option of pip, run through 'llm python -m pip install' (the llm-python plugin's command)."
+   }
+  ],
+  "found_while_checking": [
+   "pipx run-applications.rst:46 was the error output of line 45, read as a command: in a block that shows prompts, lines without one are now output.",
+   "pipdeptree's usage.rst had prose read as code: a ~~~ heading underline in reStructuredText was taken for a Markdown fence. Fences now count only in Markdown files."
+  ]
+ },
+ "commands_not_read": {
+  "about": "Every renamed-option line the commands check didn't flag, in both splits, was read: the ones in code blocks, and the ones elsewhere that name the program. These are the lines that are really commands of the project. They were found on test, so the reader wasn't changed for them; the second answer key (step 6) can measure a fix. The rest mention the option outside a command: help output, lists of options, sentences, comments, settings, or commands the docs don't format as code.",
+  "lines": [
+   [
+    "pypa/pipx:rename_option:2",
+    "docs/how-to/move-installation.rst",
+    58,
+    "PowerShell: $cache_dir = pipx environment ..."
+   ],
+   [
+    "pypa/pipx:rename_option:2",
+    "docs/how-to/move-installation.rst",
+    59,
+    "PowerShell: $logs_dir = pipx environment ..."
+   ],
+   [
+    "pypa/pipx:rename_option:2",
+    "docs/how-to/move-installation.rst",
+    60,
+    "PowerShell: $trash_dir = pipx environment ..."
+   ],
+   [
+    "pypa/pipx:rename_option:2",
+    "docs/how-to/move-installation.rst",
+    61,
+    "PowerShell: $home_dir = pipx environment ..."
+   ],
+   [
+    "pypa/pipx:rename_option:2",
+    "docs/how-to/shell-completions.rst",
+    49,
+    "inside a quoted string: \"$(pipx environment ...)\""
+   ]
+  ]
+ }
 }

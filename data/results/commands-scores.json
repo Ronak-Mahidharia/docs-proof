@@ -1,0 +1,616 @@
+{
+ "audit": {
+  "repos": [
+   {
+    "repo": "asottile/pyupgrade",
+    "split": "test",
+    "programs": [
+     "python -m pyupgrade",
+     "pyupgrade"
+    ],
+    "commands": 1,
+    "commands_with_options": 0,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "callowayproject/bump-my-version",
+    "split": "dev",
+    "programs": [
+     "bump-my-version",
+     "python -m bumpversion"
+    ],
+    "commands": 42,
+    "commands_with_options": 12,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "cookiecutter/cookiecutter",
+    "split": "dev",
+    "programs": [
+     "cookiecutter",
+     "python -m cookiecutter"
+    ],
+    "commands": 45,
+    "commands_with_options": 6,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "coveragepy/coveragepy",
+    "split": "test",
+    "programs": [
+     "coverage",
+     "python -m coverage"
+    ],
+    "commands": 75,
+    "commands_with_options": 20,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "Delgan/loguru",
+    "split": "dev",
+    "programs": [],
+    "commands": 0,
+    "commands_with_options": 0,
+    "checked": false,
+    "findings": 0
+   },
+   {
+    "repo": "encode/httpx",
+    "split": "dev",
+    "programs": [
+     "httpx"
+    ],
+    "commands": 17,
+    "commands_with_options": 0,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "gleitz/howdoi",
+    "split": "test",
+    "programs": [
+     "howdoi",
+     "python -m howdoi"
+    ],
+    "commands": 12,
+    "commands_with_options": 0,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "hhatto/autopep8",
+    "split": "test",
+    "programs": [
+     "autopep8"
+    ],
+    "commands": 7,
+    "commands_with_options": 4,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "jazzband/pip-tools",
+    "split": "dev",
+    "programs": [
+     "pip-compile",
+     "pip-sync",
+     "python -m piptools"
+    ],
+    "commands": 84,
+    "commands_with_options": 15,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "Kludex/uvicorn",
+    "split": "dev",
+    "programs": [
+     "python -m uvicorn",
+     "uvicorn"
+    ],
+    "commands": 36,
+    "commands_with_options": 22,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "mkdocs/mkdocs",
+    "split": "test",
+    "programs": [
+     "mkdocs",
+     "python -m mkdocs"
+    ],
+    "commands": 40,
+    "commands_with_options": 8,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "nvbn/thefuck",
+    "split": "dev",
+    "programs": [
+     "thefuck",
+     "thefuck_firstuse"
+    ],
+    "commands": 4,
+    "commands_with_options": 4,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "pallets/flask",
+    "split": "test",
+    "programs": [
+     "flask",
+     "python -m flask"
+    ],
+    "commands": 82,
+    "commands_with_options": 21,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "psf/black",
+    "split": "dev",
+    "programs": [
+     "black",
+     "blackd",
+     "python -m black",
+     "python -m blackd"
+    ],
+    "commands": 76,
+    "commands_with_options": 24,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "psf/requests",
+    "split": "test",
+    "programs": [],
+    "commands": 0,
+    "commands_with_options": 0,
+    "checked": false,
+    "findings": 0
+   },
+   {
+    "repo": "PyCQA/bandit",
+    "split": "dev",
+    "programs": [
+     "bandit",
+     "bandit-baseline",
+     "bandit-config-generator",
+     "python -m bandit"
+    ],
+    "commands": 25,
+    "commands_with_options": 3,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "PyCQA/isort",
+    "split": "test",
+    "programs": [
+     "isort",
+     "isort-identify-imports",
+     "python -m isort"
+    ],
+    "commands": 36,
+    "commands_with_options": 13,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "pypa/hatch",
+    "split": "test",
+    "programs": [
+     "hatch",
+     "python -m hatch"
+    ],
+    "commands": 146,
+    "commands_with_options": 38,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "pypa/pipx",
+    "split": "test",
+    "programs": [
+     "pipx",
+     "python -m pipx"
+    ],
+    "commands": 366,
+    "commands_with_options": 122,
+    "checked": true,
+    "findings": 1
+   },
+   {
+    "repo": "pypa/twine",
+    "split": "dev",
+    "programs": [
+     "python -m twine",
+     "twine"
+    ],
+    "commands": 8,
+    "commands_with_options": 0,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "simonw/datasette",
+    "split": "test",
+    "programs": [
+     "datasette",
+     "python -m datasette"
+    ],
+    "commands": 281,
+    "commands_with_options": 109,
+    "checked": true,
+    "findings": 3
+   },
+   {
+    "repo": "simonw/llm",
+    "split": "dev",
+    "programs": [
+     "llm",
+     "python -m llm"
+    ],
+    "commands": 548,
+    "commands_with_options": 147,
+    "checked": true,
+    "findings": 1
+   },
+   {
+    "repo": "simonw/shot-scraper",
+    "split": "dev",
+    "programs": [
+     "shot-scraper"
+    ],
+    "commands": 148,
+    "commands_with_options": 44,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "simonw/sqlite-utils",
+    "split": "test",
+    "programs": [
+     "python -m sqlite_utils",
+     "sqlite-utils"
+    ],
+    "commands": 440,
+    "commands_with_options": 139,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "sqlalchemy/alembic",
+    "split": "test",
+    "programs": [
+     "alembic",
+     "python -m alembic"
+    ],
+    "commands": 153,
+    "commands_with_options": 28,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "sqlfluff/sqlfluff",
+    "split": "test",
+    "programs": [
+     "python -m sqlfluff",
+     "sqlfluff"
+    ],
+    "commands": 5,
+    "commands_with_options": 2,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "theskumar/python-dotenv",
+    "split": "test",
+    "programs": [
+     "dotenv",
+     "python -m dotenv"
+    ],
+    "commands": 14,
+    "commands_with_options": 4,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "tldr-pages/tldr-python-client",
+    "split": "dev",
+    "programs": [
+     "tldr"
+    ],
+    "commands": 7,
+    "commands_with_options": 4,
+    "checked": true,
+    "findings": 0
+   },
+   {
+    "repo": "tox-dev/pipdeptree",
+    "split": "dev",
+    "programs": [
+     "pipdeptree",
+     "python -m pipdeptree"
+    ],
+    "commands": 107,
+    "commands_with_options": 63,
+    "checked": false,
+    "findings": 0
+   },
+   {
+    "repo": "yt-dlp/yt-dlp",
+    "split": "dev",
+    "programs": [
+     "python -m yt_dlp",
+     "yt-dlp"
+    ],
+    "commands": 68,
+    "commands_with_options": 22,
+    "checked": true,
+    "findings": 0
+   }
+  ],
+  "commands": 2873,
+  "commands_with_options": 874,
+  "findings": 5,
+  "out_of_date": 0,
+  "false_alarms": 5,
+  "reasons": {
+   "an option a plugin adds": 3,
+   "a command the docs show failing on purpose": 1,
+   "another program's option": 1
+  }
+ },
+ "commands": {
+  "dev": {
+   "cases": 116,
+   "repos": 15,
+   "expected_lines": 227,
+   "kinds": {
+    "rename_option": {
+     "cases": 34,
+     "tp": 21,
+     "fp": 0,
+     "fn": 74,
+     "all_found": 3,
+     "false_alarm_cases": 0,
+     "precision": 1.0,
+     "recall": 0.221,
+     "f1": 0.362
+    },
+    "rename_identifier": {
+     "cases": 19,
+     "tp": 0,
+     "fp": 0,
+     "fn": 66,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_env_var": {
+     "cases": 13,
+     "tp": 0,
+     "fp": 0,
+     "fn": 27,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_file": {
+     "cases": 15,
+     "tp": 0,
+     "fp": 0,
+     "fn": 21,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "change_default": {
+     "cases": 4,
+     "tp": 0,
+     "fp": 0,
+     "fn": 4,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "raise_python": {
+     "cases": 5,
+     "tp": 0,
+     "fp": 0,
+     "fn": 14,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_private": {
+     "cases": 14,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 14,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    },
+    "rename_unmentioned_option": {
+     "cases": 12,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 12,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    }
+   },
+   "name": {
+    "cases": 81,
+    "tp": 21,
+    "fp": 0,
+    "fn": 188,
+    "all_found": 3,
+    "false_alarm_cases": 0,
+    "precision": 1.0,
+    "recall": 0.1,
+    "f1": 0.182
+   },
+   "value": {
+    "cases": 9,
+    "tp": 0,
+    "fp": 0,
+    "fn": 18,
+    "all_found": 0,
+    "false_alarm_cases": 0,
+    "precision": null,
+    "recall": 0.0,
+    "f1": null
+   },
+   "control": {
+    "cases": 26,
+    "false_alarm_cases": 0
+   }
+  },
+  "test": {
+   "cases": 130,
+   "repos": 15,
+   "expected_lines": 375,
+   "kinds": {
+    "rename_option": {
+     "cases": 37,
+     "tp": 48,
+     "fp": 0,
+     "fn": 127,
+     "all_found": 3,
+     "false_alarm_cases": 0,
+     "precision": 1.0,
+     "recall": 0.274,
+     "f1": 0.43
+    },
+    "rename_identifier": {
+     "cases": 24,
+     "tp": 0,
+     "fp": 0,
+     "fn": 102,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_env_var": {
+     "cases": 16,
+     "tp": 0,
+     "fp": 0,
+     "fn": 52,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_file": {
+     "cases": 14,
+     "tp": 0,
+     "fp": 0,
+     "fn": 21,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "change_default": {
+     "cases": 3,
+     "tp": 0,
+     "fp": 0,
+     "fn": 5,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "raise_python": {
+     "cases": 8,
+     "tp": 0,
+     "fp": 0,
+     "fn": 20,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_private": {
+     "cases": 15,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 15,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    },
+    "rename_unmentioned_option": {
+     "cases": 13,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 13,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    }
+   },
+   "name": {
+    "cases": 91,
+    "tp": 48,
+    "fp": 0,
+    "fn": 302,
+    "all_found": 3,
+    "false_alarm_cases": 0,
+    "precision": 1.0,
+    "recall": 0.137,
+    "f1": 0.241
+   },
+   "value": {
+    "cases": 11,
+    "tp": 0,
+    "fp": 0,
+    "fn": 25,
+    "all_found": 0,
+    "false_alarm_cases": 0,
+    "precision": null,
+    "recall": 0.0,
+    "f1": null
+   },
+   "control": {
+    "cases": 28,
+    "false_alarm_cases": 0
+   }
+  }
+ }
+}

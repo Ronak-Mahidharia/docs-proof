@@ -121,42 +121,42 @@
   }
  },
  "test": {
-  "cases": 132,
+  "cases": 130,
   "repos": 15,
-  "expected_lines": 349,
+  "expected_lines": 375,
   "kinds": {
    "rename_option": {
     "cases": 37,
-    "tp": 151,
-    "fp": 0,
+    "tp": 175,
+    "fp": 4,
     "fn": 0,
     "all_found": 37,
-    "false_alarm_cases": 0,
-    "precision": 1.0,
+    "false_alarm_cases": 1,
+    "precision": 0.978,
     "recall": 1.0,
-    "f1": 1.0
+    "f1": 0.989
    },
    "rename_identifier": {
-    "cases": 26,
-    "tp": 100,
-    "fp": 7,
+    "cases": 24,
+    "tp": 102,
+    "fp": 2,
     "fn": 0,
-    "all_found": 26,
-    "false_alarm_cases": 5,
-    "precision": 0.935,
+    "all_found": 24,
+    "false_alarm_cases": 1,
+    "precision": 0.981,
     "recall": 1.0,
-    "f1": 0.966
+    "f1": 0.99
    },
    "rename_env_var": {
     "cases": 16,
     "tp": 52,
-    "fp": 0,
+    "fp": 1,
     "fn": 0,
     "all_found": 16,
-    "false_alarm_cases": 0,
-    "precision": 1.0,
+    "false_alarm_cases": 1,
+    "precision": 0.981,
     "recall": 1.0,
-    "f1": 1.0
+    "f1": 0.99
    },
    "rename_file": {
     "cases": 14,
@@ -215,15 +215,15 @@
    }
   },
   "name": {
-   "cases": 93,
-   "tp": 324,
+   "cases": 91,
+   "tp": 350,
    "fp": 7,
    "fn": 0,
-   "all_found": 93,
-   "false_alarm_cases": 5,
-   "precision": 0.979,
+   "all_found": 91,
+   "false_alarm_cases": 3,
+   "precision": 0.98,
    "recall": 1.0,
-   "f1": 0.989
+   "f1": 0.99
   },
   "value": {
    "cases": 11,

@@ -13,7 +13,7 @@ from pathlib import Path
 
 from .docs import skipped
 
-TEST_DIRS = {"tests", "test", "testing"}  # skipped at any depth
+TEST_DIRS = {"tests", "test", "testing"}  # skipped at any depth, when they hold test files
 # Skipped only at the top level: a package's own scripts folder, such as piptools/scripts, is project code.
 TOP_LEVEL_NOT_PROJECT = {"docs", "doc", "examples", "example", "benchmarks", "scripts", "tools", "ci", ".github",
                          "changelog.d"}
@@ -30,16 +30,28 @@ class Where:
     line: int
 
 
+def _is_test_folder(folder: Path) -> bool:
+    """A folder named tests, test, or testing that holds test files. A folder with that name and no test files,
+    such as hatch's src/hatch/cli/test (the "hatch test" command), is project code."""
+    return folder.name in TEST_DIRS and any(TEST_FILE.match(p.name) for p in folder.glob("*.py"))
+
+
 def project_files(root: Path) -> list[str]:
     """The project's own Python files, as sorted relative paths."""
-    files = []
+    files, test_folders = [], {}
     for path in root.rglob("*.py"):
         rel = path.relative_to(root)
         folders = rel.parts[:-1]
-        if skipped(rel.parts) or TEST_DIRS & set(folders) or (folders and folders[0] in TOP_LEVEL_NOT_PROJECT) \
-                or TEST_FILE.match(path.name):
+        if skipped(rel.parts) or (folders and folders[0] in TOP_LEVEL_NOT_PROJECT) or TEST_FILE.match(path.name):
             continue
-        files.append(rel.as_posix())
+        tested = False
+        for depth in range(1, len(folders) + 1):
+            key = "/".join(folders[:depth])
+            if key not in test_folders:
+                test_folders[key] = _is_test_folder(root / key)
+            tested = tested or test_folders[key]
+        if not tested:
+            files.append(rel.as_posix())
     return sorted(files)
 
 
@@ -73,13 +85,19 @@ def _owner(node: ast.expr) -> str | None:
 
 
 def long_options(node: ast.Call) -> list[str]:
-    """The long options a call declares, such as "--limit", splitting click's "--color/--no-color" pairs."""
-    found = []
+    """The long options a call declares, such as "--limit", splitting click's "--color/--no-color" pairs.
+    Declarations can be separate arguments or a list, as in click.Option(["-A", "--app"])."""
+    values = []
     for arg in node.args:
-        if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
-            for part in arg.value.split("/"):
-                if LONG_OPTION.fullmatch(part.strip()):
-                    found.append(part.strip())
+        if isinstance(arg, (ast.List, ast.Tuple)):
+            values += [e.value for e in arg.elts if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+        elif isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+            values.append(arg.value)
+    found = []
+    for value in values:
+        for part in value.split("/"):
+            if LONG_OPTION.fullmatch(part.strip()):
+                found.append(part.strip())
     return found
 
 
@@ -110,6 +128,23 @@ class Code:
             for option in long_options(node):
                 out.setdefault(option, []).append(Where(rel, node.lineno))
         return out
+
+    def declared_options(self) -> set[str]:
+        """Every long option the command line can accept, as far as the code shows: declared options, any string
+        that is exactly an option (alembic keeps its options in a table), and the ones libraries add themselves:
+        --help always, --version from click's version_option, and shtab's --print-completion."""
+        found = set(self.options()) | {"--help"}
+        for tree in self.trees.values():
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Constant) and isinstance(node.value, str) and LONG_OPTION.fullmatch(node.value):
+                    found.add(node.value)
+                elif isinstance(node, ast.Call):
+                    name = _call_name(node)
+                    if name == "version_option":
+                        found.add("--version")
+                    elif name == "add_argument_to":
+                        found.add("--print-completion")
+        return found
 
     def option_defaults(self) -> list[tuple[str, Where, ast.Constant]]:
         """(option, where, default) for options whose default is a plain int or float written in the call."""

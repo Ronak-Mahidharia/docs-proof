@@ -47,3 +47,26 @@ def test_public_names_leave_out_private_modules(tmp_path):
     public = Code(root).public_names()
     assert sorted(public) == ["filter_by_level", "load_all", "only_public"]
     assert [w.file for w in public["filter_by_level"]] == ["pkg/api.py"]  # the private copy isn't listed
+
+
+def test_a_command_folder_named_test_is_project_code(tmp_path):
+    from conftest import write
+    root = write(tmp_path / "r", {"src/hatch/cli/test/__init__.py": "", "src/hatch/cli/test/core.py": "",
+                                   "src/pkg/tests/test_core.py": "", "src/pkg/tests/helpers.py": "", "src/pkg/a.py": ""})
+    assert project_files(root) == ["src/hatch/cli/test/__init__.py", "src/hatch/cli/test/core.py", "src/pkg/a.py"]
+
+
+def test_declared_options_include_lists_tables_and_built_ins(tmp_path):
+    from conftest import write
+    root = write(tmp_path / "r", {"pkg/cli.py": (
+        "import click, shtab\n"
+        'app_option = click.Option(["-A", "--app"])\n'
+        'TABLE = {"autogenerate": ("--autogenerate", dict(action="store_true"))}\n'
+        "@click.version_option()\n"
+        "def main():\n"
+        '    "Use --not-an-option in help text."\n'
+        "shtab.add_argument_to(parser)\n")})
+    assert "--app" in Code(root).options()  # declared in a list, as flask does
+    declared = Code(root).declared_options()
+    assert {"--app", "--autogenerate", "--help", "--version", "--print-completion"} <= declared
+    assert "--not-an-option" not in declared  # a mention inside text isn't a declaration
