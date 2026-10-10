@@ -1,0 +1,289 @@
+{
+ "pinned": {
+  "repos": 26,
+  "commands": 1678,
+  "documented": 2756,
+  "not_run": 1,
+  "outcomes": {
+   "accepted": 1292,
+   "rejected": 344,
+   "succeeded": 23,
+   "failed": 19
+  },
+  "missing_input": 322,
+  "findings": 22
+ },
+ "audit": {
+  "out_of_date": 7,
+  "false_alarms": 15,
+  "reasons": {
+   "a command the user's own app defines": 6,
+   "a command a plugin adds, and the plugin isn't installed": 5,
+   "a quoted argument that spans several lines, which the reader doesn't join": 3,
+   "a placeholder the reader took for words": 1
+  }
+ },
+ "runner": {
+  "dev": {
+   "cases": 116,
+   "repos": 15,
+   "expected_lines": 227,
+   "kinds": {
+    "rename_option": {
+     "cases": 34,
+     "tp": 18,
+     "fp": 0,
+     "fn": 77,
+     "all_found": 2,
+     "false_alarm_cases": 0,
+     "precision": 1.0,
+     "recall": 0.189,
+     "f1": 0.318
+    },
+    "rename_identifier": {
+     "cases": 19,
+     "tp": 0,
+     "fp": 0,
+     "fn": 66,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_env_var": {
+     "cases": 13,
+     "tp": 0,
+     "fp": 0,
+     "fn": 27,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_file": {
+     "cases": 15,
+     "tp": 0,
+     "fp": 0,
+     "fn": 21,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "change_default": {
+     "cases": 4,
+     "tp": 0,
+     "fp": 0,
+     "fn": 4,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "raise_python": {
+     "cases": 5,
+     "tp": 0,
+     "fp": 0,
+     "fn": 14,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_private": {
+     "cases": 14,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 14,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    },
+    "rename_unmentioned_option": {
+     "cases": 12,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 12,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    }
+   },
+   "name": {
+    "cases": 81,
+    "tp": 18,
+    "fp": 0,
+    "fn": 191,
+    "all_found": 2,
+    "false_alarm_cases": 0,
+    "precision": 1.0,
+    "recall": 0.086,
+    "f1": 0.158
+   },
+   "value": {
+    "cases": 9,
+    "tp": 0,
+    "fp": 0,
+    "fn": 18,
+    "all_found": 0,
+    "false_alarm_cases": 0,
+    "precision": null,
+    "recall": 0.0,
+    "f1": null
+   },
+   "control": {
+    "cases": 26,
+    "false_alarm_cases": 0
+   }
+  },
+  "test": {
+   "cases": 130,
+   "repos": 15,
+   "expected_lines": 375,
+   "kinds": {
+    "rename_option": {
+     "cases": 37,
+     "tp": 29,
+     "fp": 0,
+     "fn": 146,
+     "all_found": 3,
+     "false_alarm_cases": 0,
+     "precision": 1.0,
+     "recall": 0.166,
+     "f1": 0.285
+    },
+    "rename_identifier": {
+     "cases": 24,
+     "tp": 0,
+     "fp": 0,
+     "fn": 102,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_env_var": {
+     "cases": 16,
+     "tp": 1,
+     "fp": 0,
+     "fn": 51,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": 1.0,
+     "recall": 0.019,
+     "f1": 0.037
+    },
+    "rename_file": {
+     "cases": 14,
+     "tp": 0,
+     "fp": 0,
+     "fn": 21,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "change_default": {
+     "cases": 3,
+     "tp": 0,
+     "fp": 0,
+     "fn": 5,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "raise_python": {
+     "cases": 8,
+     "tp": 0,
+     "fp": 0,
+     "fn": 20,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_private": {
+     "cases": 15,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 15,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    },
+    "rename_unmentioned_option": {
+     "cases": 13,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 13,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    }
+   },
+   "name": {
+    "cases": 91,
+    "tp": 30,
+    "fp": 0,
+    "fn": 320,
+    "all_found": 3,
+    "false_alarm_cases": 0,
+    "precision": 1.0,
+    "recall": 0.086,
+    "f1": 0.158
+   },
+   "value": {
+    "cases": 11,
+    "tp": 0,
+    "fp": 0,
+    "fn": 25,
+    "all_found": 0,
+    "false_alarm_cases": 0,
+    "precision": null,
+    "recall": 0.0,
+    "f1": null
+   },
+   "control": {
+    "cases": 28,
+    "false_alarm_cases": 0
+   }
+  }
+ },
+ "comparison": {
+  "dev": {
+   "still_accepted": 0,
+   "other": 3,
+   "only_run": []
+  },
+  "test": {
+   "still_accepted": 19,
+   "other": 0,
+   "only_run": [
+    {
+     "case": "pypa/pipx:rename_env_var:1",
+     "file": "docs/how-to/dependency-cooldown.rst",
+     "line": 69,
+     "proof": "After the change, `pipx` refuses this command: argument --value/-V: invalid choice: 'PIPX_COOLDOWN' (choose from 'PIPX_HOME', 'PIPX_GLOBAL_HOME', 'PIPX_BIN_DIR', 'PIPX_GLOBAL_BIN_DIR', 'PIPX_MAN_DIR', 'PIPX_COMPLETION_DIR', 'PIPX_GLOBAL_MAN_DIR', 'PIPX_GLOBAL_COMPLETION_DIR', 'PIPX_SHARED_LIBS', 'PIPX_DEFAULT_PYTHON', 'PIPX_DEFAULT_BACKEND', 'PIPX_COOLDOWN2', 'PIPX_FETCH_MISSING_PYTHON', 'PIPX_FETCH_PYTHON', 'PIPX_DISABLE_SHARED_LIBS_AUTO_UPGRADE', 'PIPX_USE_EMOJI', 'PIPX_MAX_LOGS', 'PIPX_LOCAL_VENVS', 'PIPX_LOG_DIR', 'PIPX_TRASH_DIR', 'PIPX"
+    }
+   ]
+  }
+ }
+}

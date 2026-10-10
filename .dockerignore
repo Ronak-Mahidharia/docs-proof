@@ -1,0 +1,8 @@
+# The sandbox image needs only the pinned repositories, the pins, and this project's code (scripts/build_sandbox.py).
+**/.git
+**/__pycache__
+.venv
+.pytest_cache
+data/results
+docs
+tests

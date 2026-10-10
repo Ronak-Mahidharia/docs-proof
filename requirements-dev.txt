@@ -1,5 +1,7 @@
-# Exact versions for the tests. The code itself uses only Python's standard library so far.
+# Exact versions for the tests. The code itself uses only Python's standard library so far; click is here
+# only so the tests can check the sandbox hooks against a real click program.
 # Install with: pip install -r requirements-dev.txt
+click==8.5.0
 iniconfig==2.3.0
 packaging==26.3
 pluggy==1.6.0

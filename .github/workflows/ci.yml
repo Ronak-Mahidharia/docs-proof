@@ -52,6 +52,7 @@ jobs:
           python scripts/build_cases.py
           python scripts/run_baseline.py
           python scripts/run_commands.py
+          python scripts/run_sandbox.py  # the sandbox's flags and scores, from its kept runs (the runs need Docker)
       - name: Check that nothing changed
         run: |
           git diff --exit-code

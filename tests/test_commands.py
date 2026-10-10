@@ -126,3 +126,17 @@ def test_a_command_line_not_declared_in_python_isnt_checked(tmp_path):
 def test_a_heading_underline_in_restructuredtext_isnt_a_fence(tmp_path):
     files = {**FILES, "docs/guide.rst": "Usage\n~~~~~\n\ntiny --prose-not-code reads a file.\n\nMore\n~~~~\n"}
     assert [c.line for c in commands(write(tmp_path / "r", files)) if c.file == "docs/guide.rst"] == []
+
+
+def test_a_quote_inside_a_word_keeps_the_word_whole():
+    words = _simple_commands([('pipx install x --pip-args="--index-url https://i/simple/ --trusted-host i" --force', 1)])
+    assert [w for w, _ in words[0]] == ["pipx", "install", "x", '--pip-args="--index-url https://i/simple/ --trusted-host i"',
+                                        "--force"]
+    assert [o for o, _ in _options(words[0])] == ["--pip-args", "--force"]  # not pip's --index-url or --trusted-host
+
+
+def test_a_note_in_restructuredtext_is_prose(tmp_path):
+    guide = (".. note::\n\n    tiny reads --not-an-option from prose here.\n\n"
+             ".. warning::\n\n    Run this::\n\n        tiny --max-results 2\n")
+    root = write(tmp_path / "r", {**FILES, "docs/guide.rst": guide})
+    assert [(c.line, c.argv) for c in commands(root) if c.file == "docs/guide.rst"] == [(9, ("tiny", "--max-results", "2"))]

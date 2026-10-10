@@ -1,0 +1,2 @@
+shtab==1.12.1
+termcolor==3.3.0

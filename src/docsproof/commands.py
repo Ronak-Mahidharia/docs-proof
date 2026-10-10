@@ -25,7 +25,9 @@ from .names import LONG_OPTION, Code, packages
 
 PROMPT = re.compile(r"^(?:\(\S+\)\s*)?(?:\$|%|>>>?|PS\S*>)\s+")
 FENCE = re.compile(r"^\s*(```+|~~~+)")
-RST_BLOCK = re.compile(r"^\s*(?:\.\.\s+(?:code-block|code|sourcecode|prompt)::.*|.*::)\s*$")
+# A code directive, or a paragraph ending in "::". Other directives, such as ".. note::", hold prose.
+RST_BLOCK = re.compile(r"^\s*(?:\.\.\s+(?:code-block|code|sourcecode|parsed-literal|prompt)::.*|(?!\s|\.\.\s).*::)\s*$")
+QUOTED_VALUE = re.compile(r"""[^'"\s]+=["']""")
 INLINE = re.compile(r"``([^`]+)``|`([^`]+)`")
 SEPARATORS = {"|", "||", "&&", ";", "&", "|&", "(", ")"}  # one command ends and the next begins
 REDIRECTS = {">", ">>", "<", "<<", ">&", "<&", ">|", "&>", "&>>"}  # skip the file named next, then go on
@@ -41,6 +43,8 @@ class Command:
     program: str  # the console script, or "python -m <package>"
     text: str
     options: tuple[tuple[str, int], ...]  # each long option, with the line it's on
+    argv: tuple[str, ...] = ()  # the words to run, from the program on, without their quotes
+    env: tuple[tuple[str, str], ...] = ()  # VAR=value words before the program
 
 
 @dataclass(frozen=True)
@@ -93,6 +97,33 @@ def main_packages(root: Path) -> set[str]:
     return found
 
 
+def _balanced(text: str) -> bool:
+    try:
+        shlex.split(text)
+    except ValueError:  # no closing quotation
+        return False
+    return True
+
+
+def _rejoin(words: list[tuple[str, int]]) -> list[tuple[str, int]]:
+    """Join the pieces of an option whose quoted value follows "=", such as --pip-args="--no-deps --pre": the
+    lexer keeps a word whole only when the quote starts it, so it splits this one at the spaces in the quotes."""
+    out: list[tuple[str, int]] = []
+    pending: list[tuple[str, int]] = []
+    for word, line in words:
+        if pending:
+            pending.append((word, line))
+            joined = " ".join(w for w, _ in pending)
+            if _balanced(joined):
+                out.append((joined, pending[0][1]))
+                pending = []
+        elif _balanced(word) or not QUOTED_VALUE.match(word):
+            out.append((word, line))
+        else:
+            pending = [(word, line)]
+    return out + pending  # a quote that never closes: the pieces stay as they were
+
+
 def _simple_commands(parts: list[tuple[str, int]]) -> list[list[tuple[str, int]]]:
     """The commands in a shell line, each a list of (word, line), the way a shell splits them: at pipes, &&, ||,
     and ;, leaving out redirects and their files, and stopping at a comment. parts: the line's text, with the
@@ -106,6 +137,7 @@ def _simple_commands(parts: list[tuple[str, int]]) -> list[list[tuple[str, int]]
             words += [(word, line) for word in lexer]
         except ValueError:  # an unbalanced quote: fall back to plain words
             words += [(word, line) for word in text.split()]
+    words = _rejoin(words)
     out: list[list[tuple[str, int]]] = [[]]
     skip = False
     for word, line in words:
@@ -145,6 +177,15 @@ def _program(words: list[str], scripts: set[str], mains: set[str]) -> tuple[str,
         if not wrapper:
             return None
         skip += len(wrapper)
+
+
+def _unquote(word: str) -> str:
+    """A word as the program receives it: "--app='hello'" becomes --app=hello."""
+    try:
+        parts = shlex.split(word)
+    except ValueError:  # an unbalanced quote
+        return word
+    return parts[0] if len(parts) == 1 else word
 
 
 def _options(words: list[tuple[str, int]]) -> tuple[tuple[str, int], ...]:
@@ -218,16 +259,21 @@ def _is_markdown(rel: str) -> bool:
     return Path(rel).suffix.lower() not in {".rst", ".txt"}
 
 
-def _doc_commands(lines: list[str], scripts: set[str], mains: set[str], markdown: bool) -> list[tuple[int, str, str, tuple]]:
-    """(0-based line of the program's name, program, text, options) for each of the project's commands in a doc."""
+def _doc_commands(lines: list[str], scripts: set[str], mains: set[str], markdown: bool) -> list[tuple]:
+    """(0-based line of the program's name, program, text, options, argv, env) for each of the project's
+    commands in a doc."""
     shell = _shell_lines(lines, markdown) + [[(a or b, i)] for i, line in enumerate(lines) for a, b in INLINE.findall(line)]
     found = []
     for parts in sorted(shell, key=lambda p: p[0][1]):
         text = " ".join(t for t, _ in parts)
         for words in _simple_commands([(PROMPT.sub("", t.strip()), i) for t, i in parts]):
-            start = _program([w for w, _ in words], scripts, mains)
+            names = [w for w, _ in words]
+            start = _program(names, scripts, mains)
             if start:
-                command = (words[start[1] - 1][1], start[0], text, _options(words[start[1]:]))
+                begin = start[1] - (3 if start[0].startswith("python -m ") else 1)  # where the program's name is
+                argv = tuple(_unquote(w) for w in names[begin:])
+                env = tuple(tuple(_unquote(w).split("=", 1)) for w in names[:begin] if ASSIGNMENT.match(w))
+                command = (words[start[1] - 1][1], start[0], text, _options(words[start[1]:]), argv, env)
                 if command not in found:  # the same inline code twice on a line
                     found.append(command)
     return found
@@ -241,8 +287,9 @@ def commands(root: Path, scripts: set[str] | None = None, mains: set[str] | None
     if not scripts and not mains:
         return found
     for rel in doc_files(root):
-        for line, program, text, options in _doc_commands(read_lines(root / rel), scripts, mains, _is_markdown(rel)):
-            found.append(Command(rel, line + 1, program, text, tuple((o, i + 1) for o, i in options)))
+        for line, program, text, options, argv, env in _doc_commands(read_lines(root / rel), scripts, mains,
+                                                                     _is_markdown(rel)):
+            found.append(Command(rel, line + 1, program, text, tuple((o, i + 1) for o, i in options), argv, env))
     return found
 
 

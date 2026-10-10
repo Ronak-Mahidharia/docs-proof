@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done, with no AI: the answer key, a baseline of exact checks, and a check of the commands in the docs against the code. Next is running those commands in a sandbox. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done, with no AI: the answer key, a baseline of exact checks, and the commands in the docs, read and then run in a sandbox. Next is the first step with AI: a model for what exact checks miss, such as a changed default. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -29,10 +29,16 @@ All on the test split (15 repositories, 130 cases).
 
 For renames, the expected lines are the doc lines that still mention the old name, so a search for removed names finds all of them by design. Those cases mostly test false alarms: the 7 are lines the change doesn't make wrong, such as another tool's option with the same name. Changed values are what the next steps have to find.
 
-**Commands in the docs:** each documented command is read the way a shell reads it, and its options are compared with the options the code declares. Nothing is run yet ([docs/results/commands.md](docs/results/commands.md)).
+**Commands in the docs, read:** each documented command is read the way a shell reads it, and its options are compared with the options the code declares ([docs/results/commands.md](docs/results/commands.md)).
 - **Renamed options** (37 cases, 175 lines): flagged 48 lines in commands, with no false alarms, each with its proof, such as "`flask` declares no --host option in the code".
 - **The other 127 lines:** 122 mention the option outside a command, in help output or a sentence, where the exact checks find them. 5 are commands it doesn't read yet, such as PowerShell's `$home_dir = pipx environment --value PIPX_HOME`.
-- **An audit of the 30 repositories as they are:** 2,873 documented commands, 874 with long options. 5 use an option the code doesn't declare, and a hand check found none of them out of date: 3 are options that plugins add, 1 is another program's option, and 1 is an error the docs show on purpose.
+- **An audit of the 30 repositories as they are:** 2,868 documented commands, 874 with long options. 5 use an option the code doesn't declare, and a hand check found none of them out of date: 3 are options that plugins add, 1 is another program's option, and 1 is an error the docs show on purpose.
+
+**Commands in the docs, run:** each documented command runs in a sandbox, a Docker container with no network, and the program is stopped right after it has read its command line, so nothing the command would do is done ([docs/results/run.md](docs/results/run.md)).
+- **Renamed options** (37 cases, 175 lines): flagged 29 lines, with no false alarms. The proof is the program's own message, such as flask's "No such option '--host'. (Did you mean one of: '--host2', '--port'?)".
+- **Read, then run:** the other 19 lines that reading flags are in commands the program still accepts after the change. argparse and optparse take a unique prefix of an option's name, so a rename from `--include-injected` to `--include-injected2` leaves `--include-injected` working. Reading finds every stale name; running proves which commands break.
+- **Found only by running:** renaming the environment variable `PIPX_COOLDOWN` broke `pipx environment --value PIPX_COOLDOWN`, which pipx refuses with "invalid choice: 'PIPX_COOLDOWN'".
+- **An audit of the 26 repositories whose programs run:** 1,678 distinct command lines. 22 are refused for a reason other than a missing input, such as a file the sandbox doesn't have. Checked by hand, 7 doc lines in 5 projects are out of date, also on each project's main branch on Oct 10, 2026, such as sqlite-utils' `populate-fts ... --tokenize=porter` (the option belongs to `enable-fts`). The other 15 are commands that the reader's own app or a plugin adds (11), quoted arguments that span several lines (3), and a placeholder (1).
 
 ## Reproduce
 ```bash
@@ -42,6 +48,13 @@ python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python scripts/build_cases.py          # rebuilds data/cases.jsonl
 .venv/bin/python scripts/run_baseline.py         # reruns the baseline and rewrites its results
 .venv/bin/python scripts/run_commands.py         # checks the documented commands and rewrites their results
+.venv/bin/python scripts/run_sandbox.py          # the sandbox's flags and scores, from its kept runs
+```
+
+To run the commands again, with Docker (about 20 minutes on a 10-core Mac; the image is about 1.1 GB):
+```bash
+.venv/bin/python scripts/build_sandbox.py        # Python 3.14 and the 26 programs, at the versions in data/sandbox/pins/
+.venv/bin/python scripts/run_sandbox.py --run    # runs every documented command, as pinned and after each change
 ```
 
 ## License

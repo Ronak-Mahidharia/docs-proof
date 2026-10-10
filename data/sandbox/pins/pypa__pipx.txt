@@ -1,0 +1,6 @@
+argcomplete==3.7.2
+click==8.5.0
+filelock==4.1.0
+packaging==26.3
+platformdirs==4.12.4
+userpath==1.9.2
