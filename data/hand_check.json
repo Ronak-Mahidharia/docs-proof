@@ -318,5 +318,253 @@
     "inside a quoted string: \"$(pipx environment ...)\""
    ]
   ]
+ },
+ "run_audit": {
+  "about": "Every finding of the sandbox audit (the repositories as pinned): a command line the program's parser refuses for a word it doesn't know, or for any reason other than a missing input. Each was read in context, checked against the code, and, for the ones out of date, run normally (no hooks) in the sandbox and checked on the project's current main branch on Oct 10, 2026.",
+  "findings": [
+   {
+    "repo": "callowayproject/bump-my-version",
+    "command": "bump-my-version --increment major show",
+    "lines": [
+     "docs/explanation/show-subcommand.md:51"
+    ],
+    "message": "No such option '--increment'.",
+    "verdict": "out of date",
+    "reason": "`--increment` comes before `show`, the subcommand it belongs to",
+    "why": "`--increment` belongs to the show subcommand (bumpversion/commands/show.py); the main command declares only -h/--help and --version. Run normally, `bump-my-version --increment patch show` stops with \"No such option '--increment'\", and `bump-my-version show --increment patch` works. Upstream main is the pinned commit."
+   },
+   {
+    "repo": "callowayproject/bump-my-version",
+    "command": "bump-my-version --increment minor show",
+    "lines": [
+     "docs/explanation/show-subcommand.md:49"
+    ],
+    "message": "No such option '--increment'.",
+    "verdict": "out of date",
+    "reason": "`--increment` comes before `show`, the subcommand it belongs to",
+    "why": "`--increment` belongs to the show subcommand (bumpversion/commands/show.py); the main command declares only -h/--help and --version. Run normally, `bump-my-version --increment patch show` stops with \"No such option '--increment'\", and `bump-my-version show --increment patch` works. Upstream main is the pinned commit."
+   },
+   {
+    "repo": "callowayproject/bump-my-version",
+    "command": "bump-my-version --increment patch show",
+    "lines": [
+     "docs/explanation/show-subcommand.md:47"
+    ],
+    "message": "No such option '--increment'.",
+    "verdict": "out of date",
+    "reason": "`--increment` comes before `show`, the subcommand it belongs to",
+    "why": "`--increment` belongs to the show subcommand (bumpversion/commands/show.py); the main command declares only -h/--help and --version. Run normally, `bump-my-version --increment patch show` stops with \"No such option '--increment'\", and `bump-my-version show --increment patch` works. Upstream main is the pinned commit."
+   },
+   {
+    "repo": "cookiecutter/cookiecutter",
+    "command": "cookiecutter with Cookiecutter full path",
+    "lines": [
+     "docs/tutorials/tutorial2.rst:81"
+    ],
+    "message": "Invalid value for '[EXTRA_CONTEXT]...': EXTRA_CONTEXT should contain items of the form key=value; 'Cookiecutter' doesn't match that form",
+    "verdict": "false alarm",
+    "reason": "a placeholder the reader took for words",
+    "why": "The docs show `cookiecutter <replace with Cookiecutter full path>`; the reader took < and > for redirects."
+   },
+   {
+    "repo": "pallets/flask",
+    "command": "flask --app flaskr init-db",
+    "lines": [
+     "docs/tutorial/database.rst:213",
+     "docs/tutorial/deploy.rst:44"
+    ],
+    "message": "No such command 'init-db'.",
+    "verdict": "false alarm",
+    "reason": "a command the user's own app defines",
+    "why": "The tutorial's flaskr app defines init-db; the sandbox can't import it."
+   },
+   {
+    "repo": "pallets/flask",
+    "command": "flask create alice",
+    "lines": [
+     "docs/cli.rst:418"
+    ],
+    "message": "No such command 'create'.",
+    "verdict": "false alarm",
+    "reason": "a command the user's own app defines",
+    "why": "an example of a command the reader's own Flask app adds with app.cli, which isn't in the sandbox"
+   },
+   {
+    "repo": "pallets/flask",
+    "command": "flask create-user admin",
+    "lines": [
+     "docs/cli.rst:339"
+    ],
+    "message": "No such command 'create-user'.",
+    "verdict": "false alarm",
+    "reason": "a command the user's own app defines",
+    "why": "an example of a command the reader's own Flask app adds with app.cli, which isn't in the sandbox"
+   },
+   {
+    "repo": "pallets/flask",
+    "command": "flask my-command",
+    "lines": [
+     "docs/cli.rst:468"
+    ],
+    "message": "No such command 'my-command'.",
+    "verdict": "false alarm",
+    "reason": "a command a plugin adds, and the plugin isn't installed",
+    "why": "An example extension's command, loaded from the flask.commands entry point."
+   },
+   {
+    "repo": "pallets/flask",
+    "command": "flask other create alice",
+    "lines": [
+     "docs/cli.rst:405"
+    ],
+    "message": "No such command 'other'.",
+    "verdict": "false alarm",
+    "reason": "a command the user's own app defines",
+    "why": "an example of a command the reader's own Flask app adds with app.cli, which isn't in the sandbox"
+   },
+   {
+    "repo": "pallets/flask",
+    "command": "flask students create alice",
+    "lines": [
+     "docs/cli.rst:390"
+    ],
+    "message": "No such command 'students'.",
+    "verdict": "false alarm",
+    "reason": "a command the user's own app defines",
+    "why": "an example of a command the reader's own Flask app adds with app.cli, which isn't in the sandbox"
+   },
+   {
+    "repo": "pallets/flask",
+    "command": "flask user create demo",
+    "lines": [
+     "docs/cli.rst:360"
+    ],
+    "message": "No such command 'user'.",
+    "verdict": "false alarm",
+    "reason": "a command the user's own app defines",
+    "why": "an example of a command the reader's own Flask app adds with app.cli, which isn't in the sandbox"
+   },
+   {
+    "repo": "pypa/pipx",
+    "command": "pipx --global install pycowsay",
+    "lines": [
+     "docs/how-to/configure-paths.rst:99"
+    ],
+    "message": "unrecognized arguments: --global",
+    "verdict": "out of date",
+    "reason": "says pipx ignores `--global` before the subcommand; pipx refuses it",
+    "why": "The docs say pipx silently ignores --global before the subcommand. pipx refuses it instead: \"unrecognized arguments: --global\", because --global is declared only on the subcommands' shared parser (src/pipx/main.py). Also refused by upstream main (7956a884e5, pipx 1.17.13), installed fresh and run normally on Python 3.14."
+   },
+   {
+    "repo": "simonw/datasette",
+    "command": "datasette publish fly mydatabase.db --app=my-app",
+    "lines": [
+     "docs/publish.rst:106"
+    ],
+    "message": "No such command 'fly'.",
+    "verdict": "false alarm",
+    "reason": "a command a plugin adds, and the plugin isn't installed",
+    "why": "datasette-publish-fly, installed on the line before."
+   },
+   {
+    "repo": "simonw/datasette",
+    "command": "datasette publish my_hosting_provider --api_key=xxx mydatabase.db",
+    "lines": [
+     "docs/plugin_hooks.rst:438"
+    ],
+    "message": "No such command 'my_hosting_provider'.",
+    "verdict": "false alarm",
+    "reason": "a command a plugin adds, and the plugin isn't installed",
+    "why": "An example of a plugin someone might write."
+   },
+   {
+    "repo": "simonw/datasette",
+    "command": "datasette publish vercel mydatabase.db --project my-database-project",
+    "lines": [
+     "docs/publish.rst:92"
+    ],
+    "message": "No such command 'vercel'.",
+    "verdict": "false alarm",
+    "reason": "a command a plugin adds, and the plugin isn't installed",
+    "why": "datasette-publish-vercel, installed on the line before."
+   },
+   {
+    "repo": "simonw/llm",
+    "command": "llm python -m pip install --pre torch torchvision --index-url https://download.pytorch.org/whl/nightly/cpu",
+    "lines": [
+     "docs/setup.md:78"
+    ],
+    "message": "No such option '--pre'. (Did you mean one of: '--key', '--param'?)",
+    "verdict": "false alarm",
+    "reason": "a command a plugin adds, and the plugin isn't installed",
+    "why": "`llm python` comes from the llm-python plugin, so the words go to the default prompt command; --pre is pip's option."
+   },
+   {
+    "repo": "simonw/llm",
+    "command": "llm schema dsl name, age int, bio: their bio",
+    "lines": [
+     "docs/help.md:647"
+    ],
+    "message": "Got unexpected extra arguments (dsl name, age int, bio: their bio)",
+    "verdict": "out of date",
+    "reason": "`llm schema dsl`: the command is `schemas`",
+    "why": "The help of `llm schemas dsl` (llm/cli.py, line 2807, copied into docs/help.md) shows `llm schema dsl ...`. There's no schema command, so llm passes the words to its default prompt command, which refuses them (\"Got unexpected extra arguments\"). Run normally, `llm schemas dsl ...` works. Upstream main is the pinned commit."
+   },
+   {
+    "repo": "simonw/shot-scraper",
+    "command": "shot-scraper -h 800 https://www.spiegel.de/international/ --wait-for \"() => {",
+    "lines": [
+     "docs/screenshots.md:97"
+    ],
+    "message": "Got unexpected extra arguments (=> {)",
+    "verdict": "false alarm",
+    "reason": "a quoted argument that spans several lines, which the reader doesn't join",
+    "why": "The quote opens on this line and closes lines later; the reader joins only lines ending in a backslash."
+   },
+   {
+    "repo": "simonw/sqlite-utils",
+    "command": "sqlite-utils populate-fts mydb.db documents title summary --tokenize=porter",
+    "lines": [
+     "docs/cli.rst:2753"
+    ],
+    "message": "No such option '--tokenize'.",
+    "verdict": "out of date",
+    "reason": "`--tokenize` belongs to `enable-fts`, not `populate-fts`",
+    "why": "`--tokenize` is an option of enable-fts (sqlite_utils/cli.py, line 747), not populate-fts, whose parameters are path, table, column, and load_extension. Run normally, it stops with \"No such option '--tokenize'\". Upstream main is the pinned commit."
+   },
+   {
+    "repo": "simonw/sqlite-utils",
+    "command": "sqlite-utils query sites.db \"select url, domain(url) from urls\" --functions '",
+    "lines": [
+     "docs/cli.rst:402"
+    ],
+    "message": "Got unexpected extra arguments (url, domain(url) from urls\")",
+    "verdict": "false alarm",
+    "reason": "a quoted argument that spans several lines, which the reader doesn't join",
+    "why": "The quote opens on this line and closes lines later; the reader joins only lines ending in a backslash."
+   },
+   {
+    "repo": "simonw/sqlite-utils",
+    "command": "sqlite-utils query sites.db select url, domain(url), extract_path(url) from urls --functions domain_funcs.py --functions 'def extract_path(url):",
+    "lines": [
+     "docs/cli.rst:421"
+    ],
+    "message": "Got unexpected extra argument (extract_path(url):)",
+    "verdict": "false alarm",
+    "reason": "a quoted argument that spans several lines, which the reader doesn't join",
+    "why": "The quote opens on this line and closes lines later; the reader joins only lines ending in a backslash."
+   },
+   {
+    "repo": "sqlalchemy/alembic",
+    "command": "alembic revision -m add ip account table \\ --head=networking@head \\ --depends-on=55af2cb1c267 --depends-on=d747a --depends-on=fa445",
+    "lines": [
+     "docs/build/branches.rst:678"
+    ],
+    "message": "unrecognized arguments: \\ \\",
+    "verdict": "out of date",
+    "reason": "lines end in two backslashes, which the shell doesn't read as a continuation",
+    "why": "Lines 678 and 679 end in two backslashes inside a literal block, which shows them as written. In a shell, \\\\ at the end of a line is a backslash, not a continuation: pasted into bash, alembic says \"unrecognized arguments: \\\" and the next two lines run as separate commands that don't exist. Upstream main is the pinned commit."
+   }
+  ]
  }
 }

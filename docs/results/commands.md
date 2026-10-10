@@ -6,7 +6,7 @@ A documented command is a command in a code block, or in inline code, that runs 
 
 ## Audit: the 30 repositories as pinned
 
-- **2,873 documented commands**, 874 of them with long options.
+- **2,868 documented commands**, 874 of them with long options.
 - **Not checked:** tox-dev/pipdeptree, whose command line isn't declared in Python; Delgan/loguru and psf/requests have no command line.
 - **Findings:** 5 options the code doesn't declare. Checked by hand ([data/hand_check.json](../../data/hand_check.json)): 0 out of date, and 5 false alarms: an option a plugin adds (3); a command the docs show failing on purpose (1); another program's option (1).
 

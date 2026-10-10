@@ -32,7 +32,7 @@
      "cookiecutter",
      "python -m cookiecutter"
     ],
-    "commands": 45,
+    "commands": 44,
     "commands_with_options": 6,
     "checked": true,
     "findings": 0
@@ -222,7 +222,7 @@
      "pipx",
      "python -m pipx"
     ],
-    "commands": 366,
+    "commands": 362,
     "commands_with_options": 122,
     "checked": true,
     "findings": 1
@@ -358,7 +358,7 @@
     "findings": 0
    }
   ],
-  "commands": 2873,
+  "commands": 2868,
   "commands_with_options": 874,
   "findings": 5,
   "out_of_date": 0,

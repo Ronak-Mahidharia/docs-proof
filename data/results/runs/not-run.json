@@ -1,0 +1,34 @@
+{
+ "asottile/pyupgrade": [],
+ "callowayproject/bump-my-version": [],
+ "cookiecutter/cookiecutter": [],
+ "coveragepy/coveragepy": [],
+ "encode/httpx": [],
+ "gleitz/howdoi": [],
+ "hhatto/autopep8": [],
+ "jazzband/pip-tools": [],
+ "Kludex/uvicorn": [],
+ "mkdocs/mkdocs": [],
+ "pallets/flask": [],
+ "psf/black": [],
+ "PyCQA/bandit": [],
+ "PyCQA/isort": [],
+ "pypa/hatch": [],
+ "pypa/pipx": [],
+ "pypa/twine": [],
+ "simonw/datasette": [],
+ "simonw/llm": [
+  {
+   "file": "docs/usage.md",
+   "line": 459,
+   "reason": "its words need the shell"
+  }
+ ],
+ "simonw/shot-scraper": [],
+ "simonw/sqlite-utils": [],
+ "sqlalchemy/alembic": [],
+ "sqlfluff/sqlfluff": [],
+ "theskumar/python-dotenv": [],
+ "tldr-pages/tldr-python-client": [],
+ "yt-dlp/yt-dlp": []
+}

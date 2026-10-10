@@ -22,8 +22,8 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
 1. **The answer key and an exact-check baseline, with no AI.** The baseline flags doc lines that still mention what the change removed or renamed. Measured: precision and recall for each kind of change.
    **Done:** 246 cases in 30 repositories. On test, the baseline found all 350 rename lines with 7 false alarms, and 0 of 25 changed-value lines ([results](results/exact.md)).
 2. **Commands,** in two halves:
-   - **Read, not run:** it reads the commands in the docs the way a shell does, and checks their options against the options the code declares. **Done:** on test, it flagged 48 of the 175 renamed-option lines with no false alarms, and an audit of 2,873 documented commands found none out of date ([results](results/commands.md)).
-   - **Run:** it runs the commands in the docs' code blocks before and after the change, in a sandbox with an allowlist and a time limit, and flags the ones that start failing, with their output as proof.
+   - **Read, not run:** it reads the commands in the docs the way a shell does, and checks their options against the options the code declares. **Done:** on test, it flagged 48 of the 175 renamed-option lines with no false alarms, and an audit of 2,868 documented commands found none out of date ([results](results/commands.md)).
+   - **Run:** it runs the commands in the docs' code blocks before and after the change, in a sandbox with an allowlist and a time limit, and flags the ones that start failing, with their output as proof. **Done:** on test, it flagged 29 of the 175 renamed-option lines with no false alarms, and an audit of 1,678 command lines found 7 doc lines in 5 projects that their programs refuse ([results](results/run.md)).
 3. **A model for what exact checks miss,** such as a changed default or a changed behavior:
    - **Search first:** it reads the diff and the doc sections that a search finds (RAG).
    - **Structured findings:** each finding must quote the doc line and the code line, and a finding without both quotes is dropped.
