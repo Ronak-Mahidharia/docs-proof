@@ -23,6 +23,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from docsproof.model import OPTIONS, PROMPTS, ask, verdict  # noqa: E402
 from docsproof.score import score  # noqa: E402
+from failures import explained  # noqa: E402
 from run_baseline import RESULTS, load_cases, pct, report  # noqa: E402
 
 MODELS = ["qwen3:8b", "granite4:3b"]  # larger first
@@ -201,4 +202,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    explained(main)

@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import secrets
 import sys
 import tempfile
 import urllib.error
@@ -29,6 +30,7 @@ from .fix import patch
 MARKER = "<!-- docs-proof -->"
 API = "https://api.github.com"
 PART = 30000  # characters of the report, and of the patch, that a comment keeps (GitHub allows 65,536 in all)
+WARNINGS = 10  # the warnings GitHub shows for one step; it drops the rest (actions/toolkit, docs/problem-matchers.md)
 
 
 def fence(body: str, info: str = "") -> str:
@@ -94,10 +96,15 @@ def comment(body: str, flagged: bool, env: dict, request=_request) -> str:
     if not number:
         return "skipped: this isn't a pull request"
     api, repo, token = env.get("GITHUB_API_URL", API).rstrip("/"), env["GITHUB_REPOSITORY"], env.get("DOCSPROOF_TOKEN", "")
-    _, comments = request("GET", f"{api}/repos/{repo}/issues/{number}/comments?per_page=100", token)
-    # only a comment an earlier run made: written by a bot (such as github-actions[bot]), starting with the marker
-    old = next((c for c in comments if (c.get("user") or {}).get("type") == "Bot"
-                and str(c.get("body", "")).startswith(MARKER)), None)
+    page = 1
+    while True:
+        _, comments = request("GET", f"{api}/repos/{repo}/issues/{number}/comments?per_page=100&page={page}", token)
+        # only a comment an earlier run made: written by a bot (such as github-actions[bot]), starting with the marker
+        old = next((c for c in comments if (c.get("user") or {}).get("type") == "Bot"
+                    and str(c.get("body", "")).startswith(MARKER)), None)
+        if old or len(comments) < 100:
+            break
+        page += 1
     if old:
         request("PATCH", f"{api}/repos/{repo}/issues/comments/{old['id']}", token, {"body": body})
         return "updated"
@@ -124,7 +131,10 @@ def main(env: dict | None = None, request=_request, out=sys.stdout) -> int:
         print(f"::error title=docs-proof::{escape(str(error))}", file=out)
         return 2
     log = text(findings, base[:7], head[:7])
-    print(log, file=out)
+    # The log shows lines from the docs, and GitHub reads a line that starts with "::" as a command (such as
+    # "::stop-commands::"), even after spaces. So commands stop while it's printed, until a token no doc can know.
+    resume = secrets.token_hex(16)
+    print(f"::stop-commands::{resume}\n{log}\n::{resume}::", file=out)
     here, workspace = repo.resolve(), Path(env.get("GITHUB_WORKSPACE") or repo).resolve()
     # annotations name files from the workspace's top: a repository in a subfolder needs its folder in front, and
     # one outside the workspace gets annotations that name the file, so none lands on an unrelated file
@@ -135,6 +145,10 @@ def main(env: dict | None = None, request=_request, out=sys.stdout) -> int:
         message = " ".join(x.why) + fixed
         print(annotation(prefix + x.file if inside else None, x.line,
                          message if inside else f"{x.file}:{x.line}: {message}"), file=out)
+    if len(findings) > WARNINGS:
+        more = len(findings) - WARNINGS
+        print(f"::notice title=docs-proof::GitHub shows {WARNINGS} warnings for a step, so the other {more} flagged "
+              f"line{'s are' if more != 1 else ' is'} only in the job summary and the log.", file=out)
     patch_file = Path(env.get("RUNNER_TEMP") or tempfile.gettempdir()) / "docs-proof.patch"
     patch_file.write_text(diff, encoding="utf-8", newline="")
     if env.get("GITHUB_STEP_SUMMARY"):

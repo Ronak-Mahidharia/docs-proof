@@ -140,3 +140,10 @@ def test_a_note_in_restructuredtext_is_prose(tmp_path):
              ".. warning::\n\n    Run this::\n\n        tiny --max-results 2\n")
     root = write(tmp_path / "r", {**FILES, "docs/guide.rst": guide})
     assert [(c.line, c.argv) for c in commands(root) if c.file == "docs/guide.rst"] == [(9, ("tiny", "--max-results", "2"))]
+
+
+def test_a_pyproject_with_odd_tables_doesnt_stop_the_check(tmp_path):
+    root = write(tmp_path / "odd", {"pyproject.toml": 'project = "not a table"\n[tool]\npoetry = 3\n'})
+    assert console_scripts(root) == set()
+    (root / "pyproject.toml").write_bytes(b'[project.scripts]\ntiny = "tiny.cli:main" # caf\xe9\n')
+    assert console_scripts(root) == {"tiny"}

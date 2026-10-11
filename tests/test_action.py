@@ -2,8 +2,11 @@
 pull request, with GitHub's files and API replaced by local ones."""
 import io
 import json
+import os
 import re
 import shutil
+import subprocess
+import sys
 import urllib.error
 from pathlib import Path
 
@@ -127,7 +130,7 @@ def test_one_comment_made_then_updated(tmp_path):
     first = calls_to([{"id": 1, "user": {"type": "User"}, "body": f"{action.MARKER} copied by a person"}])
     code, log = run(commenting(tmp_path, root), first)
     assert code == 1 and "docs-proof: comment created" in log
-    assert [(m, u) for m, u, _ in first.calls] == [("GET", "me/project/issues/7/comments?per_page=100"),
+    assert [(m, u) for m, u, _ in first.calls] == [("GET", "me/project/issues/7/comments?per_page=100&page=1"),
                                                    ("POST", "me/project/issues/7/comments")]
     assert first.calls[1][2]["body"].startswith(action.MARKER)
     again = calls_to([{"id": 9, "user": {"type": "Bot"}, "body": f"{action.MARKER}\nan earlier report"}])
@@ -186,3 +189,80 @@ def test_a_line_flagged_without_a_fix(tmp_path):
     assert (outputs["findings"], outputs["fixes"]) == ("1", "0") and "fix: none (10 is in the line 2 times)" in log
     assert Path(outputs["patch"]).read_text(encoding="utf-8") == ""
     assert "suggested fixes, as one patch" not in (tmp_path / "summary.md").read_text(encoding="utf-8")
+
+
+def test_doc_text_cant_become_a_workflow_command(tmp_path):
+    root = repo(tmp_path)
+    usage = root / "docs" / "usage.md"
+    usage.write_text("::stop-commands::hush --limit\n   ::error::a fake error --limit\n", encoding="utf-8")
+    git(root, "commit", "-q", "-am", "doc lines that look like workflow commands")
+    git(root, "switch", "-q", "-c", "rename")
+    rename_limit(root)
+    git(root, "commit", "-q", "-am", "rename --limit")
+    git(root, "switch", "-q", "main")
+    git(root, "merge", "-q", "--no-ff", "-m", "Merge the pull request", "rename")
+    tokens = set()
+    for _ in range(2):
+        code, log = run(github(tmp_path, root))
+        lines = log.split("\n")
+        stop = next(i for i, line in enumerate(lines) if line.startswith("::stop-commands::"))
+        token = lines[stop].removeprefix("::stop-commands::")
+        resume = lines.index(f"::{token}::")
+        tokens.add(token)
+        assert stop < lines.index("    ::stop-commands::hush --limit") < resume  # the doc lines, inside
+        assert stop < lines.index("    ::error::a fake error --limit") < resume
+        # every other line GitHub would read as a command (it reads one even after spaces) is one of the action's own
+        outside = [line for i, line in enumerate(lines) if line.lstrip().startswith("::") and not stop <= i <= resume]
+        assert outside and all(line.startswith("::warning file=") for line in outside)
+    assert len(tokens) == 2 and all(len(t) == 32 and t not in usage.read_text() for t in tokens)  # new each run
+
+
+def test_an_earlier_comment_on_a_later_page_is_updated(tmp_path):
+    root = pull_request(tmp_path)
+    pages = {1: [{"id": n, "user": {"type": "User"}, "body": "a comment"} for n in range(100)],
+             2: [{"id": 500, "user": {"type": "Bot"}, "body": f"{action.MARKER}\nan earlier report"}]}
+    calls = []
+
+    def request(method, url, token, data=None):
+        calls.append((method, url.rsplit("/repos/", 1)[1]))
+        return 200, pages[int(url.rsplit("page=", 1)[1])] if method == "GET" else {}
+    run(commenting(tmp_path, root), request)
+    assert calls == [("GET", "me/project/issues/7/comments?per_page=100&page=1"),
+                     ("GET", "me/project/issues/7/comments?per_page=100&page=2"),
+                     ("PATCH", "me/project/issues/comments/500")]
+
+
+def test_a_pull_request_cant_run_its_own_docsproof(tmp_path):
+    """The step as action.yml runs it, in a pull request's checkout that has a docsproof folder of its own."""
+    root = pull_request(tmp_path)
+    own = root / "docsproof"
+    own.mkdir()
+    for name in ("__init__.py", "action.py"):
+        (own / name).write_text("print('the pull request ran its own code')\n", encoding="utf-8")
+    step = (ROOT / "action.yml").read_text(encoding="utf-8").split("      run: |\n", 1)[1]
+    script = "\n".join(line.removeprefix("        ") for line in step.splitlines())
+    assert script.endswith('PYTHONPATH="$DOCSPROOF_SRC" python3 -P -m docsproof.action')
+    done = subprocess.run(["bash", "-c", script], cwd=root, capture_output=True, text=True,
+                          env={**os.environ, "PATH": f"{Path(sys.executable).parent}{os.pathsep}{os.environ['PATH']}",
+                               "DOCSPROOF_SRC": str(ROOT / "src"), **github(tmp_path, root, DOCSPROOF_PATH=".")})
+    assert "ran its own code" not in done.stdout + done.stderr
+    assert done.returncode == 1 and "docs-proof: 1 doc line the change made wrong" in done.stdout
+
+
+def test_more_flagged_lines_than_github_shows_warnings_for(tmp_path):
+    root = repo(tmp_path)
+    (root / "docs" / "many.md").write_text("".join(f"Line {n}: use --limit.\n" for n in range(1, 12)), encoding="utf-8")
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "a doc that names --limit eleven times")
+    git(root, "switch", "-q", "-c", "rename")
+    rename_limit(root)
+    git(root, "commit", "-q", "-am", "rename --limit")
+    git(root, "switch", "-q", "main")
+    git(root, "merge", "-q", "--no-ff", "-m", "Merge the pull request", "rename")
+    code, log = run(github(tmp_path, root))
+    assert log.count("::warning file=") == 12  # 11 in docs/many.md and the README's
+    assert ("::notice title=docs-proof::GitHub shows 10 warnings for a step, so the other 2 flagged lines are only in "
+            "the job summary and the log.") in log
+    assert "docs/many.md:11" in (tmp_path / "summary.md").read_text(encoding="utf-8")
+    assert f"(GitHub shows {action.WARNINGS} for a step, and a note says when there are more)" in \
+        (ROOT / "README.md").read_text(encoding="utf-8")

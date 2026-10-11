@@ -1,3 +1,5 @@
+from conftest import FILES, write
+
 from docsproof.names import Code, min_python, packages, project_files
 
 
@@ -83,3 +85,15 @@ def test_each_call_gets_its_own_copy(tiny):
     assert "--made-up" not in code.options() and code.options()["--limit"]
     assert "fetch_items" in code.defined_names() and None not in code.env_vars()["TINY_TOKEN"]
     assert code.option_calls() and "--limit" in code.declared_options()
+
+
+def test_project_files_are_real_files_in_the_folder(tmp_path):
+    root = write(tmp_path / "project", FILES)
+    (tmp_path / "elsewhere.py").write_text("def outside():\n    pass\n", encoding="utf-8")
+    (root / "tiny" / "out.py").symlink_to(tmp_path / "elsewhere.py")  # a link out of the folder
+    (root / "tiny" / "gone.py").symlink_to("nowhere.py")  # a link to nothing
+    (root / "tiny" / "folder.py").mkdir()  # a folder with a Python file's name
+    (root / "tiny" / "same.py").symlink_to("data.py")  # a link in the folder is the project's
+    files = project_files(root)
+    assert "tiny/same.py" in files and not {"tiny/out.py", "tiny/gone.py", "tiny/folder.py"} & set(files)
+    assert "outside" not in Code(root).defined_names()

@@ -17,6 +17,7 @@ import configparser
 import re
 import shlex
 import tomllib
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -56,17 +57,23 @@ class Problem:
     proof: str
 
 
+def _table(data: dict, key: str) -> dict:
+    """A TOML table, or an empty one when it's missing or isn't a table."""
+    value = data.get(key)
+    return value if isinstance(value, dict) else {}
+
+
 def console_scripts(root: Path) -> set[str]:
     """The project's console scripts, from pyproject.toml, setup.cfg, or setup.py."""
     names: set[str] = set()
     pyproject = root / "pyproject.toml"
     if pyproject.is_file():
         try:
-            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+            data = tomllib.loads(pyproject.read_text(encoding="utf-8", errors="replace"))
         except tomllib.TOMLDecodeError:
             data = {}
-        names |= set((data.get("project") or {}).get("scripts") or {})
-        names |= set(((data.get("tool") or {}).get("poetry") or {}).get("scripts") or {})
+        names |= set(_table(_table(data, "project"), "scripts"))
+        names |= set(_table(_table(_table(data, "tool"), "poetry"), "scripts"))
     setup_cfg = root / "setup.cfg"
     if setup_cfg.is_file():
         parser = configparser.ConfigParser(interpolation=None)
@@ -320,8 +327,18 @@ def problems(root: Path, code: Code | None = None) -> list[Problem]:
 
 def new_problems(before: Path, after: Path, old: list[Problem] | None = None,
                  after_code: Code | None = None) -> list[Problem]:
-    """Problems a change created: in the docs after the change, and not before it. old: problems(before),
-    when they've already been found; after_code: the "after" tree, if it's already parsed."""
-    seen = {(p.file, p.line, p.option) for p in (problems(before) if old is None else old)}
-    return [p for p in problems(after, after_code) if (p.file, p.line, p.option) not in seen]
+    """Problems a change created: in the docs after the change, and not before it. A problem the same doc line
+    had before, with the same option, isn't new wherever the line is now: a doc edit that moves a command
+    doesn't make it wrong. old: problems(before), when they've already been found; after_code: the "after"
+    tree, if it's already parsed."""
+    def same(root: Path, p: Problem) -> tuple[str, str, str]:
+        return p.file, read_lines(root / p.file)[p.line - 1].strip(), p.option
+    seen = Counter(same(before, p) for p in (problems(before) if old is None else old))
+    found = []
+    for p in problems(after, after_code):
+        if seen[same(after, p)]:
+            seen[same(after, p)] -= 1
+        else:
+            found.append(p)
+    return found
 

@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from build_real_cases import History, hunks  # noqa: E402
+from failures import explained  # noqa: E402
 from fetch_history import place  # noqa: E402
 from run_baseline import RESULTS  # noqa: E402
 from run_fixes import short  # noqa: E402
@@ -228,4 +229,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    explained(main)

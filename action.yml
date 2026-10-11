@@ -71,4 +71,6 @@ runs:
           echo "::error title=docs-proof::docs-proof needs Python 3.12 or newer; set it up with actions/setup-python first"
           exit 2
         fi
-        PYTHONPATH="$DOCSPROOF_SRC" python3 -m docsproof.action
+        # -P: Python doesn't look for modules in the current folder, the pull request's checkout, so a pull request
+        # with a docsproof folder of its own can't run its code here
+        PYTHONPATH="$DOCSPROOF_SRC" python3 -P -m docsproof.action

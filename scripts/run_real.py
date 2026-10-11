@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from build_real_cases import KIND, references  # noqa: E402
+from build_real_cases import KIND, file_lines, references  # noqa: E402
 from docsproof.docs import token_pattern  # noqa: E402
 from fetch_history import SINCE, place  # noqa: E402
 from run_baseline import RESULTS, pct  # noqa: E402
@@ -51,8 +51,8 @@ def changed_in(repo: Path, start: str, pinned: str, file: str, text: str) -> str
     the line's text (or no longer has the file); None if every version keeps it."""
     for commit in git(repo, "log", "--first-parent", "--reverse", "--format=%H", f"{start}..{pinned}", "--",
                       file).stdout.split():
-        shown = git(repo, "show", f"{commit}:{file}")
-        if shown.returncode != 0 or text not in shown.stdout.splitlines():
+        shown = file_lines(repo, commit, file)
+        if shown is None or text not in shown:
             return commit
     return None
 
@@ -80,9 +80,9 @@ def run_case(case: dict) -> dict:
     for x in found:
         row = {"file": x.file, "line": x.line, "why": x.why, "fix": x.fix.new[0] if x.fix else None}
         if (x.file, x.line) not in expected:
-            now = git(repo, "show", f"{pinned}:{x.file}")
+            now = file_lines(repo, pinned, x.file)
             row["text"] = x.text
-            row["still_there"] = now.returncode == 0 and x.text in now.stdout.splitlines()
+            row["still_there"] = now is not None and x.text in now
             if not row["still_there"]:
                 commit = changed_in(repo, case["commit"], pinned, x.file, x.text)
                 seen = {name for _, name in references(x.text)}

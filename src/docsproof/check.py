@@ -17,7 +17,7 @@ from . import model as models
 from .commands import new_problems, problems
 from .docs import read_lines
 from .exact import find
-from .fix import Fix, check_shape, renames, rule_fix
+from .fix import Fix, check_shape, renames, rule_fix, utf8
 from .names import Code, packages
 from .values import ValueChange, candidates, value_changes
 
@@ -95,6 +95,9 @@ def check(before: Path, after: Path, model: str | None = None, cache: dict | Non
         new, why = rule_fix(x.text, x.names, x.changes, pairs, own)
         if new is None:
             x.left = why
+            continue
+        if not utf8(after / x.file):
+            x.left = "the file isn't valid UTF-8, so docs-proof won't rewrite it"
             continue
         fix = Fix(x.file, x.line, (x.text,), (new,), "rule", why)
         problem = check_shape(fix, read_lines(after / x.file), x.line)

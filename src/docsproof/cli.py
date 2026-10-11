@@ -19,20 +19,21 @@ copied to a temporary folder, and the repository itself changes only after a yes
 from __future__ import annotations
 
 import argparse
-import io
 import json
 import os
-import shutil
+import re
 import subprocess
 import sys
-import tarfile
 import tempfile
+import traceback
 import urllib.error
 from pathlib import Path
 
 from .approve import apply_locally, ask
 from .check import Finding, check
+from .docs import inside, readable
 from .fix import patch
+from .model import OLLAMA
 
 DEFAULT_BRANCHES = ("origin/HEAD", "origin/main", "origin/master", "main", "master")
 
@@ -52,7 +53,15 @@ def git(repo: Path, *args: str) -> bytes:
 
 
 def toplevel(path: Path) -> Path:
-    return Path(git(path, "rev-parse", "--show-toplevel").decode().strip())
+    """The top folder of the git repository a folder is in."""
+    if not path.is_dir():
+        raise CheckError(f"{path} isn't a folder")
+    try:
+        return Path(os.fsdecode(git(path, "rev-parse", "--show-toplevel").strip()))
+    except CheckError as error:
+        if "not a git repository" in str(error):
+            raise CheckError(f"{path} isn't in a git repository") from None
+        raise
 
 
 def commit(repo: Path, ref: str) -> str:
@@ -65,53 +74,100 @@ def commit(repo: Path, ref: str) -> str:
 
 def default_base(repo: Path) -> tuple[str, str]:
     """(the commit where HEAD branched from the default branch, a label for it)."""
+    try:
+        head = commit(repo, "HEAD")
+    except CheckError:
+        raise CheckError(f"{repo} has no commit yet, so there's nothing to compare with") from None
     for ref in DEFAULT_BRANCHES:
         try:
             commit(repo, ref)
         except CheckError:
             continue
-        base = git(repo, "merge-base", "HEAD", ref).decode().strip()
+        try:
+            base = git(repo, "merge-base", head, ref).decode().strip()
+        except CheckError:  # git says nothing when two histories have no commit in common
+            raise CheckError(f"HEAD and {ref} have no commit in common; give --base") from None
         return base, f"{ref} at {base[:7]}"
     raise CheckError("no default branch (main or master) found; give --base")
 
 
-def _inside(target: Path, root: Path) -> bool:
+def blobs(repo: Path, oids: list[str]) -> dict[str, bytes]:
+    """The contents of git objects, read with one `git cat-file --batch`."""
+    wanted = list(dict.fromkeys(oids))
+    if not wanted:
+        return {}
     try:
-        target.resolve().relative_to(root.resolve())
-        return True
-    except ValueError:
-        return False
+        done = subprocess.run(["git", "-C", str(repo), "cat-file", "--batch"], capture_output=True,
+                              input="".join(f"{oid}\n" for oid in wanted).encode())
+    except FileNotFoundError:
+        raise CheckError("git isn't installed; give --before and --after folders instead") from None
+    out, at, found = done.stdout, 0, {}
+    for oid in wanted:
+        end = out.find(b"\n", at)
+        header = out[at:end].split()
+        if done.returncode or len(header) != 3:
+            raise CheckError(f"git cat-file couldn't read {oid}: {done.stderr.decode('utf-8', 'replace').strip()}")
+        size = int(header[2])
+        found[oid] = out[end + 1: end + 1 + size]
+        at = end + 1 + size + 1
+    return found
 
 
-def _safe(member: tarfile.TarInfo, path: str) -> tarfile.TarInfo | None:
-    """Leave out anything that would land, or point, outside the folder."""
-    try:
-        return tarfile.data_filter(member, path)
-    except tarfile.FilterError:
-        return None
+def _write(dest: Path, rel: str, mode: bytes, content: bytes) -> None:
+    """One file of the project, in the folder: a link only if it points inside the folder, and nothing whose
+    name isn't UTF-8 (docs.readable) or that would land outside it."""
+    target = dest / rel
+    if not readable(rel) or not inside(target, dest):
+        return
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if mode == b"120000":  # a link, such as docs/README.md to ../README.md
+        link = os.fsdecode(content)
+        if inside(target.parent / link, dest):
+            target.symlink_to(link)
+    else:
+        target.write_bytes(content)
 
 
 def export_ref(repo: Path, ref: str, dest: Path) -> None:
-    """The files of a commit, from git archive."""
+    """The files of a commit, as git stores them. Not with git archive, which leaves out files .gitattributes
+    marks export-ignore and fills in export-subst ones; submodules are left out."""
     dest.mkdir(parents=True)
-    with tarfile.open(fileobj=io.BytesIO(git(repo, "archive", "--format=tar", ref))) as archive:
-        archive.extractall(dest, filter=_safe)
+    entries = []
+    for item in git(repo, "ls-tree", "-r", "-z", "--full-tree", ref).split(b"\0"):
+        if item:
+            meta, _, name = item.partition(b"\t")
+            mode, kind, oid = meta.split()
+            if kind == b"blob":
+                entries.append((os.fsdecode(name), mode, oid.decode()))
+    contents = blobs(repo, [oid for _, _, oid in entries])
+    for rel, mode, oid in entries:
+        _write(dest, rel, mode, contents[oid])
 
 
 def export_worktree(repo: Path, dest: Path) -> None:
-    """The working tree as git sees it: tracked files and new ones that aren't ignored."""
+    """The working tree as git sees it: tracked files and new ones that aren't ignored. A file a sparse checkout
+    leaves out of the folder is taken from the index, where git keeps it."""
     dest.mkdir(parents=True)
-    for rel in git(repo, "ls-files", "-z", "--cached", "--others", "--exclude-standard").decode().split("\0"):
+    tracked, sparse = [], {}
+    for item in git(repo, "ls-files", "-z", "-t", "--stage").split(b"\0"):
+        if item:
+            meta, _, name = item.partition(b"\t")
+            tag, mode, oid, _ = meta.split()
+            rel = os.fsdecode(name)
+            if tag == b"S":
+                sparse[rel] = (mode, oid.decode())
+            elif mode != b"160000":  # not a submodule
+                tracked.append(rel)
+    others = [os.fsdecode(name) for name in git(repo, "ls-files", "-z", "--others", "--exclude-standard").split(b"\0") if name]
+    contents = blobs(repo, [oid for _, oid in sparse.values()])
+    for rel, (mode, oid) in sparse.items():
+        _write(dest, rel, mode, contents[oid])
+    for rel in dict.fromkeys(tracked + others):  # a file with a merge conflict is listed once for each side
         source = repo / rel
-        if not rel or not (source.is_file() or source.is_symlink()):
-            continue  # deleted but not yet staged, or a submodule
-        target = dest / rel
-        target.parent.mkdir(parents=True, exist_ok=True)
         if source.is_symlink():
-            if _inside(source, repo):  # a link inside the repository, such as docs/README.md to README.md
-                target.symlink_to(os.readlink(source))
-        else:
-            shutil.copyfile(source, target)
+            _write(dest, rel, b"120000", os.fsencode(os.readlink(source)))
+        elif source.is_file():  # not deleted, and not yet staged
+            _write(dest, rel, b"100644", source.read_bytes())
 
 
 def sides(args: argparse.Namespace, tmp: Path) -> tuple[Path, Path, str, str, Path | None]:
@@ -139,21 +195,31 @@ def sides(args: argparse.Namespace, tmp: Path) -> tuple[Path, Path, str, str, Pa
     return before, after, base_label, "the working tree", repo
 
 
-def text(findings: list[Finding], base: str, head: str) -> str:
+CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
+
+
+def shown(value: str) -> str:
+    """Text from the docs or the code, safe to print: a control character, which a terminal would act on, is
+    shown as an escape, such as \\x1b."""
+    return CONTROL.sub(lambda m: f"\\x{ord(m.group()):02x}", value)
+
+
+def text(findings: list[Finding], base: str, head: str, hint: bool = True) -> str:
+    """The report a person reads. hint: say how to save or make the fixes (not when the command already does)."""
     if not findings:
-        return (f"docs-proof: no doc line found that the change made wrong ({base} to {head}). It checks the names "
-                "the change removed, the options documented commands use, and the values it changed.")
+        return (f"docs-proof: no doc line found that the change made wrong ({shown(base)} to {shown(head)}). It "
+                "checks the names the change removed, the options documented commands use, and the values it changed.")
     out = [f"docs-proof: {len(findings)} doc line{'s' if len(findings) != 1 else ''} the change made wrong "
-           f"({base} to {head})", ""]
+           f"({shown(base)} to {shown(head)})", ""]
     for x in findings:
-        out += [f"{x.file}:{x.line}", f"    {x.text.strip()}"]
-        out += [f"  why: {why}" for why in x.why]
-        out.append(f"  fix: {x.fix.new[0].strip()}" if x.fix else f"  fix: none ({x.left})")
+        out += [shown(f"{x.file}:{x.line}"), shown(f"    {x.text.strip()}")]
+        out += [shown(f"  why: {why}") for why in x.why]
+        out.append(shown(f"  fix: {x.fix.new[0].strip()}" if x.fix else f"  fix: none ({x.left})"))
         out.append("")
     fixes = sum(1 for x in findings if x.fix)
     them = "them" if fixes != 1 else "it"
     out.append(f"{fixes} fix{'es' if fixes != 1 else ''} suggested." +
-               (f" Save {them} with --patch FILE, or make {them} with --apply (it asks first)." if fixes else ""))
+               (f" Save {them} with --patch FILE, or make {them} with --apply (it asks first)." if fixes and hint else ""))
     return "\n".join(out)
 
 
@@ -192,31 +258,49 @@ def main(argv: list[str] | None = None, read=input) -> int:
             findings = check(before, after, args.model)
             fixes = [x.fix for x in findings if x.fix]
             print(json.dumps(as_json(findings, base, head), indent=1, ensure_ascii=False) if args.json
-                  else text(findings, base, head))
+                  else text(findings, base, head, hint=not (args.patch or args.apply)))
             if args.patch:
-                Path(args.patch).write_text(patch(after, fixes), encoding="utf-8", newline="")
+                try:
+                    Path(args.patch).write_text(patch(after, fixes), encoding="utf-8", newline="")
+                except OSError as error:
+                    raise CheckError(f"couldn't write the patch to {args.patch} ({error.strerror})") from None
+                them = "them" if len(fixes) != 1 else "it"
+                print(f"docs-proof: wrote {len(fixes)} fix{'es' if len(fixes) != 1 else ''} to {args.patch}" +
+                      (f"; make {them} with `git apply {args.patch}` in the project's top folder" if fixes else ""),
+                      file=sys.stderr)
             if args.apply and fixes:
+                def question(prompt: str) -> str:  # with the patch, on stderr, so --json's output stays JSON
+                    print(prompt, end="", file=sys.stderr, flush=True)
+                    return read("")
+
                 def approve(diff: str) -> bool:
                     try:
-                        return ask(diff, read=read, show=lambda shown: print(shown, file=sys.stderr),
+                        return ask(diff, read=question, show=lambda shown: print(shown, file=sys.stderr),
                                    question="Make these fixes in the docs?")
                     except EOFError:  # no one to answer
                         return False
                 try:
                     done = apply_locally(target, fixes, approve)
-                except (RuntimeError, ValueError):
+                except RuntimeError:  # the patch was no longer the one approved
                     raise CheckError("the docs changed while docs-proof ran, so nothing was changed") from None
+                except ValueError as error:  # a fix that no longer matches its doc, or a file it may not change
+                    raise CheckError(f"nothing was changed: {error}") from None
                 print(f"docs-proof: {'made' if done else 'did not make'} the {len(fixes)} "
                       f"fix{'es' if len(fixes) != 1 else ''}", file=sys.stderr)
     except CheckError as error:
         print(f"docs-proof: {error}", file=sys.stderr)
         return 2
     except urllib.error.HTTPError as error:
-        print(f"docs-proof: Ollama answered {error.code} for --model {args.model}; is it pulled "
-              f"(ollama pull {args.model})?", file=sys.stderr)
+        print(f"docs-proof: Ollama answered {error.code} for --model {args.model}" +
+              (f"; is it pulled (ollama pull {args.model})?" if error.code == 404 else ""), file=sys.stderr)
         return 2
     except urllib.error.URLError as error:
-        print(f"docs-proof: couldn't reach Ollama at 127.0.0.1:11434 for --model ({error.reason})", file=sys.stderr)
+        print(f"docs-proof: couldn't reach Ollama at {OLLAMA} for --model ({error.reason})", file=sys.stderr)
+        return 2
+    except Exception as error:  # a bug: exit 2, the check couldn't run, not 1, which says lines were flagged
+        traceback.print_exc()
+        print(f"docs-proof: the check stopped on an error it doesn't expect ({type(error).__name__}: {error}). "
+              "Please report it, with the command you ran.", file=sys.stderr)
         return 2
     return 1 if findings else 0
 

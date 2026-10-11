@@ -120,3 +120,13 @@ def test_the_patch_keeps_line_endings_and_git_applies_it(tmp_path):
     subprocess.run([*git, "apply", str(tmp_path / "fix.patch")], check=True)
     assert (repo / "a.md").read_bytes() == b"first\r\nUse --cap here.\r\nlast\r\n"
     assert (repo / "b.rst").read_bytes() == b"Requires Python 3.11+"
+
+
+def test_a_line_with_a_form_feed_in_it_can_still_be_fixed(tmp_path):
+    lines = ["Use `--limit`\x0c to cap it.", "next"]  # one line for git, two for str.splitlines
+    fix = Fix("a.md", 1, (lines[0],), ("Use `--cap`\x0c to cap it.",), "rule", "`--limit` is now `--cap`")
+    assert check_shape(fix, lines, 1) is None
+    assert check_shape(Fix("a.md", 1, (lines[0],), ("Use `--cap`\n to cap it.",), "rule", ""), lines, 1) == \
+        "give one line in each string"
+    (tmp_path / "a.md").write_bytes(b"Use `--limit`\x0c to cap it.\r\nnext\n")
+    assert fixed_text(tmp_path / "a.md", [fix]) == "Use `--cap`\x0c to cap it.\r\nnext\n"  # its own ending kept

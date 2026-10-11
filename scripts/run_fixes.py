@@ -45,6 +45,7 @@ from docsproof.names import packages  # noqa: E402
 from docsproof.plant import apply as plant  # noqa: E402
 from docsproof.run import missing_input, refused, run_in_sandbox, runnable  # noqa: E402
 from docsproof.values import ValueChange  # noqa: E402
+from failures import explained  # noqa: E402
 from run_baseline import RESULTS, load_cases  # noqa: E402
 
 RUNS = RESULTS / "runs"
@@ -680,4 +681,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    explained(main)

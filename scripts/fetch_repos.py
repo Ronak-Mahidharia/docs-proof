@@ -12,6 +12,8 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from failures import explained
+
 ROOT = Path(__file__).resolve().parent.parent
 REPOS_DIR = ROOT / "data" / "repos"
 
@@ -20,13 +22,18 @@ def folder(repo: str) -> Path:
     return REPOS_DIR / repo.replace("/", "__")
 
 
-def git(cwd: Path, *args: str) -> str:
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
+def git(cwd: Path, *args: str, check: bool = True) -> str:
+    done = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+    if check and done.returncode:
+        said = " ".join(done.stderr.split())  # git's message, on one line
+        raise SystemExit(f"{cwd.name}: git {args[0]} stopped ({said}); run this again to retry")
+    return done.stdout.strip()
 
 
 def fetch(entry: dict) -> str:
     target = folder(entry["repo"])
-    if (target / ".git").is_dir() and git(target, "rev-parse", "HEAD") == entry["commit"]:
+    # an earlier fetch that stopped before its checkout leaves a .git with no HEAD: fetch again
+    if (target / ".git").is_dir() and git(target, "rev-parse", "HEAD", check=False) == entry["commit"]:
         return f"{entry['repo']}: already at {entry['commit'][:10]}"
     target.mkdir(parents=True, exist_ok=True)
     git(target, "init", "-q")
@@ -48,4 +55,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    explained(main)

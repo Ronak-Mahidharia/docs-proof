@@ -37,3 +37,27 @@ def test_qualifiers_name_the_package_in_front_of_a_mention():
     assert qualifiers("passed an :class:`.AutogenContext`,", "AutogenContext") == [None]
     assert qualifiers("from uvicorn.workers import UvicornWorker", "UvicornWorker") == [None]
     assert qualifiers("[More info here.](docs/configuration/git_hook.md)", "git_hook") == ["<path>"]
+
+
+def test_lines_are_split_as_git_splits_them():
+    from docsproof.docs import split_lines
+    assert split_lines("a\x0cb\nc d\x85e\r\nf\n") == ["a\x0cb", "c d\x85e", "f"]  # only "\n" ends a line
+    assert split_lines("") == [] and split_lines("\n") == [""] and split_lines("a") == ["a"]
+    assert split_lines("a\rb\n") == ["a\rb"]  # a lone "\r" isn't a line ending for git
+    assert "a\x0cb\nc".splitlines() == ["a", "b", "c"]  # what docs-proof used before, and why it drifted
+
+
+def test_doc_files_leave_out_links_out_of_the_folder_and_names_that_arent_utf8(tmp_path):
+    import os
+    root = tmp_path / "project"
+    (root / "docs").mkdir(parents=True)
+    (root / "README.md").write_text("x\n", encoding="utf-8")
+    (tmp_path / "notes.md").write_text("x\n", encoding="utf-8")
+    (root / "docs" / "notes.md").symlink_to(tmp_path / "notes.md")  # out of the folder
+    (root / "docs" / "index.md").symlink_to("../README.md")  # in it
+    (root / "docs" / "gone.md").symlink_to("nowhere.md")
+    try:
+        (root / "docs" / os.fsdecode(b"caf\xe9.md")).write_text("x\n", encoding="utf-8")
+    except OSError:
+        pass  # macOS doesn't allow a name that isn't UTF-8; Linux does
+    assert doc_files(root) == ["README.md", "docs/index.md"]

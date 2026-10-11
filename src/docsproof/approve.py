@@ -11,6 +11,7 @@ import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
+from .docs import inside
 from .fix import Fix, fixed_text, patch
 
 BRANCH = "docs-proof/fixes"
@@ -40,11 +41,19 @@ def apply_locally(root: Path, fixes: list[Fix], approve: Callable[[str], bool]) 
         return False
     if patch(root, fixes) != diff:
         raise RuntimeError("the docs changed after the patch was made; nothing was changed")
-    files = sorted({f.file for f in fixes})
-    texts = {rel: fixed_text(root / rel, [f for f in fixes if f.file == rel]) for rel in files}
+    texts = _texts(root, fixes)
     for rel, text in texts.items():
         (root / rel).write_bytes(text.encode("utf-8"))
     return True
+
+
+def _texts(root: Path, fixes: list[Fix]) -> dict[str, str]:
+    """Each fixed file's new text, for files in the folder only: never one a link leads out of it to."""
+    files = sorted({f.file for f in fixes})
+    for rel in files:
+        if not inside(root / rel, root):
+            raise ValueError(f"{rel} leads out of {root}")
+    return {rel: fixed_text(root / rel, [f for f in fixes if f.file == rel]) for rel in files}
 
 
 def open_pull_request(repo: Path, fixes: list[Fix], approve: Callable[[str], bool], base: str,
@@ -57,14 +66,15 @@ def open_pull_request(repo: Path, fixes: list[Fix], approve: Callable[[str], boo
         return False
     if patch(repo, fixes) != diff:
         raise RuntimeError("the docs changed after the patch was made; nothing was changed")
-    files = sorted({f.file for f in fixes})
-    texts = {rel: fixed_text(repo / rel, [f for f in fixes if f.file == rel]) for rel in files}
+    texts = _texts(repo, fixes)
+    files = list(texts)
     git = ["git", "-C", str(repo)]
     run([*git, "switch", "-c", branch], check=True)
     for rel, text in texts.items():
         (repo / rel).write_bytes(text.encode("utf-8"))
     run([*git, "add", "--", *files], check=True)
-    run([*git, "commit", "-m", title, "-m", summary(fixes)], check=True)
+    # only the fixed files: not anything else that was already staged
+    run([*git, "commit", "-m", title, "-m", summary(fixes), "--", *files], check=True)
     run([*git, "push", "-u", "origin", branch], check=True)
     run(["gh", "pr", "create", "--base", base, "--head", branch, "--title", title, "--body", summary(fixes)],
         check=True, cwd=repo)
