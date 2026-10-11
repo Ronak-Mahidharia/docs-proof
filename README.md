@@ -2,7 +2,40 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, a check on my own projects, a rule for names that could be ordinary words, and the fixes measured on real history. Next is the write-up and a demo. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, a check on my own projects, a rule for names that could be ordinary words, and the fixes measured on real history, then the write-up and a demo. Next is a full check of the project, then this README as a finished project. The steps are in [docs/plan.md](docs/plan.md).
+
+**Read more:** [the write-up](docs/write-up.md), the project in order with the numbers behind each decision, and [a demo on a real change](docs/demo.md): yt-dlp's rename of `--match-filter`, and what docs-proof would have said that day.
+
+## How it fits together
+```mermaid
+flowchart LR
+    tools["The docs-proof command,<br/>the GitHub Action,<br/>or the MCP server"]
+    change["A code change<br/>two commits, or two folders"]
+
+    subgraph check["The check: no AI unless you ask"]
+        exact["Exact checks<br/>names the change removed"]
+        commands["Commands in the docs<br/>read the way a shell reads them"]
+        values["Changed values<br/>doc lines that show the old value"]
+        model["A local model, if asked<br/>reads each value line"]
+        fixes["Suggested fixes<br/>rules, each checked first"]
+    end
+
+    person["A person's yes<br/>before anything changes"]
+
+    subgraph offline["Measured offline"]
+        keys["Two answer keys<br/>planted changes, and real history"]
+        sandbox["Sandbox runs<br/>Docker, no network"]
+        agent["An agent for harder fixes<br/>local model, read-only tools"]
+    end
+
+    tools --> change
+    change --> exact & commands & values
+    values -.-> model
+    exact & commands & values --> fixes --> person
+    keys -. measure .-> exact & commands & values & fixes
+    sandbox -. proves .-> commands
+    agent -. tries .-> fixes
+```
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
