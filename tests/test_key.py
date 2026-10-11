@@ -103,6 +103,7 @@ def test_readme_numbers_match_the_key_and_the_scores():
     name, value = test["name"], test["value"]
     expected = [
         f"**{len(CASES)} planted changes in {len(REPOS)} real repositories.**",
+        f"**Two answer keys:** changes planted in {len(REPOS)} real repositories, and the same repositories' own history",
         f"{sum(len(c['expected']) for c in CASES)} lines in all",
         f"{dev['cases']} dev cases in {dev['repos']} repositories, and {test['cases']} test cases in the other {test['repos']}",
         f"{dev['control']['cases'] + test['control']['cases']} cases change something no doc mentions",

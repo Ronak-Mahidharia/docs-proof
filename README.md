@@ -1,10 +1,18 @@
 # docs-proof
 
-Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
+Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against two answer keys built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, a check on my own projects, a rule for names that could be ordinary words, and the fixes measured on real history, then the write-up and a demo, and a full check of the project, with its last fixes: each doc read once, and the real history's window fixed at midnight UTC. Next is this README as a finished project. The steps are in [docs/plan.md](docs/plan.md).
+**Try it:** clone this repository and run `pip install -e .`, then run `docs-proof` in a Python project's git repository ([how](#use-it)). It uses no AI unless you ask for it, and sends nothing anywhere.
 
-**Read more:** [the write-up](docs/write-up.md), the project in order with the numbers behind each decision, and [a demo on a real change](docs/demo.md): yt-dlp's rename of `--match-filter`, and what docs-proof would have said that day.
+[![CI](https://github.com/Ronak-Mahidharia/docs-proof/actions/workflows/ci.yml/badge.svg)](https://github.com/Ronak-Mahidharia/docs-proof/actions/workflows/ci.yml)
+
+**What's here:**
+- **Two answer keys:** changes planted in 30 real repositories, and the same repositories' own history, where nobody planted anything.
+- **Checks with no AI:** names the change removed, the commands in the docs (read, and run in a sandbox), and changed values, with a local model if you ask.
+- **Suggested fixes,** each checked before it's offered, and nothing changed without a person's yes.
+- **Three ways to use it:** a command, a GitHub Action, and an MCP server for AI assistants.
+
+How it was built is in [docs/plan.md](docs/plan.md), and the story, with the numbers behind each decision, is in [the write-up](docs/write-up.md). There's also [a demo on a real change](docs/demo.md): yt-dlp's rename of `--match-filter`, and what docs-proof would have said that day.
 
 ## How it fits together
 ```mermaid
@@ -52,17 +60,17 @@ flowchart LR
   - samples of the rename cases: 59 of 60 lines were right on a sample drawn after the rules were final
   - every line of the 15 rename cases that a later fix to the code reading changed: 54 of 61 were right, and the other 7 were removed
   - every line the exact checks flag that the key leaves out: 4 of 16 named the project's own class or function through a short module name (such as `c.ListOfItems` after `config_options as c`), and were added
-  - the key's fixed lines (step 4): every value line, every name line that mentions the name more than once or under a package's name, and 40 more drawn at random. 5 value lines need a fix of their own, and 1 name line turned out not to be wrong (bandit's `.. automodule:: bandit.plugins.yaml_load` names the module, not the renamed function), so it was removed
+  - the key's fixed lines: every value line, every name line that mentions the name more than once or under a package's name, and 40 more drawn at random. 5 value lines need a fix of their own, and 1 name line turned out not to be wrong (bandit's `.. automodule:: bandit.plugins.yaml_load` names the module, not the renamed function), so it was removed
 
-## Results so far
-All on the test split (15 repositories, 130 cases). Only the last part uses AI.
+## Results
+All on the test split (15 repositories, 130 cases). Only the local model for changed values and the agent for fixes use AI.
 
 **Exact checks:** a search for names the change removed ([docs/results/exact.md](docs/results/exact.md)).
 - **Renames** (91 cases, 338 lines): found all 338, with 7 false alarms (precision 98.0%).
 - **Changed values** (11 cases, 25 lines): found 0 of 25.
 - **Controls** (28 cases): no false alarms.
 
-For renames, the expected lines are the doc lines that still mention the old name, so a search for removed names finds all of them by design. Those cases mostly test false alarms: the 7 are lines the change doesn't make wrong, such as another tool's option with the same name. Changed values are found in step 3, below.
+For renames, the expected lines are the doc lines that still mention the old name, so a search for removed names finds all of them by design. Those cases mostly test false alarms: the 7 are lines the change doesn't make wrong, such as another tool's option with the same name. Changed values are found by the search below.
 
 **A name that could be an ordinary word,** such as a function named `records`, counts only where the doc marks it as code: in a code block, in backticks, as a call, or after a dot. Otherwise every sentence that uses the word is flagged, as on one of my own projects (below). The answer key renames only names that can't be ordinary words, such as `fetch_items` or `PluginSQL`, so the rule changed no result on either answer key. For the same reason, neither key can measure what it costs: a real mention of such a name in a plain sentence.
 
@@ -84,11 +92,11 @@ For renames, the expected lines are the doc lines that still mention the old nam
 - **Proof:** each finding quotes the doc line and the code line, and a finding whose quotes aren't really there is dropped (1 of 35 on test).
 
 **Suggested fixes:** each flagged line gets a fix that's checked before it's offered, and a fixed command is run again in the sandbox, after the change ([docs/results/fixes.md](docs/results/fixes.md)). Nothing in a repository changes without approval: the fixes become one patch, and a pull request is opened only after a person says yes to it.
-- **The rules, with no AI** (on the 380 lines steps 1 and 3 flag): fixed 358 of the 363 lines the change made wrong, all of them right, and declined 5. The program took every one of the 51 fixed lines that are part of a documented command, run again after the change.
+- **The rules, with no AI** (on the 380 lines the exact checks and the value search flag): fixed 358 of the 363 lines the change made wrong, all of them right, and declined 5. The program took every one of the 51 fixed lines that are part of a documented command, run again after the change.
 - **An agent for the rest** (qwen3:8b through Ollama, working only through tools, with a turn limit and loop detection; chosen on dev from 2 models and 3 prompts): of the 5 lines, it fixed 3 right and 1 wrong, and left 1 for a person.
 - **Together:** 361 of the 363 lines fixed right.
 - **Every false alarm got a fix too** (17 of 17), so each fix needs a person's yes.
-- **The doc lines step 2 found out of date:** on test's 3, the agent left 2 for a person and fixed 1 wrong: it joined alembic's command onto one line and left the old lines under it. On dev, it fixed llm's `schema dsl` to `schemas dsl`, as the usage line above it says.
+- **The doc lines the sandbox's audit found out of date:** on test's 3, the agent left 2 for a person and fixed 1 wrong: it joined alembic's command onto one line and left the old lines under it. On dev, it fixed llm's `schema dsl` to `schemas dsl`, as the usage line above it says.
 
 ## Real history
 The planted changes measure what docs-proof was built to find. A second answer key measures what it would have caught in practice: it comes from the same 30 repositories' own history since 2020, and nobody planted it ([docs/results/real.md](docs/results/real.md)).
@@ -99,13 +107,13 @@ The planted changes measure what docs-proof was built to find. A second answer k
 - **How long the lines stayed wrong:** on test, a median of 447 days over the 23 lines, and up to 1,424 days (alembic's `SafeConfigParser`, almost 4 years). On dev, a median of 18 days, with 9 of the 30 lines fixed the same day.
 - **Not scored:** it also flagged 30 lines the key doesn't list, since the key lists only the lines its rules matched to a later fix. By the pinned commit, 20 of them had changed, 13 in a commit that fixed one of the case's key lines. A hand check of the 10 still there found 4 false alarms and 6 unclear.
 - **Its fixes, against the later commits' own fixes** ([docs/results/real-fixes.md](docs/results/real-fixes.md)): a hand check of the 23 lines the rules would have fixed found 14 right, 6 incomplete, and 3 wrong. On dev, all 18 used the new name that replaced the old one, and 4 left something else the change made untrue, such as a help line's old description. On test, the 3 wrong ones are coverage.py's: the change replaced three variables with a different scheme, and the rules paired them one to one by how alike the names are.
-- **The stricter check step 4 left for new data** (a fix may change a line only where the old name is): it stops none of the agent's dev fixes, and the later commits changed more than the old name in 7 of the 14 lines they edited, so it isn't added.
+- **A stricter fix check, measured and not added** (a fix may change a line only where the old name is): it stops none of the agent's dev fixes, and the later commits changed more than the old name in 7 of the 14 lines they edited, so it isn't added.
 
 ## On my own projects
 docs-proof checked every pull request merged into main in my two public projects, [Car Safety Checker](https://github.com/Ronak-Mahidharia/car-safety-checker) and [Control Finder](https://github.com/Ronak-Mahidharia/control-finder), the way its GitHub Action would have: just before and just after each merge, with no AI ([docs/results/own.md](docs/results/own.md)).
 - **Control Finder** (15 merges): nothing flagged.
 - **Car Safety Checker** (18 merges): nothing flagged since the rule for ordinary words (above). Before it, 23 lines were flagged, all in one pull request and all false alarms: that pull request removed a function named `records`, and every flagged line uses "records" as an ordinary word, such as "NHTSA's own records". The suggested fix was wrong too: it paired `records` with an unrelated new function, `words`.
-- **What it showed:** neither answer key has a name like this, so checking real projects found a problem the keys couldn't. How an old name is paired with a new one is measured next, on the real-history key.
+- **What it showed:** neither answer key has a name like this, so checking real projects found a problem the keys couldn't. How an old name is paired with a new one is measured on the real-history key, above.
 
 ## Use it
 `docs-proof` checks a change in a Python project's git repository. It uses no AI unless you ask for it, and sends nothing anywhere.
@@ -127,10 +135,9 @@ README.md:316
   fix: - [Unless `--keep-mock2` is passed on the commandline](https://github.com/asottile/pyupgrade/issues/314).
 ```
 
-- **The same as the measured steps:** on all 246 cases, it flags exactly the 612 lines that the exact checks, the commands read, and the changed-value search flag, and offers exactly step 4's 598 rule fixes ([scripts/check_tool.py](scripts/check_tool.py)).
+- **The same as the measured steps:** on all 246 cases, it flags exactly the 612 lines that the exact checks, the commands read, and the changed-value search flag, and offers exactly the same 598 rule fixes ([scripts/check_tool.py](scripts/check_tool.py)).
 - **For scripts and CI:** the exit status is 0 when nothing is flagged, 1 when something is, and 2 when the check couldn't run. `--json` prints the findings, and `--before`/`--after` compare two folders without git.
-- **Optional AI:** `--model qwen3:8b` adds step 3's local model for changed values, through Ollama on your computer.
-- **Not in it yet:** the sandbox runs, which need an environment built for each project, and the agent.
+- **Optional AI:** `--model qwen3:8b` adds the local model measured above for changed values, through Ollama on your computer.
 
 ### In GitHub Actions
 On a pull request, the action runs the same check and reports it where GitHub shows it: the job summary, a warning on each flagged line (GitHub shows 10 for a step, and a note says when there are more), and a failed check. It reads the pull request's code and docs and never runs them, and it needs no write permission.
@@ -194,7 +201,7 @@ To run the commands again, with Docker (about 20 minutes on a 10-core Mac; the i
 .venv/bin/python scripts/run_fixes.py --run      # runs the rules' fixed commands, after each change
 ```
 
-To run the agent again (Ollama and Docker, about 15 minutes), delete `data/results/agent-answers.jsonl`, then run `.venv/bin/python scripts/run_fixes.py --agent dev` (every setting) and `--agent test` (the setting chosen on dev). Its fixes for the doc lines step 2 found out of date are judged by hand in `data/hand_check.json`, and the scores aren't written until every new fix is judged.
+To run the agent again (Ollama and Docker, about 15 minutes), delete `data/results/agent-answers.jsonl`, then run `.venv/bin/python scripts/run_fixes.py --agent dev` (every setting) and `--agent test` (the setting chosen on dev). Its fixes for the doc lines the sandbox's audit found out of date are judged by hand in `data/hand_check.json`, and the scores aren't written until every new fix is judged.
 
 To mine the real history again (about 6 minutes on a 10-core Mac; the histories are about 218 MB):
 ```bash
@@ -206,6 +213,23 @@ To mine the real history again (about 6 minutes on a 10-core Mac; the histories 
 The mining stops if it finds a case that hasn't been checked by hand, and the scores aren't written until every flagged line that's still there has been read.
 
 To check my own projects again (a few seconds; it fetches their history): `.venv/bin/python scripts/check_own.py --run`. The scores aren't written until every flagged line has a hand verdict.
+
+## Project structure
+| Folder | What's in it |
+|---|---|
+| [`src/docsproof/`](src/docsproof) | The Python package: the checks, the fixes, the command, the GitHub Action's script, and the MCP server, plus the sandbox runner and the agent used in the measurements |
+| [`scripts/`](scripts) | One command per measurement, plus fetching the repositories and their history |
+| [`tests/`](tests) | The tests (pytest), including that every published number reproduces |
+| [`data/`](data) | The two answer keys, the hand checks, the pinned repositories, and every kept run and model answer (`data/results/`) |
+| [`docs/`](docs) | The results pages, the write-up, the demo, and the plan |
+| [`action.yml`](action.yml) | The GitHub Action |
+
+## Limits
+- **Python projects only.** It reads Python code, and docs in Markdown, reStructuredText, and plain text.
+- **What it compares:** names the change removed (options, functions and classes, environment variables, and files), the options in documented commands, option defaults, and the minimum Python version. On real history, the lines it missed named methods, other libraries' names, dependencies, or values (see [Real history](#real-history)).
+- **The sandbox and the agent aren't in the command.** The sandbox needs an environment built for each project, so the sandbox runs and the agent are measured offline, and the command uses the checks and the rules' fixes.
+- **Every fix needs a person's yes.** False alarms get fixes too, and pairing an old name with a new one by how alike they are can't tell a rename from a replacement (coverage.py, under [Real history](#real-history)).
+- **A name that could be an ordinary word** counts only where the doc marks it as code, and neither answer key can measure what that costs.
 
 ## License
 MIT for the code in this repository. The repositories used for measurement keep their own licenses; they're cloned at a pinned commit when the measurement runs, and never copied here.

@@ -33,7 +33,7 @@ def test_readme_and_plan_numbers_for_the_tool():
     flagged = sum(TOOL[s]["flagged_lines"] for s in TOOL)
     fixes = sum(TOOL[s]["fixes"] for s in TOOL)
     assert (f"on all {cases} cases, it flags exactly the {flagged} lines that the exact checks, the commands read, and "
-            f"the changed-value search flag, and offers exactly step 4's {fixes} rule fixes") in readme
+            f"the changed-value search flag, and offers exactly the same {fixes} rule fixes") in readme
     assert f"the command-line tool: on all {cases} cases it flags exactly the {flagged} lines the measured steps flag, and offers exactly step 4's {fixes} rule fixes" in plan
 
 
