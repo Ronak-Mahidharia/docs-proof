@@ -1,0 +1,246 @@
+{
+ "baseline": {
+  "dev": {
+   "cases": 116,
+   "repos": 15,
+   "expected_lines": 227,
+   "kinds": {
+    "rename_option": {
+     "cases": 34,
+     "tp": 0,
+     "fp": 0,
+     "fn": 95,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_identifier": {
+     "cases": 19,
+     "tp": 0,
+     "fp": 0,
+     "fn": 66,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_env_var": {
+     "cases": 13,
+     "tp": 0,
+     "fp": 0,
+     "fn": 27,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_file": {
+     "cases": 15,
+     "tp": 0,
+     "fp": 0,
+     "fn": 21,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "change_default": {
+     "cases": 4,
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 4,
+     "false_alarm_cases": 0,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "raise_python": {
+     "cases": 5,
+     "tp": 14,
+     "fp": 3,
+     "fn": 0,
+     "all_found": 5,
+     "false_alarm_cases": 3,
+     "precision": 0.824,
+     "recall": 1.0,
+     "f1": 0.904
+    },
+    "rename_private": {
+     "cases": 14,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 14,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    },
+    "rename_unmentioned_option": {
+     "cases": 12,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 12,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    }
+   },
+   "name": {
+    "cases": 81,
+    "tp": 0,
+    "fp": 0,
+    "fn": 209,
+    "all_found": 0,
+    "false_alarm_cases": 0,
+    "precision": null,
+    "recall": 0.0,
+    "f1": null
+   },
+   "value": {
+    "cases": 9,
+    "tp": 18,
+    "fp": 3,
+    "fn": 0,
+    "all_found": 9,
+    "false_alarm_cases": 3,
+    "precision": 0.857,
+    "recall": 1.0,
+    "f1": 0.923
+   },
+   "control": {
+    "cases": 26,
+    "false_alarm_cases": 0
+   }
+  },
+  "test": {
+   "cases": 130,
+   "repos": 15,
+   "expected_lines": 375,
+   "kinds": {
+    "rename_option": {
+     "cases": 37,
+     "tp": 0,
+     "fp": 0,
+     "fn": 175,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_identifier": {
+     "cases": 24,
+     "tp": 0,
+     "fp": 0,
+     "fn": 102,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_env_var": {
+     "cases": 16,
+     "tp": 0,
+     "fp": 0,
+     "fn": 52,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "rename_file": {
+     "cases": 14,
+     "tp": 0,
+     "fp": 0,
+     "fn": 21,
+     "all_found": 0,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "change_default": {
+     "cases": 3,
+     "tp": 5,
+     "fp": 2,
+     "fn": 0,
+     "all_found": 3,
+     "false_alarm_cases": 1,
+     "precision": 0.714,
+     "recall": 1.0,
+     "f1": 0.833
+    },
+    "raise_python": {
+     "cases": 8,
+     "tp": 20,
+     "fp": 8,
+     "fn": 0,
+     "all_found": 8,
+     "false_alarm_cases": 5,
+     "precision": 0.714,
+     "recall": 1.0,
+     "f1": 0.833
+    },
+    "rename_private": {
+     "cases": 15,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 15,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    },
+    "rename_unmentioned_option": {
+     "cases": 13,
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "all_found": 13,
+     "false_alarm_cases": 0,
+     "precision": null,
+     "recall": null,
+     "f1": null
+    }
+   },
+   "name": {
+    "cases": 91,
+    "tp": 0,
+    "fp": 0,
+    "fn": 350,
+    "all_found": 0,
+    "false_alarm_cases": 0,
+    "precision": null,
+    "recall": 0.0,
+    "f1": null
+   },
+   "value": {
+    "cases": 11,
+    "tp": 25,
+    "fp": 10,
+    "fn": 0,
+    "all_found": 11,
+    "false_alarm_cases": 6,
+    "precision": 0.714,
+    "recall": 1.0,
+    "f1": 0.833
+   },
+   "control": {
+    "cases": 28,
+    "false_alarm_cases": 0
+   }
+  }
+ }
+}
