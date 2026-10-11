@@ -42,7 +42,7 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
    - the GitHub Action ([action.yml](../action.yml)): it reports in the job summary and with warnings on the flagged lines, needs no write permission, and comments on the pull request only when asked to. CI runs it on a throwaway repository and on every pull request here
    - the MCP server ([src/docsproof/mcp_server.py](../src/docsproof/mcp_server.py)): two read-only tools that give assistants such as Claude Code the command's findings; its tests compare the two, in-process and over stdio
 6. **Real history** as a second answer key, plus a check on my own repositories.
-   **Done:** the key: 27 real cases, of 36 mined, in the 30 repositories' history since 2020. On test, docs-proof would have flagged 7 of the 23 lines a later commit fixed (30.4%), including every line whose name it compares ([results](results/real.md)). Next: the check on my own repositories.
+   **Done:** the key: 27 real cases, of 36 mined, in the 30 repositories' history since 2020. On test, docs-proof would have flagged 7 of the 23 lines a later commit fixed (30.4%), including every line whose name it compares ([results](results/real.md)). And the check on my own repositories: on 33 merged pull requests in my two public projects, it flagged 23 lines, all false alarms from one removed function named with an ordinary word, `records` ([results](results/own.md)). Next: count such a name only where the docs mark it as code, measured on both answer keys.
 7. **The write-up and a demo.**
 
 ## Rules

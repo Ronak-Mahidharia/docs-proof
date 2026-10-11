@@ -1,0 +1,79 @@
+"""Checks on docs-proof's run over my own public projects (step 6): the scores and docs/results/own.md come from
+the kept results, every flagged line has a hand verdict, and the README and plan quote the numbers. Rerunning
+needs the projects' history (scripts/check_own.py --run), so the last test checks the kept results against it
+when it's there."""
+import copy
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "src"))
+
+import check_own  # noqa: E402
+from fetch_history import place  # noqa: E402
+
+REPOS = json.loads((ROOT / "data" / "own_repos.json").read_text(encoding="utf-8"))["repos"]
+ROWS = [json.loads(line) for line in (ROOT / "data" / "results" / "own.jsonl").read_text(encoding="utf-8").splitlines()]
+SCORES = json.loads((ROOT / "data" / "results" / "own-scores.json").read_text(encoding="utf-8"))
+HAND = json.loads((ROOT / "data" / "hand_check.json").read_text(encoding="utf-8"))["own_repositories"]["lines"]
+
+
+def test_the_scores_and_the_page_come_from_the_kept_results():
+    read = check_own.verdicts(ROWS, HAND)
+    s = check_own.scores(REPOS, ROWS, read)
+    assert s == SCORES
+    assert check_own.markdown(s, REPOS, ROWS, HAND) == (ROOT / "docs" / "results" / "own.md").read_text(encoding="utf-8")
+
+
+def test_every_flagged_line_has_a_hand_verdict():
+    assert all(h["verdict"] in check_own.ALL and h["why"] for h in HAND)
+    with pytest.raises(SystemExit, match="Read these flagged lines by hand first"):
+        check_own.verdicts(ROWS, [{**HAND[0], "lines": HAND[0]["lines"][1:]}])
+    with pytest.raises(SystemExit, match="no longer flagged"):
+        check_own.verdicts(ROWS, [{**HAND[0], "lines": HAND[0]["lines"] + [["README.md", 1]]}])
+    rows = copy.deepcopy(ROWS)
+    rows[0]["flagged"].append({"file": "README.md", "line": 1})
+    with pytest.raises(SystemExit, match="Read these flagged lines by hand first"):
+        check_own.verdicts(rows, HAND)
+
+
+def test_each_merge_is_a_pull_request_of_a_pinned_project():
+    assert {r["repo"] for r in ROWS} == {e["repo"] for e in REPOS}
+    for entry in REPOS:
+        numbers = [r["pr"] for r in ROWS if r["repo"] == entry["repo"]]
+        assert numbers == list(range(1, len(numbers) + 1))  # every pull request, in order
+        assert next(r for r in reversed(ROWS) if r["repo"] == entry["repo"])["commit"] == entry["commit"]
+
+
+def test_readme_and_plan_numbers_for_my_own_projects():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    plan = (ROOT / "docs" / "plan.md").read_text(encoding="utf-8")
+    csc, cf = SCORES["Ronak-Mahidharia/car-safety-checker"], SCORES["Ronak-Mahidharia/control-finder"]
+    assert cf["lines"] == 0 and f"- **Control Finder** ({cf['merges']} merges): nothing flagged." in readme
+    assert csc["merges_flagged"] == 1 and csc["false_alarms"] == csc["lines"] and csc["wrong"] == 0
+    assert (f"- **Car Safety Checker** ({csc['merges']} merges): {csc['lines']} lines flagged, all in one pull request, "
+            "and all false alarms. That pull request removed a function named `records`") in readme
+    assert [h["name"] for h in HAND] == ["records"]
+    merges = sum(t["merges"] for t in SCORES.values())
+    lines = sum(t["lines"] for t in SCORES.values())
+    assert (f"on {merges} merged pull requests in my two public projects, it flagged {lines} lines, all false alarms "
+            "from one removed function named with an ordinary word, `records`") in plan
+
+
+@pytest.mark.skipif(not all(place(e["repo"]).is_dir() for e in REPOS), reason="needs the projects' history (scripts/check_own.py --run)")
+def test_the_kept_merges_match_the_history():
+    for entry in REPOS:
+        repo = place(entry["repo"])
+        kept = [(r["commit"], r["subject"]) for r in ROWS if r["repo"] == entry["repo"]]
+        assert check_own.merges(repo, entry["commit"]) == kept
+
+        def git(*args: str) -> str:
+            return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True, check=True).stdout.strip()
+        # each merge's parent is the merge before it, and the first one's is the project's first commit
+        parents = [git("rev-parse", f"{commit}^1") for commit, _ in kept]
+        assert parents == [git("rev-list", "--max-parents=0", entry["commit"])] + [commit for commit, _ in kept[:-1]]

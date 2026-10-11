@@ -1,0 +1,7 @@
+{
+ "about": "My own public projects, checked with docs-proof on every pull request merged into main (step 6). Each is pinned to its main branch on Oct 11, 2026. Both are mine and public, so running a tool on them shares nothing that isn't public already.",
+ "repos": [
+  {"repo": "Ronak-Mahidharia/car-safety-checker", "url": "https://github.com/Ronak-Mahidharia/car-safety-checker.git", "commit": "8a8fab138e45824b0977e3b3033a4d1d36653e26", "license": "MIT"},
+  {"repo": "Ronak-Mahidharia/control-finder", "url": "https://github.com/Ronak-Mahidharia/control-finder.git", "commit": "2448c23ff8ca62409e29050e0c6a031c6f4eac46", "license": "MIT"}
+ ]
+}
