@@ -1328,5 +1328,173 @@
     "why": "The pull request removed the top-level function `records()` from `src/carsafety/nhtsa.py`, and no doc line ever named it as code. Every flagged line uses \"records\" as an ordinary word, such as \"NHTSA's own records\" or \"complaint records\". The suggested fix was wrong too: it paired `records` with `words()`, a new and unrelated helper in `src/carsafety/vehicles.py`."
    }
   ]
+ },
+ "real_fixes": {
+  "checked_on": "2026-10-11",
+  "about": "Hand verdicts on the rules' fixes (step 4) for the real-history lines docs-proof flagged (step 6), judged against the project's code just after the change and the later commit's fix, both read from the fetched history.",
+  "criteria": "Right: the fixed line is true of the code after the change. Incomplete: the right new name, but the line still says something the change made untrue (a description, a type, an example, a module path). Wrong: the new name isn't what replaced the old one, or the fix makes the line say something false.",
+  "fixes": [
+   {
+    "case": "coveragepy/coveragepy@469d26f116",
+    "file": "doc/contributing.rst",
+    "line": 181,
+    "verdict": "wrong",
+    "why": "The change replaced the tracer variables with a different scheme: COVERAGE_CORE names a core (such as ctrace), COVERAGE_TEST_CORES lists the cores to test, and COVERAGE_ONE_CORE runs tests for one core (coverage/collector.py, igor.py). The fix pairs each old variable with one of them by how alike the names are, so it says something false, such as \"COVERAGE_CORE=1 disables the Python tracer\"."
+   },
+   {
+    "case": "coveragepy/coveragepy@469d26f116",
+    "file": "doc/contributing.rst",
+    "line": 184,
+    "verdict": "wrong",
+    "why": "The change replaced the tracer variables with a different scheme: COVERAGE_CORE names a core (such as ctrace), COVERAGE_TEST_CORES lists the cores to test, and COVERAGE_ONE_CORE runs tests for one core (coverage/collector.py, igor.py). The fix pairs each old variable with one of them by how alike the names are, so it says something false, such as \"COVERAGE_CORE=1 disables the Python tracer\"."
+   },
+   {
+    "case": "coveragepy/coveragepy@469d26f116",
+    "file": "doc/contributing.rst",
+    "line": 187,
+    "verdict": "wrong",
+    "why": "The change replaced the tracer variables with a different scheme: COVERAGE_CORE names a core (such as ctrace), COVERAGE_TEST_CORES lists the cores to test, and COVERAGE_ONE_CORE runs tests for one core (coverage/collector.py, igor.py). The fix pairs each old variable with one of them by how alike the names are, so it says something false, such as \"COVERAGE_CORE=1 disables the Python tracer\"."
+   },
+   {
+    "case": "simonw/datasette@b9c6e7a0f6",
+    "file": "docs/plugin_hooks.rst",
+    "line": 1460,
+    "verdict": "incomplete",
+    "why": "PermissionSQL is the right new name, but the same change moved the class to datasette/permissions.py, so datasette.utils.permissions.PermissionSQL names a module that no longer has it. The later fix wrote datasette.permissions.PermissionSQL."
+   },
+   {
+    "case": "simonw/datasette@b9c6e7a0f6",
+    "file": "docs/plugin_hooks.rst",
+    "line": 1474,
+    "verdict": "incomplete",
+    "why": "PermissionSQL is the right new name, but the same change moved the class to datasette/permissions.py, so datasette.utils.permissions.PermissionSQL names a module that no longer has it. The later fix wrote datasette.permissions.PermissionSQL."
+   },
+   {
+    "case": "simonw/llm@2066397aae",
+    "file": "docs/help.md",
+    "line": 305,
+    "verdict": "incomplete",
+    "why": "--short is the new option, but this is help output: the new help says \"Shorter YAML output with truncated prompts\" (llm/cli.py), and the fix keeps the old description."
+   },
+   {
+    "case": "simonw/llm@2066397aae",
+    "file": "docs/logging.md",
+    "line": 92,
+    "verdict": "right",
+    "why": "--short shows the prompts truncated, without responses; the later docs say \"a shortened YAML log with truncated prompts and no responses\"."
+   },
+   {
+    "case": "simonw/llm@2066397aae",
+    "file": "docs/logging.md",
+    "line": 94,
+    "verdict": "right",
+    "why": "llm logs -n 2 --short is a working command, and the later docs use exactly it."
+   },
+   {
+    "case": "simonw/llm@88d839fa85",
+    "file": "docs/help.md",
+    "line": 86,
+    "verdict": "incomplete",
+    "why": "--cid is the new option (with --conversation), but it takes a text ID and its help says \"Continue the conversation with the given ID.\"; the fix keeps INTEGER and \"chat ID\"."
+   },
+   {
+    "case": "simonw/llm@88d839fa85",
+    "file": "docs/usage.md",
+    "line": 43,
+    "verdict": "right",
+    "why": "--cid is how to continue a given conversation; the later docs say `--cid/--conversation <id>`."
+   },
+   {
+    "case": "simonw/llm@88d839fa85",
+    "file": "docs/usage.md",
+    "line": 45,
+    "verdict": "incomplete",
+    "why": "The change made conversation IDs text (load_conversation takes a str), and the later example is --cid 01h53zma5txeby33t1kbe3xk8q; the fix keeps the old number, 2."
+   },
+   {
+    "case": "tldr-pages/tldr-python-client@21a712e115",
+    "file": "README.md",
+    "line": 112,
+    "verdict": "right",
+    "why": "tldr reads LANGUAGE as the priority list (tldr.py, line 160), so the fix matches the code; the later commit rewrote the paragraph."
+   },
+   {
+    "case": "tldr-pages/tldr-python-client@21a712e115",
+    "file": "README.md",
+    "line": 114,
+    "verdict": "right",
+    "why": "tldr reads LANGUAGE as the priority list (tldr.py, line 160), and the later line names LANGUAGE too."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@06e57990f7",
+    "file": "README.md",
+    "line": 331,
+    "verdict": "incomplete",
+    "why": "--config-locations \"Can be used multiple times\", so \"except the one provided by\" is out of date; the later line says \"except those given by --config-locations\"."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@06e57990f7",
+    "file": "README.md",
+    "line": 338,
+    "verdict": "right",
+    "why": "The help line with the new name; the later line also re-aligned the columns."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@73922e66e4",
+    "file": "CONTRIBUTING.md",
+    "line": 180,
+    "verdict": "right",
+    "why": "--include-group is the new option, and the later fix used it."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@73922e66e4",
+    "file": "README.md",
+    "line": 262,
+    "verdict": "right",
+    "why": "--include-group is the new option, and the later fix used it. Its later line also changed python3 to python, which the change didn't need."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@b1a7cd056a",
+    "file": "README.md",
+    "line": 114,
+    "verdict": "right",
+    "why": "--match-filters is the new option, and the later fix used it. The later commit then removed the line."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@b1a7cd056a",
+    "file": "README.md",
+    "line": 433,
+    "verdict": "right",
+    "why": "--match-filters is the new option, and the later fix used it. Its later line also re-aligned the columns."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@b1a7cd056a",
+    "file": "README.md",
+    "line": 1869,
+    "verdict": "right",
+    "why": "--match-filters is the new option, and the later fix used it."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@b1a7cd056a",
+    "file": "README.md",
+    "line": 1870,
+    "verdict": "right",
+    "why": "--match-filters is the new option, and the later fix used it."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@b1a7cd056a",
+    "file": "README.md",
+    "line": 1871,
+    "verdict": "right",
+    "why": "--match-filters is the new option, and the later fix used it."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@b1a7cd056a",
+    "file": "README.md",
+    "line": 1872,
+    "verdict": "right",
+    "why": "--match-filters is the new option, and the later fix used it."
+   }
+  ]
  }
 }
