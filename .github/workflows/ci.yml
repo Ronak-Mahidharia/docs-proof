@@ -107,6 +107,7 @@ jobs:
           python scripts/run_real.py  # the real-history scores, from the kept results (mining needs the fetched history)
           python scripts/check_own.py  # the check on my own projects, from the kept results (rerunning fetches their history)
           python scripts/real_fixes.py  # the fixes on real history, from the kept results and hand verdicts
+          python scripts/write_up.py  # the write-up, every number from the results (the demo needs the fetched history)
       - name: Check that nothing changed
         run: |
           git diff --exit-code
