@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, a check on my own projects, and a rule for names that could be ordinary words. Next: the fixes, measured on the real-history key, then the write-up. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, a check on my own projects, a rule for names that could be ordinary words, and the fixes measured on real history. Next is the write-up and a demo. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -64,6 +64,8 @@ The planted changes measure what docs-proof was built to find. A second answer k
 - **Why it misses:** it flagged every line whose name its exact check compares, 7 of 7 on test (19 of 19 on dev). The other 16 test lines name what it doesn't compare: a method (alembic's `compare_against_backend()`), another library's name (livereload's `Server`), a dependency (`sphinx_rtd_theme`), or a value (autopep8's `W690` fixer). So on real history, its misses come from what it compares, not from how it matches doc lines.
 - **How long the lines stayed wrong:** on test, a median of 447 days over the 23 lines, and up to 1,424 days (alembic's `SafeConfigParser`, almost 4 years). On dev, a median of 18 days, with 9 of the 30 lines fixed the same day.
 - **Not scored:** it also flagged 30 lines the key doesn't list, since the key lists only the lines its rules matched to a later fix. By the pinned commit, 20 of them had changed, 13 in a commit that fixed one of the case's key lines. A hand check of the 10 still there found 4 false alarms and 6 unclear.
+- **Its fixes, against the later commits' own fixes** ([docs/results/real-fixes.md](docs/results/real-fixes.md)): a hand check of the 23 lines the rules would have fixed found 14 right, 6 incomplete, and 3 wrong. On dev, all 18 used the new name that replaced the old one, and 4 left something else the change made untrue, such as a help line's old description. On test, the 3 wrong ones are coverage.py's: the change replaced three variables with a different scheme, and the rules paired them one to one by how alike the names are.
+- **The stricter check step 4 left for new data** (a fix may change a line only where the old name is): it stops none of the agent's dev fixes, and the later commits changed more than the old name in 7 of the 14 lines they edited, so it isn't added.
 
 ## On my own projects
 docs-proof checked every pull request merged into main in my two public projects, [Car Safety Checker](https://github.com/Ronak-Mahidharia/car-safety-checker) and [Control Finder](https://github.com/Ronak-Mahidharia/control-finder), the way its GitHub Action would have: just before and just after each merge, with no AI ([docs/results/own.md](docs/results/own.md)).
@@ -145,6 +147,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python scripts/run_fixes.py            # the fixes and their scores, from the kept runs and answers
 .venv/bin/python scripts/check_tool.py           # the docs-proof tool on every case, against the measured steps
 .venv/bin/python scripts/run_real.py             # the real-history scores, from the kept results
+.venv/bin/python scripts/real_fixes.py           # the fixes on real history, from the kept results and hand verdicts
 .venv/bin/python scripts/check_own.py            # the check on my own projects, from the kept results
 ```
 
@@ -164,6 +167,7 @@ To mine the real history again (about 6 minutes on a 10-core Mac; the histories 
 .venv/bin/python scripts/fetch_history.py        # each repository's history since 2020, up to its pinned commit
 .venv/bin/python scripts/build_real_cases.py     # mines the cases, then keeps the ones the hand check found real
 .venv/bin/python scripts/run_real.py --run       # runs docs-proof on each case, the way it would have run on the day
+.venv/bin/python scripts/real_fixes.py --run     # reads what each later commit made of the line
 ```
 The mining stops if it finds a case that hasn't been checked by hand, and the scores aren't written until every flagged line that's still there has been read.
 

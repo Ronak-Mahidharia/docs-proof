@@ -44,7 +44,7 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
 6. **Real history** as a second answer key, plus a check on my own repositories.
    **Done:** the key: 27 real cases, of 36 mined, in the 30 repositories' history since 2020. On test, docs-proof would have flagged 7 of the 23 lines a later commit fixed (30.4%), including every line whose name it compares ([results](results/real.md)). And the check on my own repositories: on 33 merged pull requests in my two public projects, it flagged 23 lines, all false alarms from one removed function named with an ordinary word, `records` ([results](results/own.md)). That led to a rule: a removed function or class whose name could be an ordinary word counts only where the doc marks it as code. It changed no result on either answer key, and on my own projects it removed all 23 false alarms.
 7. **The write-up and a demo.**
-   - **Before it:** the fixes, measured on the real-history key: the stricter check step 4 left for a new answer key (a fix changes a line only where the old name or value is), and how an old name is paired with a new one (Car Safety Checker's `records` was paired with an unrelated new `words`).
+   - **Done before it:** the fixes, measured on the real-history key: a hand check found 14 of the rules' 23 fixes right, 6 incomplete, and 3 wrong, all 3 from pairing coverage.py's replaced variables one to one. The stricter check step 4 left for new data stops none of the agent's dev fixes, and right fixes often change more than the old name, so it isn't added ([results](results/real-fixes.md)).
    - **After it:** a full check of the project (a fresh clone, every script, failures caused on purpose, and a code review), then the README as a finished project.
 
 ## Rules

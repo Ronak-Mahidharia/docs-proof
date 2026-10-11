@@ -1,0 +1,80 @@
+{
+ "dev": {
+  "lines": 30,
+  "flagged": 19,
+  "fixed": 18,
+  "right": 14,
+  "incomplete": 4,
+  "wrong": 0,
+  "later_edits": 12,
+  "later_edits_only_the_name": 7
+ },
+ "test": {
+  "lines": 23,
+  "flagged": 7,
+  "fixed": 5,
+  "right": 0,
+  "incomplete": 2,
+  "wrong": 3,
+  "later_edits": 2,
+  "later_edits_only_the_name": 0
+ },
+ "agent": {
+  "dev qwen3:8b v1": {
+   "right_kept": 2,
+   "right_stopped": 0,
+   "wrong_kept": 0,
+   "wrong_stopped": 0,
+   "harm_kept": 4,
+   "harm_stopped": 0
+  },
+  "dev qwen3:8b v2": {
+   "right_kept": 2,
+   "right_stopped": 0,
+   "wrong_kept": 0,
+   "wrong_stopped": 0,
+   "harm_kept": 4,
+   "harm_stopped": 0
+  },
+  "dev qwen3:8b v3": {
+   "right_kept": 2,
+   "right_stopped": 0,
+   "wrong_kept": 0,
+   "wrong_stopped": 0,
+   "harm_kept": 4,
+   "harm_stopped": 0
+  },
+  "dev granite4:3b v1": {
+   "right_kept": 1,
+   "right_stopped": 0,
+   "wrong_kept": 0,
+   "wrong_stopped": 0,
+   "harm_kept": 2,
+   "harm_stopped": 0
+  },
+  "dev granite4:3b v2": {
+   "right_kept": 1,
+   "right_stopped": 0,
+   "wrong_kept": 0,
+   "wrong_stopped": 0,
+   "harm_kept": 1,
+   "harm_stopped": 0
+  },
+  "dev granite4:3b v3": {
+   "right_kept": 1,
+   "right_stopped": 0,
+   "wrong_kept": 0,
+   "wrong_stopped": 0,
+   "harm_kept": 1,
+   "harm_stopped": 0
+  },
+  "test qwen3:8b v3": {
+   "right_kept": 3,
+   "right_stopped": 0,
+   "wrong_kept": 0,
+   "wrong_stopped": 1,
+   "harm_kept": 2,
+   "harm_stopped": 1
+  }
+ }
+}

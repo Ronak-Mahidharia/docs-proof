@@ -640,7 +640,9 @@ def markdown(s: dict) -> str:
               "- **The check that a fix keeps most of a line is loose.** On test, it let through a fix that cuts a line "
               "short (pipx's comparisons.rst:227) and one that drops a Markdown quote marker (mkdocs's plugins.md:117). "
               "A stricter check, that a fix changes the line only where the old name or value is, would have stopped "
-              "both. It was found on test, so it waits for a new answer key (step 6) to be measured.", ""]
+              "both. It was found on test, so it waited for new data. Measured in step 6, it stops none of the agent's "
+              "dev fixes, and right fixes often change more than the old name, so it isn't added "
+              "([fixes on real history](real-fixes.md)).", ""]
     return "\n".join(lines)
 
 
