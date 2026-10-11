@@ -29,6 +29,53 @@ jobs:
       - name: Run tests (the answer key, the published scores, and the README's numbers)
         run: python -m pytest -q
 
+  # The GitHub Action itself, on GitHub's runner and its oldest supported Python: on a throwaway repository with
+  # one option renamed, and on each pull request here. Read-only like the rest: the report goes to the job summary
+  # and annotations, and nothing is commented.
+  action:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 2 # a pull request's merge commit, and its base
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: A throwaway repository with one option renamed
+        run: |
+          set -eu
+          repo="$RUNNER_TEMP/selftest"
+          mkdir -p "$repo/tiny"
+          cd "$repo"
+          printf '# tiny\nUse `--limit` to cap the list.\n' > README.md
+          printf 'import argparse\np = argparse.ArgumentParser()\np.add_argument("--limit", type=int)\n' > tiny/cli.py
+          git init -q -b main
+          git add -A
+          git -c user.name=ci -c user.email=ci@example.com commit -q -m start
+          sed -i 's/"--limit"/"--cap"/' tiny/cli.py
+          git -c user.name=ci -c user.email=ci@example.com commit -q -am "rename --limit"
+      - name: The action, on that repository
+        id: selftest
+        uses: ./
+        with:
+          path: ${{ runner.temp }}/selftest
+          base: HEAD~1
+          fail-on-findings: "false"
+      - name: It flagged the stale line, with a fix
+        env:
+          FINDINGS: ${{ steps.selftest.outputs.findings }}
+          FIXES: ${{ steps.selftest.outputs.fixes }}
+          PATCH: ${{ steps.selftest.outputs.patch }}
+        run: |
+          test "$FINDINGS" = 1
+          test "$FIXES" = 1
+          grep -qF '+Use `--cap` to cap the list.' "$PATCH"
+      - name: The action, on this pull request
+        if: github.event_name == 'pull_request'
+        uses: ./
+
   # Rebuilds the answer key and the results from the 30 pinned repositories, and fails if anything
   # differs from what's committed.
   reproduce:

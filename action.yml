@@ -1,0 +1,74 @@
+# The docs-proof GitHub Action: on a pull request, find the doc lines the change made wrong, with proof for each
+# one, and suggest fixes. It reads the pull request's code and docs, and never runs them.
+#
+#   on: pull_request
+#   permissions:
+#     contents: read
+#   jobs:
+#     docs-proof:
+#       runs-on: ubuntu-latest
+#       steps:
+#         - uses: actions/checkout@<commit>   # pinned to a commit
+#           with:
+#             fetch-depth: 2                   # the pull request's merge commit, and its base
+#             persist-credentials: false
+#         - uses: Ronak-Mahidharia/docs-proof@<commit>
+#
+# By default it needs no write permission: the report goes to the job summary and to annotations, and the step
+# fails when a line is flagged. With comment: true it also comments on the pull request, which needs
+# "pull-requests: write" (GitHub's token is always read-only on pull requests from forks, so it's skipped there).
+name: docs-proof
+description: Find the doc lines a pull request made wrong, with proof for each one, and suggest fixes.
+author: Ronak Mahidharia
+branding:
+  icon: file-text
+  color: blue
+inputs:
+  path:
+    description: The repository's folder, checked out with fetch-depth 2 or more.
+    default: "."
+  base:
+    description: The commit before the change. By default, the base of the pull request's merge commit.
+    default: ""
+  head:
+    description: The commit after the change. By default, the checked-out commit.
+    default: HEAD
+  fail-on-findings:
+    description: Fail the step when a doc line is flagged ("true" or "false").
+    default: "true"
+  comment:
+    description: Also comment on the pull request, and update that comment on later runs ("true" needs pull-requests write).
+    default: "false"
+  token:
+    description: The token for the comment.
+    default: ${{ github.token }}
+outputs:
+  findings:
+    description: How many doc lines were flagged.
+    value: ${{ steps.check.outputs.findings }}
+  fixes:
+    description: How many fixes were suggested.
+    value: ${{ steps.check.outputs.fixes }}
+  patch:
+    description: The suggested fixes, as a patch file.
+    value: ${{ steps.check.outputs.patch }}
+runs:
+  using: composite
+  steps:
+    - id: check
+      shell: bash
+      # Every input reaches the script through the environment, never pasted into it, so no input can run as code.
+      env:
+        DOCSPROOF_PATH: ${{ inputs.path }}
+        DOCSPROOF_BASE: ${{ inputs.base }}
+        DOCSPROOF_HEAD: ${{ inputs.head }}
+        DOCSPROOF_FAIL: ${{ inputs.fail-on-findings }}
+        DOCSPROOF_COMMENT: ${{ inputs.comment }}
+        DOCSPROOF_TOKEN: ${{ inputs.token }}
+        DOCSPROOF_SRC: ${{ github.action_path }}/src
+      run: |
+        if ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 12))'; then
+          echo "::error title=docs-proof::docs-proof needs Python 3.12 or newer; set it up with actions/setup-python first"
+          exit 2
+        fi
+        PYTHONPATH="$DOCSPROOF_SRC" python3 -m docsproof.action
