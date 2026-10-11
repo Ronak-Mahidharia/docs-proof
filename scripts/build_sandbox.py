@@ -22,6 +22,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from build_cases import folder  # noqa: E402
 from docsproof.commands import console_scripts, main_packages  # noqa: E402
+from failures import explained  # noqa: E402
 
 IMAGE = "docsproof-sandbox"
 BASE = "python:3.14-slim@sha256:a2b82f3c48559aa0a8446d9af49826b6e2b2016f4cd2afabfe6013ec53729170"
@@ -95,4 +96,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    explained(main)

@@ -50,17 +50,47 @@ def is_doc(rel: str) -> bool:
     return not (path.suffix.lower() == ".txt" and REQUIREMENTS.search(path.name))
 
 
+def inside(path: Path, root: Path) -> bool:
+    """Whether a path, after following any links, is in the folder."""
+    return path.resolve().is_relative_to(root.resolve())
+
+
+def readable(rel: str) -> bool:
+    """Whether a file's name is valid UTF-8. One that isn't can't be printed, or named in a patch."""
+    try:
+        rel.encode("utf-8")
+        return True
+    except UnicodeEncodeError:
+        return False
+
+
+def project_file(path: Path, root: Path) -> bool:
+    """Whether a path is a file of the project's own: a readable name, and, after following any links, a file in
+    the folder (a link to a file elsewhere isn't the project's, and one to nothing isn't a file)."""
+    return readable(path.relative_to(root).as_posix()) and path.is_file() and inside(path, root)
+
+
 def doc_files(root: Path) -> list[str]:
     """The repository's doc files, as sorted relative paths."""
-    found = [p.name for p in root.iterdir() if p.is_file()]
+    found = [p.name for p in root.iterdir()]
     for name in DOC_DIRS:
         if (root / name).is_dir():
-            found += [p.relative_to(root).as_posix() for p in (root / name).rglob("*") if p.is_file()]
-    return sorted(f for f in found if is_doc(f))
+            found += [p.relative_to(root).as_posix() for p in (root / name).rglob("*")]
+    return sorted(rel for rel in found if is_doc(rel) and project_file(root / rel, root))
+
+
+def split_lines(text: str) -> list[str]:
+    """A text's lines as git and GitHub count them: split only at "\n", with a "\r" before it dropped.
+    str.splitlines would also break at a form feed and other separators that can sit inside a line, and then
+    the line numbers docs-proof reports, and the patch it makes, would drift from the file's."""
+    lines = text.split("\n")
+    if lines[-1] == "":
+        lines.pop()
+    return [line[:-1] if line.endswith("\r") else line for line in lines]
 
 
 def read_lines(path: Path) -> list[str]:
-    return path.read_text(encoding="utf-8", errors="replace").splitlines()
+    return split_lines(path.read_bytes().decode("utf-8", errors="replace"))
 
 
 def token_pattern(name: str, kind: str) -> re.Pattern[str]:

@@ -28,6 +28,7 @@ from build_sandbox import sandboxed  # noqa: E402
 from build_sandbox import SKIP  # noqa: E402
 from docsproof.commands import commands  # noqa: E402
 from docsproof.run import MISSING_INPUT, documented, flagged_lines, proof, refused, run_in_sandbox, runnable  # noqa: E402
+from failures import explained  # noqa: E402
 from run_baseline import RESULTS, load_cases, pct, report  # noqa: E402
 
 RUNS = RESULTS / "runs"
@@ -275,4 +276,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    explained(main)

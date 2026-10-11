@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 
-from .docs import skipped
+from .docs import project_file, skipped
 
 TEST_DIRS = {"tests", "test", "testing"}  # skipped at any depth, when they hold test files
 # Skipped only at the top level: a package's own scripts folder, such as piptools/scripts, is project code.
@@ -44,6 +44,8 @@ def project_files(root: Path) -> list[str]:
         rel = path.relative_to(root)
         folders = rel.parts[:-1]
         if skipped(rel.parts) or (folders and folders[0] in TOP_LEVEL_NOT_PROJECT) or TEST_FILE.match(path.name):
+            continue
+        if not project_file(path, root):  # a link to nothing or out of the folder, a folder named x.py
             continue
         tested = False
         for depth in range(1, len(folders) + 1):
@@ -112,7 +114,7 @@ class Code:
         for rel in project_files(root):
             try:
                 self.trees[rel] = ast.parse((root / rel).read_text(encoding="utf-8", errors="replace"))
-            except (SyntaxError, ValueError):
+            except (SyntaxError, ValueError, OSError):  # OSError: a file it may not read
                 continue
 
     def option_calls(self) -> list[tuple[str, ast.Call]]:

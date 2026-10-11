@@ -157,7 +157,7 @@ def check_shape(fix: Fix, lines: list[str], flagged: int) -> str | None:
         return "those aren't the doc's lines"
     if fix.new == fix.old:
         return "that changes nothing"
-    if any(text.splitlines() not in ([text], []) for text in fix.new):
+    if any("\n" in text or "\r" in text for text in fix.new):
         return "give one line in each string"
     for old_text, new_text in zip(fix.old, fix.new):
         if old_text != new_text and not close(old_text, new_text):
@@ -180,14 +180,32 @@ def apply(lines: list[str], fixes: list[Fix]) -> list[str]:
     return out
 
 
+def utf8(path: Path) -> bool:
+    """Whether a doc is valid UTF-8. One that isn't is read, but never rewritten: writing it back would change
+    bytes no fix meant to change."""
+    try:
+        path.read_bytes().decode("utf-8")
+        return True
+    except UnicodeDecodeError:
+        return False
+
+
+def _split_raw(text: str) -> list[str]:
+    """A text's lines with their own endings ("\r\n" kept), split where read_lines splits them: at "\n" only."""
+    parts = text.split("\n")
+    return [part + "\n" for part in parts[:-1]] + ([parts[-1]] if parts[-1] else [])
+
+
 def _raw_lines(path: Path) -> list[str]:
-    """The file's lines with their own endings ("\r\n" kept), split where read_lines splits them."""
-    return path.read_bytes().decode("utf-8", errors="replace").splitlines(keepends=True)
+    try:
+        return _split_raw(path.read_bytes().decode("utf-8"))
+    except UnicodeDecodeError:
+        raise ValueError(f"{path.name} isn't valid UTF-8, so docs-proof won't rewrite it") from None
 
 
 def _content(line: str) -> str:
-    parts = line.splitlines()
-    return parts[0] if parts else ""
+    """A line without its ending, as read_lines gives it: no "\n", and no "\r" before it."""
+    return line.removesuffix("\n").removesuffix("\r")
 
 
 def fixed_text(path: Path, fixes: list[Fix]) -> str:
@@ -205,6 +223,6 @@ def patch(root: Path, fixes: list[Fix]) -> str:
     out = []
     for rel in sorted(by_file):
         before = _raw_lines(root / rel)
-        after = fixed_text(root / rel, by_file[rel]).splitlines(keepends=True)
+        after = _split_raw(fixed_text(root / rel, by_file[rel]))
         out += difflib.unified_diff(before, after, f"a/{rel}", f"b/{rel}")
     return "".join(line if line.endswith("\n") else line + "\n\\ No newline at end of file\n" for line in out)

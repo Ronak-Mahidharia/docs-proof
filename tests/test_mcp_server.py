@@ -86,7 +86,7 @@ def test_commits_and_folders(tmp_path):
 def test_problems_come_back_as_messages(tmp_path):
     plain = write(tmp_path / "plain", FILES)
     for tool, arguments, message in (
-            ("check_repository", {"repo": str(plain)}, "not a git repository"),
+            ("check_repository", {"repo": str(plain)}, "isn't in a git repository"),
             ("check_repository", {"repo": str(repo(tmp_path)), "base": "nope"}, "no commit, branch, or tag called nope"),
             ("check_folders", {"before": str(plain), "after": str(tmp_path / "missing")}, "isn't a folder")):
         got = call(tool, arguments)
@@ -110,8 +110,15 @@ def test_a_long_report_is_capped(tmp_path, monkeypatch):
 def test_over_stdio_as_an_assistant_starts_it(tmp_path, capsys):
     root = repo(tmp_path)
     rename_limit(root)
-    params = StdioServerParameters(command=sys.executable, args=["-m", "docsproof.mcp_server"],
-                                   env={**os.environ, "PYTHONPATH": str(SRC)})
+    own = root / "docsproof"  # the checked project has a docsproof of its own, in the folder the server starts in
+    own.mkdir()
+    for name in ("__init__.py", "mcp_server.py"):
+        (own / name).write_text("raise SystemExit('the checked project ran its own code')\n", encoding="utf-8")
+    readme = (SRC.parent / "README.md").read_text(encoding="utf-8")
+    assert '-- "$PWD/.venv/bin/python" -P -m docsproof.mcp_server' in readme  # as the README starts it
+    assert "`python -P -m docsproof.mcp_server`" in readme
+    params = StdioServerParameters(command=sys.executable, args=["-P", "-m", "docsproof.mcp_server"],
+                                   env={**os.environ, "PYTHONPATH": str(SRC)}, cwd=str(root))
     out = call("check_repository", {"repo": str(root), "base": "HEAD"}, params).structured_content
     assert out["findings"] == command_json(capsys, ["--repo", str(root), "--base", "HEAD", "--json"])["findings"]
 

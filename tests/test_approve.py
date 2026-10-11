@@ -66,3 +66,35 @@ def test_local_fixes_stop_if_the_docs_changed_after_the_patch(tmp_path):
     with pytest.raises(RuntimeError, match="changed after the patch was made"):
         apply_locally(root, [FIX], approve_while_someone_edits)
     assert (root / "README.md").read_text(encoding="utf-8") == "# tiny, edited\nUse --limit here.\n"
+
+
+def test_the_pull_request_commits_only_the_fixes(tmp_path):
+    import subprocess
+    root = repo(tmp_path)
+    git = ["git", "-C", str(root), "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false"]
+    subprocess.run([*git, "init", "-q", "-b", "main"], check=True)
+    subprocess.run([*git, "add", "-A"], check=True)
+    subprocess.run([*git, "commit", "-q", "-m", "start"], check=True)
+    (root / "notes.txt").write_text("someone's work in progress\n", encoding="utf-8")
+    subprocess.run([*git, "add", "notes.txt"], check=True)  # staged before docs-proof runs
+
+    def run(cmd, **kwargs):  # git for real, with the test's name; never push or gh
+        if cmd[0] == "git" and cmd[3] != "push":
+            subprocess.run([*git, *cmd[3:]], check=True, capture_output=True)
+    assert open_pull_request(root, [FIX], lambda diff: True, "main", run=run)
+    shown = subprocess.run([*git, "show", "--name-only", "--format=", "HEAD"], capture_output=True, text=True).stdout
+    assert shown.split() == ["README.md"]
+    staged = subprocess.run([*git, "diff", "--cached", "--name-only"], capture_output=True, text=True).stdout
+    assert staged.split() == ["notes.txt"]  # still staged, as it was, and not in the fix
+
+
+def test_fixes_are_never_written_through_a_link_out_of_the_folder(tmp_path):
+    from docsproof.approve import apply_locally
+    elsewhere = tmp_path / "elsewhere.md"
+    elsewhere.write_text("# tiny\nUse --limit here.\n", encoding="utf-8")
+    root = tmp_path / "project"
+    root.mkdir()
+    (root / "README.md").symlink_to(elsewhere)
+    with pytest.raises(ValueError, match="leads out of"):
+        apply_locally(root, [FIX], lambda diff: True)
+    assert elsewhere.read_text(encoding="utf-8") == "# tiny\nUse --limit here.\n"

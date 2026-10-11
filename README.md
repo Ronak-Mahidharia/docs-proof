@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, a check on my own projects, a rule for names that could be ordinary words, and the fixes measured on real history, then the write-up and a demo. Next is a full check of the project, then this README as a finished project. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, a check on my own projects, a rule for names that could be ordinary words, and the fixes measured on real history, then the write-up and a demo, and a full check of the project. Next: a doc that's only a link to another doc is read once (the answer key counts its lines twice now), then this README as a finished project. The steps are in [docs/plan.md](docs/plan.md).
 
 **Read more:** [the write-up](docs/write-up.md), the project in order with the numbers behind each decision, and [a demo on a real change](docs/demo.md): yt-dlp's rename of `--match-filter`, and what docs-proof would have said that day.
 
@@ -132,7 +132,7 @@ README.md:316
 - **Not in it yet:** the sandbox runs, which need an environment built for each project, and the agent.
 
 ### In GitHub Actions
-On a pull request, the action runs the same check and reports it where GitHub shows it: the job summary, a warning on each flagged line, and a failed check. It reads the pull request's code and docs and never runs them, and it needs no write permission.
+On a pull request, the action runs the same check and reports it where GitHub shows it: the job summary, a warning on each flagged line (GitHub shows 10 for a step, and a note says when there are more), and a failed check. It reads the pull request's code and docs and never runs them, and it needs no write permission.
 
 ```yaml
 on: pull_request
@@ -151,7 +151,7 @@ jobs:
 
 - **A comment on the pull request** is optional: add `comment: true` under `with:`, and `pull-requests: write` under `permissions:`. Later runs update the same comment. On pull requests from forks, GitHub's token is always read-only, so the comment is skipped there, and the job summary still has the report.
 - **Inputs:** `base` and `head` (commits), `path` (the repository's folder), and `fail-on-findings: false` to report without failing the check. **Outputs:** `findings`, `fixes`, and `patch`, the suggested fixes as a file.
-- **Safe with what a pull request contains:** every input reaches the script through the environment, never pasted into it, and text from the docs is shown only inside code blocks that nothing in it can end.
+- **Safe with what a pull request contains:** every input reaches the script through the environment, never pasted into it. Python ignores a `docsproof` folder in the pull request (`-P`), GitHub reads no command from the doc text in the log, and text from the docs is shown only inside code blocks that nothing in it can end.
 - **Checked on GitHub's runner** with Python 3.12, in this repository's CI. On a throwaway repository with one option renamed, it must flag that one line, with its fix. It also runs on every pull request here.
 
 ### With Claude Code and other assistants (MCP)
@@ -159,12 +159,12 @@ The MCP server gives AI assistants two read-only tools: `check_repository` (a ch
 
 ```bash
 pip install -e . -r requirements-mcp.txt        # the official MCP Python SDK and its pinned dependencies
-claude mcp add --scope user docs-proof -- "$PWD/.venv/bin/python" -m docsproof.mcp_server
+claude mcp add --scope user docs-proof -- "$PWD/.venv/bin/python" -P -m docsproof.mcp_server
 ```
 
 - **The same answers as the command:** its tests compare the two, through a real MCP client, in-process and over stdio.
 - **Its dependencies:** mcp 2.3.0 and the 27 packages it installs, all with permissive licenses, pinned in [requirements-mcp.txt](requirements-mcp.txt). pip-audit found no known vulnerabilities in them. The rest of docs-proof still uses only Python's standard library.
-- **Other MCP clients** start it the same way: `python -m docsproof.mcp_server`, over stdio.
+- **Other MCP clients** start it the same way: `python -P -m docsproof.mcp_server`, over stdio. With `-P`, Python doesn't look for modules in the folder it starts in, so a project you check can't put its own `docsproof` in the server's place.
 
 ## Reproduce
 ```bash

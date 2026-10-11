@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import ast
 import re
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -43,6 +44,11 @@ def _number(value: int | float) -> str:
     return repr(value) if isinstance(value, float) else str(value)
 
 
+def code_line(path: Path, number: int) -> str:
+    """A line of code, numbered as ast numbers it: Python counts lines at "\n" and "\r", not at a form feed."""
+    return path.read_text(encoding="utf-8", errors="replace").split("\n")[number - 1].strip()
+
+
 def _defaults(code: Code) -> dict[tuple[str, str, int], ast.Constant]:
     return {(option, where.file, where.line): const for option, where, const in code.option_defaults()}
 
@@ -52,10 +58,17 @@ def value_changes(before: Path, after: Path, before_code: Code | None = None,
     """The values the change set differently: option defaults, and the minimum Python version."""
     found = []
     old = _defaults(Code(before) if before_code is None else before_code)
-    for (option, file, line), const in sorted(_defaults(Code(after) if after_code is None else after_code).items()):
+    new = _defaults(Code(after) if after_code is None else after_code)
+    # a default whose line moved (a line added above it, say) is the same one when its file declares the
+    # option once, before and after the change
+    declared = Counter((o, f) for o, f, _ in old), Counter((o, f) for o, f, _ in new)
+    moved = {(o, f): const for (o, f, _), const in old.items() if declared[0][(o, f)] == declared[1][(o, f)] == 1}
+    for (option, file, line), const in sorted(new.items()):
         previous = old.get((option, file, line))
+        if previous is None:
+            previous = moved.get((option, file))
         if previous is not None and previous.value != const.value:
-            code = read_lines(after / file)[const.lineno - 1].strip()
+            code = code_line(after / file, const.lineno)
             found.append(ValueChange("default", option, _number(previous.value), _number(const.value), file,
                                      const.lineno, code))
     was, now = min_python(before), min_python(after)

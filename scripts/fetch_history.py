@@ -14,6 +14,8 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from failures import explained
+
 ROOT = Path(__file__).resolve().parent.parent
 HISTORY = ROOT / "data" / "history"
 SINCE = "2020-01-01"
@@ -25,7 +27,11 @@ def place(repo: str) -> Path:
 
 
 def git(target: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(target), *args], capture_output=True, text=True, check=check)
+    done = subprocess.run(["git", "-C", str(target), *args], capture_output=True, text=True)
+    if check and done.returncode:
+        said = " ".join(done.stderr.split())  # git's message, on one line
+        raise SystemExit(f"{target.name}: git {args[0]} stopped ({said}); run this again to retry")
+    return done
 
 
 def fetch(entry: dict) -> str:
@@ -53,4 +59,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    explained(main)

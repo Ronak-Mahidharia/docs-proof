@@ -38,7 +38,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from docsproof.docs import is_doc, token_pattern  # noqa: E402
+from docsproof.docs import is_doc, split_lines, token_pattern  # noqa: E402
 from fetch_history import REF, SINCE, place  # noqa: E402
 
 CODE = ["*.py", ":(exclude)tests/*", ":(exclude)test/*", ":(exclude)docs/*", ":(exclude)doc/*"]
@@ -50,6 +50,13 @@ KIND = {"option": "option", "env": "identifier", "identifier": "identifier", "pa
 # Old code can make the parser warn (such as "\\s" in a plain string) and is still read; set once, before any thread.
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 LITERALS = {"true", "false", "none", "null"}
+
+
+def file_lines(repo: Path, commit: str, file: str) -> list[str] | None:
+    """A file's lines at a commit, read and split as docs-proof reads a doc (docs.read_lines), or None if it isn't
+    there."""
+    shown = subprocess.run(["git", "-C", str(repo), "show", f"{commit}:{file}"], capture_output=True)
+    return split_lines(shown.stdout.decode("utf-8", errors="replace")) if shown.returncode == 0 else None
 
 
 class History:
@@ -89,8 +96,7 @@ class History:
 
     def lines(self, commit: str, file: str) -> list[str] | None:
         """A file's lines at a commit, split as docs-proof splits them, or None if it isn't there."""
-        shown = self.git("show", f"{commit}:{file}")
-        return shown.stdout.splitlines() if shown.returncode == 0 else None
+        return file_lines(self.path, commit, file)
 
     def day(self, commit: str) -> str:
         return self.git("log", "-1", "--format=%cs", commit).stdout.strip()
