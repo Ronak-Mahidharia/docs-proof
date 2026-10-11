@@ -3,18 +3,18 @@
   "dev": {
    "groups": {
     "name": {
-     "expected": 208,
+     "expected": 207,
      "false_alarms": 5,
-     "right": 208,
+     "right": 207,
      "wrong": 0,
      "harm": 1,
      "declined": 0,
      "declined_false_alarms": 4
     },
     "value": {
-     "expected": 18,
+     "expected": 17,
      "false_alarms": 3,
-     "right": 14,
+     "right": 13,
      "wrong": 2,
      "harm": 3,
      "declined": 2,
@@ -27,9 +27,9 @@
   "test": {
    "groups": {
     "name": {
-     "expected": 350,
+     "expected": 338,
      "false_alarms": 7,
-     "right": 346,
+     "right": 334,
      "wrong": 0,
      "harm": 5,
      "declined": 4,
@@ -45,21 +45,21 @@
      "declined_false_alarms": 1
     }
    },
-   "command_lines": 52,
-   "command_lines_taken": 52
+   "command_lines": 51,
+   "command_lines_taken": 51
   }
  },
  "together": {
   "dev": {
    "name": {
-    "right": 208,
+    "right": 207,
     "wrong": 0,
     "left": 0,
     "harm": 5,
     "left alone": 0
    },
    "value": {
-    "right": 16,
+    "right": 15,
     "wrong": 2,
     "left": 0,
     "harm": 3,
@@ -68,7 +68,7 @@
   },
   "test": {
    "name": {
-    "right": 348,
+    "right": 336,
     "wrong": 1,
     "left": 1,
     "harm": 7,

@@ -575,7 +575,7 @@
  },
  "fixes": {
   "checked_on": "2026-10-10",
-  "about": "Hand checks of the answer key's fixed lines (step 4). The key fixes a doc line by making the planted change in it: every mention of a renamed name becomes the new name, except inside a file path, and the old value becomes the new value. Read by hand, in context: every value line (43), every name line that mentions the name more than once or under a package's name (51; one turned out not to be wrong, see the notes for PyCQA/bandit:rename_identifier:2), and 40 other name lines drawn at random (20 dev and 20 test, seed 4; listed in name_sample). All read right except the 5 value lines in labels, whose right fix isn't the mechanical one. real: the agent's fixes for the doc lines the step 2 audit found out of date, judged by hand after its runs.",
+  "about": "Hand checks of the answer key's fixed lines (step 4). The key fixes a doc line by making the planted change in it: every mention of a renamed name becomes the new name, except inside a file path, and the old value becomes the new value. Read by hand, in context: every value line (43), every name line that mentions the name more than once or under a package's name (51; one turned out not to be wrong, see the notes for PyCQA/bandit:rename_identifier:2), and 40 other name lines drawn at random (20 dev and 20 test, seed 4; listed in name_sample). All read right except the 5 value lines in labels, whose right fix isn't the mechanical one. Since each doc is read once (python-dotenv's docs/index.md and cookiecutter's docs/README.md are links to their READMEs), one sampled line, docs/index.md:219, is listed as README.md:219, the same line of the same file; and 1 of the 43 value lines, cookiecutter's docs/README.md:36, left the key as a copy of README.md:36. real: the agent's fixes for the doc lines the step 2 audit found out of date, judged by hand after its runs.",
   "name_sample": [
    [
     "psf/black:rename_option:1",
@@ -724,7 +724,7 @@
    ],
    [
     "theskumar/python-dotenv:rename_identifier:1",
-    "docs/index.md",
+    "README.md",
     219
    ],
    [

@@ -3,7 +3,7 @@
   "dev": {
    "cases": 116,
    "repos": 15,
-   "expected_lines": 226,
+   "expected_lines": 224,
    "kinds": {
     "rename_option": {
      "cases": 34,
@@ -42,7 +42,7 @@
      "cases": 15,
      "tp": 0,
      "fp": 0,
-     "fn": 21,
+     "fn": 20,
      "all_found": 0,
      "false_alarm_cases": 0,
      "precision": null,
@@ -62,14 +62,14 @@
     },
     "raise_python": {
      "cases": 5,
-     "tp": 14,
+     "tp": 13,
      "fp": 3,
      "fn": 0,
      "all_found": 5,
      "false_alarm_cases": 3,
-     "precision": 0.824,
+     "precision": 0.812,
      "recall": 1.0,
-     "f1": 0.904
+     "f1": 0.896
     },
     "rename_private": {
      "cases": 14,
@@ -98,7 +98,7 @@
     "cases": 81,
     "tp": 0,
     "fp": 0,
-    "fn": 208,
+    "fn": 207,
     "all_found": 0,
     "false_alarm_cases": 0,
     "precision": null,
@@ -107,14 +107,14 @@
    },
    "value": {
     "cases": 9,
-    "tp": 18,
+    "tp": 17,
     "fp": 3,
     "fn": 0,
     "all_found": 9,
     "false_alarm_cases": 3,
-    "precision": 0.857,
+    "precision": 0.85,
     "recall": 1.0,
-    "f1": 0.923
+    "f1": 0.919
    },
    "control": {
     "cases": 26,
@@ -124,13 +124,13 @@
   "test": {
    "cases": 130,
    "repos": 15,
-   "expected_lines": 375,
+   "expected_lines": 363,
    "kinds": {
     "rename_option": {
      "cases": 37,
      "tp": 0,
      "fp": 0,
-     "fn": 175,
+     "fn": 174,
      "all_found": 0,
      "false_alarm_cases": 0,
      "precision": null,
@@ -141,7 +141,7 @@
      "cases": 24,
      "tp": 0,
      "fp": 0,
-     "fn": 102,
+     "fn": 92,
      "all_found": 0,
      "false_alarm_cases": 0,
      "precision": null,
@@ -152,7 +152,7 @@
      "cases": 16,
      "tp": 0,
      "fp": 0,
-     "fn": 52,
+     "fn": 51,
      "all_found": 0,
      "false_alarm_cases": 0,
      "precision": null,
@@ -219,7 +219,7 @@
     "cases": 91,
     "tp": 0,
     "fp": 0,
-    "fn": 350,
+    "fn": 338,
     "all_found": 0,
     "false_alarm_cases": 0,
     "precision": null,

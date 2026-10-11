@@ -47,17 +47,28 @@ def test_lines_are_split_as_git_splits_them():
     assert "a\x0cb\nc".splitlines() == ["a", "b", "c"]  # what docs-proof used before, and why it drifted
 
 
-def test_doc_files_leave_out_links_out_of_the_folder_and_names_that_arent_utf8(tmp_path):
+def test_doc_files_leave_out_links_and_names_that_arent_utf8(tmp_path):
     import os
     root = tmp_path / "project"
     (root / "docs").mkdir(parents=True)
     (root / "README.md").write_text("x\n", encoding="utf-8")
+    (root / "docs" / "usage.md").write_text("x\n", encoding="utf-8")
     (tmp_path / "notes.md").write_text("x\n", encoding="utf-8")
     (root / "docs" / "notes.md").symlink_to(tmp_path / "notes.md")  # out of the folder
-    (root / "docs" / "index.md").symlink_to("../README.md")  # in it
+    (root / "docs" / "index.md").symlink_to("../README.md")  # in it: README.md is read under its own name
+    (root / "doc").symlink_to("docs")  # a folder link: docs/usage.md would be read twice
     (root / "docs" / "gone.md").symlink_to("nowhere.md")
     try:
         (root / "docs" / os.fsdecode(b"caf\xe9.md")).write_text("x\n", encoding="utf-8")
     except OSError:
         pass  # macOS doesn't allow a name that isn't UTF-8; Linux does
-    assert doc_files(root) == ["README.md", "docs/index.md"]
+    assert doc_files(root) == ["README.md", "docs/usage.md"]
+
+
+def test_a_repository_reached_through_a_link_still_has_its_docs(tmp_path):
+    root = tmp_path / "project"
+    (root / "docs").mkdir(parents=True)
+    (root / "README.md").write_text("x\n", encoding="utf-8")
+    (root / "docs" / "usage.md").write_text("x\n", encoding="utf-8")
+    (tmp_path / "alias").symlink_to(root)  # as /tmp is a link to /private/tmp on macOS
+    assert doc_files(tmp_path / "alias") == doc_files(root) == ["README.md", "docs/usage.md"]

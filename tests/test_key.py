@@ -159,3 +159,17 @@ def test_expected_lines_match_the_pinned_docs():
         for e in c["expected"]:
             text = (root / e["file"]).read_text(encoding="utf-8", errors="replace").splitlines()[e["line"] - 1]
             assert hashlib.sha256(text.encode("utf-8")).hexdigest()[:16] == e["sha256"], (c["id"], e["file"], e["line"])
+
+
+def test_a_planted_copy_keeps_links_as_links(tmp_path):
+    """The copy each planted change is made in: a link to a doc stays a link, on macOS (cp -R) and on Linux
+    (shutil.copytree), so the copy's docs are the original's."""
+    src = tmp_path / "repo"
+    (src / "docs").mkdir(parents=True)
+    (src / ".git").mkdir()
+    (src / "README.md").write_text("Use --limit.\n", encoding="utf-8")
+    (src / "docs" / "index.md").symlink_to("../README.md")
+    build_cases.clone(src, tmp_path / "copy")
+    copy = tmp_path / "copy"
+    assert (copy / "docs" / "index.md").is_symlink() and not (copy / ".git").exists()
+    assert build_cases.doc_files(copy) == build_cases.doc_files(src) == ["README.md"]

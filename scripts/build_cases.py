@@ -150,12 +150,13 @@ def candidates(root: Path) -> dict[str, list[tuple[dict, list]]]:
 
 
 def clone(src: Path, dst: Path) -> None:
-    """A copy of the repository without its .git folder (an instant copy-on-write clone on macOS)."""
+    """A copy of the repository without its .git folder (an instant copy-on-write clone on macOS). Links stay links
+    on both systems, as cp -R keeps them, since a doc reached through a link is read only where it really is."""
     if sys.platform == "darwin":
         subprocess.run(["cp", "-c", "-R", str(src), str(dst)], check=True)
         shutil.rmtree(dst / ".git", ignore_errors=True)
     else:
-        shutil.copytree(src, dst, ignore=shutil.ignore_patterns(".git"))
+        shutil.copytree(src, dst, symlinks=True, ignore=shutil.ignore_patterns(".git"))
 
 
 def plants_cleanly(root: Path, edit: dict) -> str | None:

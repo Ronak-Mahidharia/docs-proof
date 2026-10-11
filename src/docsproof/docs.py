@@ -70,13 +70,20 @@ def project_file(path: Path, root: Path) -> bool:
     return readable(path.relative_to(root).as_posix()) and path.is_file() and inside(path, root)
 
 
+def linked(path: Path, root: Path) -> bool:
+    """Whether a path in the folder goes through a link: the file itself, or a folder on the way to it."""
+    return path.resolve() != root.resolve() / path.relative_to(root)
+
+
 def doc_files(root: Path) -> list[str]:
-    """The repository's doc files, as sorted relative paths."""
+    """The repository's doc files, as sorted relative paths. Each is read once, where it really is: a doc reached
+    through a link, such as a docs/index.md that links to README.md, is left out, since the file it leads to is
+    read under its own name if it's a doc."""
     found = [p.name for p in root.iterdir()]
     for name in DOC_DIRS:
         if (root / name).is_dir():
             found += [p.relative_to(root).as_posix() for p in (root / name).rglob("*")]
-    return sorted(rel for rel in found if is_doc(rel) and project_file(root / rel, root))
+    return sorted(rel for rel in found if is_doc(rel) and project_file(root / rel, root) and not linked(root / rel, root))
 
 
 def split_lines(text: str) -> list[str]:

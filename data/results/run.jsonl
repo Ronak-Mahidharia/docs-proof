@@ -214,7 +214,7 @@
 {"id": "sqlfluff/sqlfluff:raise_python:1", "predicted": []}
 {"id": "sqlfluff/sqlfluff:rename_private:1", "predicted": []}
 {"id": "sqlfluff/sqlfluff:rename_unmentioned_option:1", "predicted": []}
-{"id": "theskumar/python-dotenv:rename_option:1", "predicted": [{"file": "README.md", "line": 160, "argv": ["dotenv", "list", "--format=json"], "proof": "After the change, `dotenv` refuses this command: No such option '--format'. Did you mean '--format2'?"}, {"file": "docs/index.md", "line": 160, "argv": ["dotenv", "list", "--format=json"], "proof": "After the change, `dotenv` refuses this command: No such option '--format'. Did you mean '--format2'?"}]}
+{"id": "theskumar/python-dotenv:rename_option:1", "predicted": [{"file": "README.md", "line": 160, "argv": ["dotenv", "list", "--format=json"], "proof": "After the change, `dotenv` refuses this command: No such option '--format'. Did you mean '--format2'?"}]}
 {"id": "theskumar/python-dotenv:rename_identifier:1", "predicted": []}
 {"id": "theskumar/python-dotenv:rename_identifier:2", "predicted": []}
 {"id": "theskumar/python-dotenv:rename_env_var:1", "predicted": []}

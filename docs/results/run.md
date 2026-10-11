@@ -6,7 +6,7 @@ Each documented command that runs one of the project's own programs is run in a 
 
 ## What ran
 
-- **1,678 distinct command lines** from 2,756 documented commands in 26 repositories. 1 documented command wasn't run, because its words need the shell (such as `$(...)`).
+- **1,678 distinct command lines** from 2,743 documented commands in 26 repositories. 1 documented command wasn't run, because its words need the shell (such as `$(...)`).
 - **Not run:** tox-dev/pipdeptree (its command line is written in Rust); nvbn/thefuck (it doesn't run on Python 3.14 at this commit: it imports distutils, removed in Python 3.12); and the two repositories with no command line.
 - **As pinned:** the parser took the command line: 1,292; the parser refused it: 344; ran to the end: 23; stopped for another reason (such as reading a missing input): 19. Of the refusals, 322 are for an input the sandbox doesn't have or the docs leave out: a file, a required argument or value, a subcommand, or the network.
 
@@ -31,7 +31,7 @@ A command line is flagged when, after the planted change, the parser names a wor
 | Split | Renamed option: cases | Lines | Flagged | False alarms | Precision | Recall | Read, not run: flagged |
 |---|---|---|---|---|---|---|---|
 | dev | 34 | 95 | 18 | 0 | 100.0% | 18.9% | 21 |
-| test | 37 | 175 | 29 | 0 | 100.0% | 16.6% | 48 |
+| test | 37 | 174 | 28 | 0 | 100.0% | 16.1% | 47 |
 
 **Read, then run.** Of the renamed-option lines that reading the commands flags and running doesn't, 0 in dev and 19 in test are in commands the program still accepts after the change: argparse and optparse take a unique prefix of an option's name, so after a rename from `--x` to `--x2`, `--x` still works. 3 in dev and 0 in test are in commands that weren't run (their repository's program doesn't run in the sandbox) or were refused for another reason.
 

@@ -43,7 +43,8 @@ flowchart LR
 - **README updates are easy to miss.** In a 2026 study of pull requests from 714 repositories, only 0.8% of all pull requests changed the README, and the study's LLM approach recovered half of the README updates that had really been made (Gao et al., [arXiv:2603.00489](https://arxiv.org/abs/2603.00489)).
 
 ## The answer key
-- **246 planted changes in 30 real repositories.** Popular Python tools and libraries with permissive licenses, each pinned to a commit ([data/repos.json](data/repos.json)), are changed one realistic way at a time: a renamed option, function, environment variable, or file, a changed default, or a raised minimum Python version. Each case records the doc lines the change makes wrong ([data/cases.jsonl](data/cases.jsonl)): 601 lines in all.
+- **246 planted changes in 30 real repositories.** Popular Python tools and libraries with permissive licenses, each pinned to a commit ([data/repos.json](data/repos.json)), are changed one realistic way at a time: a renamed option, function, environment variable, or file, a changed default, or a raised minimum Python version. Each case records the doc lines the change makes wrong ([data/cases.jsonl](data/cases.jsonl)): 587 lines in all.
+- **Each doc read once:** a doc that's only a link to another, such as python-dotenv's `docs/index.md` (a link to its README), is read as the file it links to.
 - **Split by repository:** 116 dev cases in 15 repositories, and 130 test cases in the other 15.
 - **Controls:** 54 cases change something no doc mentions, so nothing should be flagged.
 - **Checked by hand** ([data/hand_check.json](data/hand_check.json)):
@@ -57,7 +58,7 @@ flowchart LR
 All on the test split (15 repositories, 130 cases). Only the last part uses AI.
 
 **Exact checks:** a search for names the change removed ([docs/results/exact.md](docs/results/exact.md)).
-- **Renames** (91 cases, 350 lines): found all 350, with 7 false alarms (precision 98.0%).
+- **Renames** (91 cases, 338 lines): found all 338, with 7 false alarms (precision 98.0%).
 - **Changed values** (11 cases, 25 lines): found 0 of 25.
 - **Controls** (28 cases): no false alarms.
 
@@ -66,12 +67,12 @@ For renames, the expected lines are the doc lines that still mention the old nam
 **A name that could be an ordinary word,** such as a function named `records`, counts only where the doc marks it as code: in a code block, in backticks, as a call, or after a dot. Otherwise every sentence that uses the word is flagged, as on one of my own projects (below). The answer key renames only names that can't be ordinary words, such as `fetch_items` or `PluginSQL`, so the rule changed no result on either answer key. For the same reason, neither key can measure what it costs: a real mention of such a name in a plain sentence.
 
 **Commands in the docs, read:** each documented command is read the way a shell reads it, and its options are compared with the options the code declares ([docs/results/commands.md](docs/results/commands.md)).
-- **Renamed options** (37 cases, 175 lines): flagged 48 lines in commands, with no false alarms, each with its proof, such as "`flask` declares no --host option in the code".
+- **Renamed options** (37 cases, 174 lines): flagged 47 lines in commands, with no false alarms, each with its proof, such as "`flask` declares no --host option in the code".
 - **The other 127 lines:** 122 mention the option outside a command, in help output or a sentence, where the exact checks find them. 5 are commands it doesn't read yet, such as PowerShell's `$home_dir = pipx environment --value PIPX_HOME`.
-- **An audit of the 30 repositories as they are:** 2,868 documented commands, 874 with long options. 5 use an option the code doesn't declare, and a hand check found none of them out of date: 3 are options that plugins add, 1 is another program's option, and 1 is an error the docs show on purpose.
+- **An audit of the 30 repositories as they are:** 2,855 documented commands, 872 with long options. 5 use an option the code doesn't declare, and a hand check found none of them out of date: 3 are options that plugins add, 1 is another program's option, and 1 is an error the docs show on purpose.
 
 **Commands in the docs, run:** each documented command runs in a sandbox, a Docker container with no network, and the program is stopped right after it has read its command line, so nothing the command would do is done ([docs/results/run.md](docs/results/run.md)).
-- **Renamed options** (37 cases, 175 lines): flagged 29 lines, with no false alarms. The proof is the program's own message, such as flask's "No such option '--host'. (Did you mean one of: '--host2', '--port'?)".
+- **Renamed options** (37 cases, 174 lines): flagged 28 lines, with no false alarms. The proof is the program's own message, such as flask's "No such option '--host'. (Did you mean one of: '--host2', '--port'?)".
 - **Read, then run:** the other 19 lines that reading flags are in commands the program still accepts after the change. argparse and optparse take a unique prefix of an option's name, so a rename from `--include-injected` to `--include-injected2` leaves `--include-injected` working. Reading finds every stale name; running proves which commands break.
 - **Found only by running:** renaming the environment variable `PIPX_COOLDOWN` broke `pipx environment --value PIPX_COOLDOWN`, which pipx refuses with "invalid choice: 'PIPX_COOLDOWN'".
 - **An audit of the 26 repositories whose programs run:** 1,678 distinct command lines. 22 are refused for a reason other than a missing input, such as a file the sandbox doesn't have. Checked by hand, 7 doc lines in 5 projects are out of date, also on each project's main branch on Oct 10, 2026, such as sqlite-utils' `populate-fts ... --tokenize=porter` (the option belongs to `enable-fts`). The other 15 are commands that the reader's own app or a plugin adds (11), quoted arguments that span several lines (3), and a placeholder (1).
@@ -83,9 +84,9 @@ For renames, the expected lines are the doc lines that still mention the old nam
 - **Proof:** each finding quotes the doc line and the code line, and a finding whose quotes aren't really there is dropped (1 of 35 on test).
 
 **Suggested fixes:** each flagged line gets a fix that's checked before it's offered, and a fixed command is run again in the sandbox, after the change ([docs/results/fixes.md](docs/results/fixes.md)). Nothing in a repository changes without approval: the fixes become one patch, and a pull request is opened only after a person says yes to it.
-- **The rules, with no AI** (on the 392 lines steps 1 and 3 flag): fixed 370 of the 375 lines the change made wrong, all of them right, and declined 5. The program took every one of the 52 fixed lines that are part of a documented command, run again after the change.
+- **The rules, with no AI** (on the 380 lines steps 1 and 3 flag): fixed 358 of the 363 lines the change made wrong, all of them right, and declined 5. The program took every one of the 51 fixed lines that are part of a documented command, run again after the change.
 - **An agent for the rest** (qwen3:8b through Ollama, working only through tools, with a turn limit and loop detection; chosen on dev from 2 models and 3 prompts): of the 5 lines, it fixed 3 right and 1 wrong, and left 1 for a person.
-- **Together:** 373 of the 375 lines fixed right.
+- **Together:** 361 of the 363 lines fixed right.
 - **Every false alarm got a fix too** (17 of 17), so each fix needs a person's yes.
 - **The doc lines step 2 found out of date:** on test's 3, the agent left 2 for a person and fixed 1 wrong: it joined alembic's command onto one line and left the old lines under it. On dev, it fixed llm's `schema dsl` to `schemas dsl`, as the usage line above it says.
 
@@ -126,7 +127,7 @@ README.md:316
   fix: - [Unless `--keep-mock2` is passed on the commandline](https://github.com/asottile/pyupgrade/issues/314).
 ```
 
-- **The same as the measured steps:** on all 246 cases, it flags exactly the 626 lines that the exact checks, the commands read, and the changed-value search flag, and offers exactly step 4's 612 rule fixes ([scripts/check_tool.py](scripts/check_tool.py)).
+- **The same as the measured steps:** on all 246 cases, it flags exactly the 612 lines that the exact checks, the commands read, and the changed-value search flag, and offers exactly step 4's 598 rule fixes ([scripts/check_tool.py](scripts/check_tool.py)).
 - **For scripts and CI:** the exit status is 0 when nothing is flagged, 1 when something is, and 2 when the check couldn't run. `--json` prints the findings, and `--before`/`--after` compare two folders without git.
 - **Optional AI:** `--model qwen3:8b` adds step 3's local model for changed values, through Ollama on your computer.
 - **Not in it yet:** the sandbox runs, which need an environment built for each project, and the agent.
