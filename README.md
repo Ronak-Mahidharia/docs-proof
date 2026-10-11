@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), and the command-line tool. Next: a GitHub Action that comments on pull requests, and an MCP server. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the command-line tool, and the GitHub Action. Next: an MCP server, so Claude Code and other assistants can use it. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -78,6 +78,29 @@ README.md:316
 - **For scripts and CI:** the exit status is 0 when nothing is flagged, 1 when something is, and 2 when the check couldn't run. `--json` prints the findings, and `--before`/`--after` compare two folders without git.
 - **Optional AI:** `--model qwen3:8b` adds step 3's local model for changed values, through Ollama on your computer.
 - **Not in it yet:** the sandbox runs, which need an environment built for each project, and the agent.
+
+### In GitHub Actions
+On a pull request, the action runs the same check and reports it where GitHub shows it: the job summary, a warning on each flagged line, and a failed check. It reads the pull request's code and docs and never runs them, and it needs no write permission.
+
+```yaml
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  docs-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@<commit>        # pin each action to a commit
+        with:
+          fetch-depth: 2                         # the merge commit and its base
+          persist-credentials: false
+      - uses: Ronak-Mahidharia/docs-proof@<commit>
+```
+
+- **A comment on the pull request** is optional: add `comment: true` under `with:`, and `pull-requests: write` under `permissions:`. Later runs update the same comment. On pull requests from forks, GitHub's token is always read-only, so the comment is skipped there, and the job summary still has the report.
+- **Inputs:** `base` and `head` (commits), `path` (the repository's folder), and `fail-on-findings: false` to report without failing the check. **Outputs:** `findings`, `fixes`, and `patch`, the suggested fixes as a file.
+- **Safe with what a pull request contains:** every input reaches the script through the environment, never pasted into it, and text from the docs is shown only inside code blocks that nothing in it can end.
+- **Checked on GitHub's runner** with Python 3.12, in this repository's CI. On a throwaway repository with one option renamed, it must flag that one line, with its fix. It also runs on every pull request here.
 
 ## Reproduce
 ```bash
