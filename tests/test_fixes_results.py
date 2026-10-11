@@ -90,7 +90,7 @@ def test_readme_and_plan_numbers_for_fixes():
     assert rules["command_lines_taken"] == rules["command_lines"] and test["right"] + test["wrong"] + test["left"] == declined
     assert [x["outcome"] for x in real].count("no fix") == 2 and [x["verdict"] for x in real].count("wrong") == 1
     expected = [
-        f"**The rules, with no AI** (on the {made + alarms} lines steps 1 and 3 flag): fixed {fixed} of the {made} lines "
+        f"**The rules, with no AI** (on the {made + alarms} lines the exact checks and the value search flag): fixed {fixed} of the {made} lines "
         f"the change made wrong, all of them right, and declined {declined}. The program took every one of the "
         f"{rules['command_lines']} fixed lines that are part of a documented command, run again after the change.",
         f"**An agent for the rest** ({SCORES['chosen']['model']} through Ollama, working only through tools, with a turn "
