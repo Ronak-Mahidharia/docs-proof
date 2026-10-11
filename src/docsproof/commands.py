@@ -318,9 +318,10 @@ def problems(root: Path, code: Code | None = None) -> list[Problem]:
     return found
 
 
-def new_problems(before: Path, after: Path, old: list[Problem] | None = None) -> list[Problem]:
+def new_problems(before: Path, after: Path, old: list[Problem] | None = None,
+                 after_code: Code | None = None) -> list[Problem]:
     """Problems a change created: in the docs after the change, and not before it. old: problems(before),
-    when they've already been found."""
+    when they've already been found; after_code: the "after" tree, if it's already parsed."""
     seen = {(p.file, p.line, p.option) for p in (problems(before) if old is None else old)}
-    return [p for p in problems(after) if (p.file, p.line, p.option) not in seen]
+    return [p for p in problems(after, after_code) if (p.file, p.line, p.option) not in seen]
 

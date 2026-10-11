@@ -24,10 +24,27 @@ def summary(fixes: list[Fix]) -> str:
     return "\n".join(lines + [f"- `{f.file}`, line {f.line}: {f.reason}" for f in sorted(fixes, key=lambda f: (f.file, f.line))])
 
 
-def ask(diff: str, read: Callable[[str], str] = input, show: Callable[[str], None] = print) -> bool:
+def ask(diff: str, read: Callable[[str], str] = input, show: Callable[[str], None] = print,
+        question: str = "Open a pull request with these fixes?") -> bool:
     """Show the patch and ask. Only "y" or "yes" is a yes."""
     show(diff)
-    return read("Open a pull request with these fixes? [y/N] ").strip().lower() in ("y", "yes")
+    return read(f"{question} [y/N] ").strip().lower() in ("y", "yes")
+
+
+def apply_locally(root: Path, fixes: list[Fix], approve: Callable[[str], bool]) -> bool:
+    """Make the fixes in the files under root, only if approve(patch) says yes. Returns whether they were made."""
+    if not fixes:
+        return False
+    diff = patch(root, fixes)
+    if not approve(diff):
+        return False
+    if patch(root, fixes) != diff:
+        raise RuntimeError("the docs changed after the patch was made; nothing was changed")
+    files = sorted({f.file for f in fixes})
+    texts = {rel: fixed_text(root / rel, [f for f in fixes if f.file == rel]) for rel in files}
+    for rel, text in texts.items():
+        (root / rel).write_bytes(text.encode("utf-8"))
+    return True
 
 
 def open_pull_request(repo: Path, fixes: list[Fix], approve: Callable[[str], bool], base: str,

@@ -70,3 +70,16 @@ def test_declared_options_include_lists_tables_and_built_ins(tmp_path):
     declared = Code(root).declared_options()
     assert {"--app", "--autogenerate", "--help", "--version", "--print-completion"} <= declared
     assert "--not-an-option" not in declared  # a mention inside text isn't a declaration
+
+
+def test_each_call_gets_its_own_copy(tiny):
+    code = Code(tiny)
+    code.options()["--made-up"] = []
+    code.options()["--limit"].clear()
+    code.defined_names().pop("fetch_items")
+    code.env_vars()["TINY_TOKEN"].append(None)
+    code.option_calls().clear()
+    code.declared_options().clear()
+    assert "--made-up" not in code.options() and code.options()["--limit"]
+    assert "fetch_items" in code.defined_names() and None not in code.env_vars()["TINY_TOKEN"]
+    assert code.option_calls() and "--limit" in code.declared_options()

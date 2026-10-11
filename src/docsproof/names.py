@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 import re
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 
 from .docs import skipped
@@ -102,7 +103,8 @@ def long_options(node: ast.Call) -> list[str]:
 
 
 class Code:
-    """A repository's own Python code, parsed once."""
+    """A repository's own Python code, parsed once. Each kind of name is also worked out once, the first time
+    it's asked for, and every call returns a fresh copy, so a caller can't change what the next one gets."""
 
     def __init__(self, root: Path):
         self.root = root
@@ -115,6 +117,10 @@ class Code:
 
     def option_calls(self) -> list[tuple[str, ast.Call]]:
         """(file, call) for every call that declares at least one long option."""
+        return list(self._option_calls)
+
+    @cached_property
+    def _option_calls(self) -> list[tuple[str, ast.Call]]:
         calls = []
         for rel, tree in self.trees.items():
             for node in ast.walk(tree):
@@ -123,8 +129,12 @@ class Code:
         return calls
 
     def options(self) -> dict[str, list[Where]]:
+        return _copied(self._options)
+
+    @cached_property
+    def _options(self) -> dict[str, list[Where]]:
         out: dict[str, list[Where]] = {}
-        for rel, node in self.option_calls():
+        for rel, node in self._option_calls:
             for option in long_options(node):
                 out.setdefault(option, []).append(Where(rel, node.lineno))
         return out
@@ -133,7 +143,11 @@ class Code:
         """Every long option the command line can accept, as far as the code shows: declared options, any string
         that is exactly an option (alembic keeps its options in a table), and the ones libraries add themselves:
         --help always, --version from click's version_option, and shtab's --print-completion."""
-        found = set(self.options()) | {"--help"}
+        return set(self._declared_options)
+
+    @cached_property
+    def _declared_options(self) -> set[str]:
+        found = set(self._options) | {"--help"}
         for tree in self.trees.values():
             for node in ast.walk(tree):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str) and LONG_OPTION.fullmatch(node.value):
@@ -148,8 +162,12 @@ class Code:
 
     def option_defaults(self) -> list[tuple[str, Where, ast.Constant]]:
         """(option, where, default) for options whose default is a plain int or float written in the call."""
+        return list(self._option_defaults)
+
+    @cached_property
+    def _option_defaults(self) -> list[tuple[str, Where, ast.Constant]]:
         found = []
-        for rel, node in self.option_calls():
+        for rel, node in self._option_calls:
             for kw in node.keywords:
                 value = kw.value
                 if kw.arg == "default" and isinstance(value, ast.Constant) and type(value.value) in (int, float):
@@ -158,6 +176,10 @@ class Code:
 
     def defined_names(self) -> dict[str, list[Where]]:
         """Top-level functions and classes, public and private."""
+        return _copied(self._defined_names)
+
+    @cached_property
+    def _defined_names(self) -> dict[str, list[Where]]:
         out: dict[str, list[Where]] = {}
         for rel, tree in self.trees.items():
             for node in tree.body:
@@ -171,11 +193,15 @@ class Code:
         project's interface, so docs that use it usually mean something of their own."""
         def public(rel: str) -> bool:
             return not any(part.startswith("_") and part not in ("__init__.py", "__main__.py") for part in rel.split("/"))
-        return {name: [w for w in where if public(w.file)] for name, where in self.defined_names().items()
+        return {name: [w for w in where if public(w.file)] for name, where in self._defined_names.items()
                 if any(public(w.file) for w in where)}
 
     def env_vars(self) -> dict[str, list[Where]]:
         """Environment variables the code reads: os.getenv("X"), os.environ.get("X"), os.environ["X"], ..."""
+        return _copied(self._env_vars)
+
+    @cached_property
+    def _env_vars(self) -> dict[str, list[Where]]:
         out: dict[str, list[Where]] = {}
         for rel, tree in self.trees.items():
             for node in ast.walk(tree):
@@ -191,6 +217,10 @@ class Code:
                 if isinstance(value, str) and ENV_NAME.match(value):
                     out.setdefault(value, []).append(Where(rel, line))
         return out
+
+
+def _copied(found: dict[str, list]) -> dict[str, list]:
+    return {key: list(value) for key, value in found.items()}
 
 
 REQUIRES = re.compile(r"""(?m)^\s*(?:requires-python|python_requires)\s*[=:]\s*["']?\s*>=\s*3\.(\d+)""")

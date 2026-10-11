@@ -36,6 +36,8 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
    - a command-line tool
    - a GitHub Action that comments on pull requests
    - an MCP server for Claude Code and other MCP clients
+
+   **Done so far:** the command-line tool. On all 246 cases it flags exactly the 626 lines the measured steps flag, and offers exactly step 4's 612 rule fixes ([the check](../scripts/check_tool.py)).
 6. **Real history** as a second answer key, plus a check on my own repositories.
 7. **The write-up and a demo.**
 

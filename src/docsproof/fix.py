@@ -41,7 +41,8 @@ def _names(code: Code, files: set[str]) -> dict[str, set[str]]:
             "path": files}
 
 
-def renames(before: Path, after: Path, cache: dict | None = None) -> dict[tuple[str, str], str]:
+def renames(before: Path, after: Path, cache: dict | None = None,
+            after_code: Code | None = None) -> dict[tuple[str, str], str]:
     """{(kind, old name): new name} for the names the change renamed: of one kind, a single removed and a single
     added name are a pair; with more, each old name is paired with the most alike new one, if alike enough. The
     names are read as exact.removed_names reads them, and a cache dict shares the parse of the "before" tree."""
@@ -51,7 +52,7 @@ def renames(before: Path, after: Path, cache: dict | None = None) -> dict[tuple[
         old, old_files = Code(before), repo_files(before)
         if cache is not None:
             cache[str(before)] = (old, old_files)
-    was, now = _names(old, old_files), _names(Code(after), repo_files(after))
+    was, now = _names(old, old_files), _names(Code(after) if after_code is None else after_code, repo_files(after))
     pairs = {}
     for kind in was:
         old_names, new_names = sorted(was[kind] - now[kind]), sorted(now[kind] - was[kind])
@@ -98,6 +99,32 @@ def value_fix(text: str, change: ValueChange) -> str | None:
     if len(pattern.findall(text)) != 1:
         return None
     return pattern.sub(lambda _: change.new, text)
+
+
+def rule_fix(text: str, names: list[tuple[str, str]], changes: list[ValueChange], pairs: dict[tuple[str, str], str],
+             own: set[str]) -> tuple[str | None, str]:
+    """The rules' fix for a flagged line: (the fixed line, why), or (None, why the rules decline it). names are the
+    (kind, name) pairs the line was flagged for, changes the values it may still state, and pairs what renames()
+    found."""
+    new, reasons = text, []
+    for kind, name in names:
+        target = pairs.get((kind, name))
+        if target is None:
+            return None, f"the change added no name to put in place of `{name}`"
+        fixed = rename_fix(new, kind, name, target, own)
+        if fixed is None:
+            return None, f"`{name}` is there only under another package's name or in a file path"
+        new = fixed
+        reasons.append(f"`{name}` is now `{target}`")
+    for change in changes:
+        fixed = value_fix(new, change)
+        if fixed is None:
+            return None, f"{change.old} is in the line {len(value_pattern(change).findall(new))} times"
+        new = fixed
+        what = ("the oldest Python version the project supports" if change.kind == "python" else
+                f"the default of the option {change.subject}")
+        reasons.append(f"{what} is now {change.new}")
+    return new, "; ".join(reasons)
 
 
 def stale_name(text: str, kind: str, old: str, own: set[str] | None = None) -> bool:

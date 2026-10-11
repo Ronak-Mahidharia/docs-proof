@@ -47,11 +47,12 @@ def _defaults(code: Code) -> dict[tuple[str, str, int], ast.Constant]:
     return {(option, where.file, where.line): const for option, where, const in code.option_defaults()}
 
 
-def value_changes(before: Path, after: Path, before_code: Code | None = None) -> list[ValueChange]:
+def value_changes(before: Path, after: Path, before_code: Code | None = None,
+                  after_code: Code | None = None) -> list[ValueChange]:
     """The values the change set differently: option defaults, and the minimum Python version."""
     found = []
     old = _defaults(Code(before) if before_code is None else before_code)
-    for (option, file, line), const in sorted(_defaults(Code(after)).items()):
+    for (option, file, line), const in sorted(_defaults(Code(after) if after_code is None else after_code).items()):
         previous = old.get((option, file, line))
         if previous is not None and previous.value != const.value:
             code = read_lines(after / file)[const.lineno - 1].strip()
