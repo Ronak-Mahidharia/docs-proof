@@ -87,6 +87,11 @@
    "pypa/hatch:rename_env_var:2",
    "docs/config/environment/overview.md",
    158
+  ],
+  [
+   "PyCQA/bandit:rename_identifier:2",
+   "doc/source/plugins/b506_yaml_load.rst",
+   5
   ]
  ],
  "add_lines": [
@@ -171,7 +176,8 @@
   "pypa/hatch:rename_env_var:2": "environment/overview.md:158 is a generic example of setting an environment variable.",
   "mkdocs/mkdocs:rename_identifier:2": "plugins.md:117 and 153 use c.ListOfItems after 'from mkdocs.config import base, config_options as c', so they name mkdocs's class.",
   "pallets/flask:rename_identifier:1": "cli.rst:71 refers to cli.run_command under '.. currentmodule:: flask': flask's own function.",
-  "sqlalchemy/alembic:rename_identifier:2": "cookbook.rst:1525 uses script.ScriptDirectory after 'from alembic import config, script': alembic's own class."
+  "sqlalchemy/alembic:rename_identifier:2": "cookbook.rst:1525 uses script.ScriptDirectory after 'from alembic import config, script': alembic's own class.",
+  "PyCQA/bandit:rename_identifier:2": "b506_yaml_load.rst:5 is `.. automodule:: bandit.plugins.yaml_load`, the module bandit/plugins/yaml_load.py, which renaming the function doesn't rename. Line 2 stays: bandit reports the check by the function's name. Found in step 4's hand check of the fixes."
  },
  "name_group_samples": [
   {
@@ -224,10 +230,10 @@
   {
    "what": "every doc line the exact check flags that the key leaves out, in both splits: the lines the rule for a name after another name (such as jinja2_time.TimeExtension) or a hand check left out",
    "checked_on": "2026-10-10",
-   "lines": 15,
-   "right": 11,
+   "lines": 16,
+   "right": 12,
    "wrong": "4 lines name the project's own class or function through a short module name: mkdocs's c.ListOfItems (2 lines), flask's cli.run_command, and alembic's script.ScriptDirectory",
-   "result": "the 4 lines were added. The 11 left out: jinja2_time.TimeExtension (4 lines, another package's class), waitress-serve's --host (4), links to isort's git_hook.md doc file (2), and a generic example of setting an environment variable (1)"
+   "result": "the 4 lines were added. The 12 left out: jinja2_time.TimeExtension (4 lines, another package's class), waitress-serve's --host (4), links to isort's git_hook.md doc file (2), a generic example of setting an environment variable (1), and bandit's `.. automodule:: bandit.plugins.yaml_load` (1), which names the module, not the renamed function: it was in the key until step 4's hand check of the fixes"
   }
  ],
  "audit": {
@@ -566,5 +572,331 @@
     "why": "Lines 678 and 679 end in two backslashes inside a literal block, which shows them as written. In a shell, \\\\ at the end of a line is a backslash, not a continuation: pasted into bash, alembic says \"unrecognized arguments: \\\" and the next two lines run as separate commands that don't exist. Upstream main is the pinned commit."
    }
   ]
+ },
+ "fixes": {
+  "checked_on": "2026-10-10",
+  "about": "Hand checks of the answer key's fixed lines (step 4). The key fixes a doc line by making the planted change in it: every mention of a renamed name becomes the new name, except inside a file path, and the old value becomes the new value. Read by hand, in context: every value line (43), every name line that mentions the name more than once or under a package's name (51; one turned out not to be wrong, see the notes for PyCQA/bandit:rename_identifier:2), and 40 other name lines drawn at random (20 dev and 20 test, seed 4; listed in name_sample). All read right except the 5 value lines in labels, whose right fix isn't the mechanical one. real: the agent's fixes for the doc lines the step 2 audit found out of date, judged by hand after its runs.",
+  "name_sample": [
+   [
+    "psf/black:rename_option:1",
+    "docs/usage_and_configuration/the_basics.md",
+    232
+   ],
+   [
+    "psf/black:rename_env_var:1",
+    "docs/usage_and_configuration/the_basics.md",
+    415
+   ],
+   [
+    "jazzband/pip-tools:rename_option:2",
+    "docs/reference/configuration.md",
+    17
+   ],
+   [
+    "simonw/llm:rename_option:1",
+    "docs/embeddings/cli.md",
+    297
+   ],
+   [
+    "simonw/llm:rename_identifier:1",
+    "docs/plugins/advanced-model-plugins.md",
+    694
+   ],
+   [
+    "Kludex/uvicorn:rename_identifier:2",
+    "docs/deployment/index.md",
+    113
+   ],
+   [
+    "jazzband/pip-tools:rename_option:1",
+    "README.md",
+    559
+   ],
+   [
+    "cookiecutter/cookiecutter:rename_file:1",
+    "CONTRIBUTING.md",
+    330
+   ],
+   [
+    "callowayproject/bump-my-version:rename_file:1",
+    "AGENTS.md",
+    54
+   ],
+   [
+    "simonw/llm:rename_option:1",
+    "docs/help.md",
+    903
+   ],
+   [
+    "simonw/shot-scraper:rename_option:2",
+    "docs/har.md",
+    124
+   ],
+   [
+    "psf/black:rename_env_var:1",
+    "docs/usage_and_configuration/file_collection_and_discovery.md",
+    29
+   ],
+   [
+    "cookiecutter/cookiecutter:rename_env_var:1",
+    "docs/advanced/user_config.rst",
+    23
+   ],
+   [
+    "psf/black:rename_option:1",
+    "docs/usage_and_configuration/file_collection_and_discovery.md",
+    33
+   ],
+   [
+    "simonw/llm:rename_env_var:2",
+    "docs/plugins/advanced-model-plugins.md",
+    743
+   ],
+   [
+    "simonw/shot-scraper:rename_option:1",
+    "docs/multi.md",
+    152
+   ],
+   [
+    "pypa/twine:rename_file:1",
+    "docs/contributing.rst",
+    202
+   ],
+   [
+    "psf/black:rename_identifier:1",
+    "docs/usage_and_configuration/the_basics.md",
+    467
+   ],
+   [
+    "Kludex/uvicorn:rename_file:2",
+    "docs/contributing.md",
+    86
+   ],
+   [
+    "jazzband/pip-tools:rename_option:2",
+    "docs/reference/configuration.md",
+    19
+   ],
+   [
+    "PyCQA/isort:rename_option:2",
+    "docs/configuration/options.md",
+    1297
+   ],
+   [
+    "pallets/flask:rename_option:1",
+    "docs/tutorial/install.rst",
+    85
+   ],
+   [
+    "coveragepy/coveragepy:rename_option:2",
+    "doc/commands/cmd_report.rst",
+    137
+   ],
+   [
+    "PyCQA/isort:rename_option:1",
+    "docs/configuration/options.md",
+    1309
+   ],
+   [
+    "PyCQA/isort:rename_identifier:1",
+    "docs/configuration/options.md",
+    471
+   ],
+   [
+    "pallets/flask:rename_option:1",
+    "docs/quickstart.rst",
+    44
+   ],
+   [
+    "pallets/flask:rename_option:1",
+    "docs/cli.rst",
+    98
+   ],
+   [
+    "pypa/pipx:rename_option:2",
+    "docs/how-to/configure-paths.rst",
+    153
+   ],
+   [
+    "pypa/hatch:rename_option:3",
+    "docs/tutorials/testing/overview.md",
+    116
+   ],
+   [
+    "theskumar/python-dotenv:rename_identifier:1",
+    "docs/index.md",
+    219
+   ],
+   [
+    "pypa/pipx:rename_env_var:1",
+    "docs/reference/environment-variables.rst",
+    42
+   ],
+   [
+    "gleitz/howdoi:rename_env_var:2",
+    "README.md",
+    113
+   ],
+   [
+    "theskumar/python-dotenv:rename_identifier:1",
+    "README.md",
+    107
+   ],
+   [
+    "pypa/pipx:rename_option:2",
+    "docs/how-to/move-installation.rst",
+    79
+   ],
+   [
+    "simonw/datasette:rename_option:1",
+    "docs/cli-reference.rst",
+    548
+   ],
+   [
+    "sqlalchemy/alembic:rename_option:1",
+    "docs/build/cookbook.rst",
+    1304
+   ],
+   [
+    "psf/requests:rename_env_var:2",
+    "docs/user/advanced.rst",
+    661
+   ],
+   [
+    "pallets/flask:rename_option:1",
+    "docs/cli.rst",
+    547
+   ],
+   [
+    "psf/requests:rename_env_var:2",
+    "docs/user/advanced.rst",
+    239
+   ],
+   [
+    "simonw/sqlite-utils:rename_option:2",
+    "docs/cli-reference.rst",
+    863
+   ]
+  ],
+  "labels": [
+   {
+    "case": "Kludex/uvicorn:change_default:1",
+    "file": "docs/settings.md",
+    "line": 148,
+    "fix": "* `--limit-max-requests-jitter <int>` - Maximum jitter to add to `limit-max-requests`. Each worker adds a random number in the range `[0, jitter]`, staggering restarts to avoid all workers restarting simultaneously. **Default:** *1*.",
+    "why": "Only the default changes: the 0 in `[0, jitter]` is where the jitter's range starts."
+   },
+   {
+    "case": "psf/black:raise_python:1",
+    "file": "docs/integrations/editors.md",
+    "line": 235,
+    "fix": "This plugin **requires Vim 7.0+ built with Python 3.12+ support**. It needs Python 3.12",
+    "why": "Both 3.10s state the minimum Python version."
+   },
+   {
+    "case": "pypa/pipx:raise_python:1",
+    "file": "docs/how-to/install-pipx.rst",
+    "line": 17,
+    "fix": "Installing pipx needs Python 3.13 or newer; the apps it runs can target Python 3.3 or newer. Without Python 3.13, see",
+    "why": "Both 3.11s state the minimum Python version; 3.3 is about the apps pipx runs."
+   },
+   {
+    "case": "yt-dlp/yt-dlp:raise_python:1",
+    "file": "CONTRIBUTING.md",
+    "line": 297,
+    "fix": "1. Make sure your code works under all [Python](https://www.python.org/) versions supported by yt-dlp, namely CPython >=3.12 and PyPy >=3.12. Backward compatibility is not required for even older versions of Python.",
+    "why": "pip checks requires-python against PyPy's Python version too, so PyPy 3.11 stops being supported (as with coveragepy's PyPy3 line)."
+   },
+   {
+    "case": "yt-dlp/yt-dlp:raise_python:1",
+    "file": "README.md",
+    "line": 196,
+    "fix": "Python versions 3.12+ (CPython) and 3.12+ (PyPy) are supported. Other versions and implementations may or may not work correctly.",
+    "why": "pip checks requires-python against PyPy's Python version too, so PyPy 3.11 stops being supported (as with coveragepy's PyPy3 line)."
+   }
+  ],
+  "real": [
+   {
+    "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:51",
+    "model": "qwen3:8b",
+    "version": "v1",
+    "fix": [
+     "$ bump-my-version show"
+    ],
+    "verdict": "wrong",
+    "why": "It drops `--increment major`, the option the example is about, so the command prints the whole configuration, not the 2.0.0 shown under it."
+   },
+   {
+    "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:49",
+    "model": "qwen3:8b",
+    "version": "v2",
+    "fix": [
+     "$ bump-my-version show --increment minor"
+    ],
+    "verdict": "wrong",
+    "why": "The option is now after `show`, but with no name after it, `show` prints the whole configuration, not the 1.1.0 shown under it: run normally, `bump-my-version show --increment patch` prints a dict of every setting, and `bump-my-version show --increment patch new_version` prints the version."
+   },
+   {
+    "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:51",
+    "model": "qwen3:8b",
+    "version": "v2",
+    "fix": [
+     "$ bump-my-version show"
+    ],
+    "verdict": "wrong",
+    "why": "It drops `--increment major`, the option the example is about, so the command prints the whole configuration, not the 2.0.0 shown under it."
+   },
+   {
+    "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:47",
+    "model": "qwen3:8b",
+    "version": "v3",
+    "fix": [
+     "$ bump-my-version show --increment patch"
+    ],
+    "verdict": "wrong",
+    "why": "The option is now after `show`, but with no name after it, `show` prints the whole configuration, not the 1.0.2 shown under it: run normally, `bump-my-version show --increment patch` prints a dict of every setting, and `bump-my-version show --increment patch new_version` prints the version."
+   },
+   {
+    "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:49",
+    "model": "qwen3:8b",
+    "version": "v3",
+    "fix": [
+     "$ bump-my-version show --increment minor"
+    ],
+    "verdict": "wrong",
+    "why": "The option is now after `show`, but with no name after it, `show` prints the whole configuration, not the 1.1.0 shown under it: run normally, `bump-my-version show --increment patch` prints a dict of every setting, and `bump-my-version show --increment patch new_version` prints the version."
+   },
+   {
+    "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:51",
+    "model": "qwen3:8b",
+    "version": "v3",
+    "fix": [
+     "$ bump-my-version show --increment major"
+    ],
+    "verdict": "wrong",
+    "why": "The option is now after `show`, but with no name after it, `show` prints the whole configuration, not the 2.0.0 shown under it: run normally, `bump-my-version show --increment patch` prints a dict of every setting, and `bump-my-version show --increment patch new_version` prints the version."
+   },
+   {
+    "task": "audit|simonw/llm|docs/help.md:647",
+    "model": "qwen3:8b",
+    "version": "v3",
+    "fix": [
+     "       llm schemas dsl 'name, age int, bio: their bio'"
+    ],
+    "verdict": "right",
+    "why": "The command is `schemas`, as the usage line above it says; run normally, `llm schemas dsl` prints the JSON schema. The line is copied from the help in llm/cli.py (line 2807), so the fix that lasts is made there."
+   },
+   {
+    "task": "audit|sqlalchemy/alembic|docs/build/branches.rst:678",
+    "model": "qwen3:8b",
+    "version": "v3",
+    "fix": [
+     "    $ alembic revision -m \"add ip account table\" --head=networking@head --depends-on=55af2cb1c267 --depends-on=d747a --depends-on=fa445"
+    ],
+    "verdict": "wrong",
+    "why": "It joins the whole command onto line 678 but leaves lines 679 and 680, which still end in two backslashes and now repeat its options under the command. The fix is one backslash at the end of each line."
+   }
+  ],
+  "real_rule": "Written before the agent's dev runs were judged. A fix for one of the out-of-date doc lines is right when the fixed line says what the project really does: the program accepts the fixed command, and the command does what the doc around it shows (such as the output printed under it), with nothing else in the line changed. A fix that makes the program accept a command by dropping part of it is wrong. Judged by reading the project's code."
  }
 }

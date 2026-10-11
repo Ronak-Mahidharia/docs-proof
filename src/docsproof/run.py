@@ -12,6 +12,7 @@ that it didn't name before, or refuses a command line it took before. The proof 
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from collections import defaultdict
 from pathlib import Path
@@ -46,14 +47,17 @@ def documented(root: Path) -> dict[Key, list[Command]]:
     return dict(sorted(found.items()))
 
 
-def job_commands(keys: list[Key]) -> list[dict]:
-    return [{"id": i, "argv": list(argv), "env": dict(env)} for i, (argv, env) in enumerate(keys)]
+def job_commands(keys: list[Key], capture: bool = False) -> list[dict]:
+    return [{"id": i, "argv": list(argv), "env": dict(env), **({"capture": True} if capture else {})}
+            for i, (argv, env) in enumerate(keys)]
 
 
-def run_in_sandbox(folder: str, keys: list[Key], edit: dict | None = None, image: str = IMAGE) -> dict[Key, dict]:
-    """Run the commands in a fresh container for this repository, after applying the planted change if given."""
+def run_in_sandbox(folder: str, keys: list[Key], edit: dict | None = None, image: str = IMAGE,
+                   capture: bool = False) -> dict[Key, dict]:
+    """Run the commands in a fresh container for this repository, after applying the planted change if given.
+    With capture, each result also has the start of what the command printed."""
     job = {"repo": f"/work/{folder}", "env": f"/envs/{folder}", "edit": edit, "timeout": TIMEOUT,
-           "commands": job_commands(keys)}
+           "commands": job_commands(keys, capture)}
     done = subprocess.run(["docker", "run", *SANDBOX, image, "python3", "/opt/docsproof/docsproof/sandbox_run.py"],
                           input=json.dumps(job), capture_output=True, text=True, timeout=4 * 3600)
     if done.returncode != 0:
@@ -62,6 +66,19 @@ def run_in_sandbox(folder: str, keys: list[Key], edit: dict | None = None, image
     if [r["id"] for r in results] != list(range(len(keys))):
         raise RuntimeError(f"the sandbox returned {len(results)} results for {len(keys)} commands ({folder})")
     return {key: {k: v for k, v in result.items() if k != "id"} for key, result in zip(keys, results)}
+
+
+# A refusal for something the sandbox doesn't have, or the docs leave out on purpose: a file or folder, a
+# required argument or value, a subcommand (the docs name only the program), or the network.
+MISSING_INPUT = re.compile(r"does not exist|No such file|can't open|not found|Not a directory|is a directory|"
+                           r"not a valid directory path|Missing argument|Missing option|required|"
+                           r"the following arguments|requires an argument|expected one argument|requires \d+ arguments|"
+                           r"name resolution|^\s*Usage:", re.I)
+
+
+def missing_input(result: dict) -> bool:
+    """Whether the program refused a command line only for an input the sandbox doesn't have."""
+    return result["outcome"] == "rejected" and not result["unknown"] and bool(MISSING_INPUT.search(result["message"]))
 
 
 def refused(before: dict, after: dict) -> list[str] | None:

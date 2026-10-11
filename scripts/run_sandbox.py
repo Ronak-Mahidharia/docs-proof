@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -28,7 +27,7 @@ from build_cases import folder  # noqa: E402
 from build_sandbox import sandboxed  # noqa: E402
 from build_sandbox import SKIP  # noqa: E402
 from docsproof.commands import commands  # noqa: E402
-from docsproof.run import documented, flagged_lines, proof, refused, run_in_sandbox, runnable  # noqa: E402
+from docsproof.run import MISSING_INPUT, documented, flagged_lines, proof, refused, run_in_sandbox, runnable  # noqa: E402
 from run_baseline import RESULTS, load_cases, pct, report  # noqa: E402
 
 RUNS = RESULTS / "runs"
@@ -100,14 +99,6 @@ def predictions(cases: list[dict], audit: list[dict], runs: list[dict]) -> dict[
                                           "proof": proof(key[0], after)})
         out[case["id"]] = [flagged[k] for k in sorted(flagged)]
     return out
-
-
-# A refusal for something the sandbox doesn't have, or the docs leave out on purpose: a file or folder, a
-# required argument or value, a subcommand (the docs name only the program), or the network.
-MISSING_INPUT = re.compile(r"does not exist|No such file|can't open|not found|Not a directory|is a directory|"
-                           r"not a valid directory path|Missing argument|Missing option|required|"
-                           r"the following arguments|requires an argument|expected one argument|requires \d+ arguments|"
-                           r"name resolution|^\s*Usage:", re.I)
 
 
 def audit_findings(audit: list[dict]) -> list[dict]:

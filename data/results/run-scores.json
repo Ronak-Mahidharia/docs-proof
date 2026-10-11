@@ -27,7 +27,7 @@
   "dev": {
    "cases": 116,
    "repos": 15,
-   "expected_lines": 227,
+   "expected_lines": 226,
    "kinds": {
     "rename_option": {
      "cases": 34,
@@ -44,7 +44,7 @@
      "cases": 19,
      "tp": 0,
      "fp": 0,
-     "fn": 66,
+     "fn": 65,
      "all_found": 0,
      "false_alarm_cases": 0,
      "precision": null,
@@ -122,12 +122,12 @@
     "cases": 81,
     "tp": 18,
     "fp": 0,
-    "fn": 191,
+    "fn": 190,
     "all_found": 2,
     "false_alarm_cases": 0,
     "precision": 1.0,
-    "recall": 0.086,
-    "f1": 0.158
+    "recall": 0.087,
+    "f1": 0.16
    },
    "value": {
     "cases": 9,

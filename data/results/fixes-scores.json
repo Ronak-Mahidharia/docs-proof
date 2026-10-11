@@ -1,0 +1,602 @@
+{
+ "rules": {
+  "dev": {
+   "groups": {
+    "name": {
+     "expected": 208,
+     "false_alarms": 5,
+     "right": 208,
+     "wrong": 0,
+     "harm": 1,
+     "declined": 0,
+     "declined_false_alarms": 4
+    },
+    "value": {
+     "expected": 18,
+     "false_alarms": 3,
+     "right": 14,
+     "wrong": 2,
+     "harm": 3,
+     "declined": 2,
+     "declined_false_alarms": 0
+    }
+   },
+   "command_lines": 20,
+   "command_lines_taken": 20
+  },
+  "test": {
+   "groups": {
+    "name": {
+     "expected": 350,
+     "false_alarms": 7,
+     "right": 346,
+     "wrong": 0,
+     "harm": 5,
+     "declined": 4,
+     "declined_false_alarms": 2
+    },
+    "value": {
+     "expected": 25,
+     "false_alarms": 10,
+     "right": 24,
+     "wrong": 0,
+     "harm": 9,
+     "declined": 1,
+     "declined_false_alarms": 1
+    }
+   },
+   "command_lines": 52,
+   "command_lines_taken": 52
+  }
+ },
+ "together": {
+  "dev": {
+   "name": {
+    "right": 208,
+    "wrong": 0,
+    "left": 0,
+    "harm": 5,
+    "left alone": 0
+   },
+   "value": {
+    "right": 16,
+    "wrong": 2,
+    "left": 0,
+    "harm": 3,
+    "left alone": 0
+   }
+  },
+  "test": {
+   "name": {
+    "right": 348,
+    "wrong": 1,
+    "left": 1,
+    "harm": 7,
+    "left alone": 0
+   },
+   "value": {
+    "right": 25,
+    "wrong": 0,
+    "left": 0,
+    "harm": 10,
+    "left alone": 0
+   }
+  }
+ },
+ "dev_settings": [
+  {
+   "model": "qwen3:8b",
+   "version": "v1",
+   "right": 2,
+   "wrong": 0,
+   "left": 0,
+   "harm": 4,
+   "left alone": 0,
+   "real_fixed": 1,
+   "real": 4,
+   "real_right": 0,
+   "outcomes": {
+    "fixed": 7,
+    "no fix": 3,
+    "turn limit": 0,
+    "loop": 0
+   },
+   "seconds": 7.734500000000001,
+   "turns": 1.0
+  },
+  {
+   "model": "qwen3:8b",
+   "version": "v2",
+   "right": 2,
+   "wrong": 0,
+   "left": 0,
+   "harm": 4,
+   "left alone": 0,
+   "real_fixed": 2,
+   "real": 4,
+   "real_right": 0,
+   "outcomes": {
+    "fixed": 8,
+    "no fix": 2,
+    "turn limit": 0,
+    "loop": 0
+   },
+   "seconds": 7.148,
+   "turns": 1.0
+  },
+  {
+   "model": "qwen3:8b",
+   "version": "v3",
+   "right": 2,
+   "wrong": 0,
+   "left": 0,
+   "harm": 4,
+   "left alone": 0,
+   "real_fixed": 4,
+   "real": 4,
+   "real_right": 1,
+   "outcomes": {
+    "fixed": 10,
+    "no fix": 0,
+    "turn limit": 0,
+    "loop": 0
+   },
+   "seconds": 9.0485,
+   "turns": 1.0
+  },
+  {
+   "model": "granite4:3b",
+   "version": "v1",
+   "right": 1,
+   "wrong": 0,
+   "left": 1,
+   "harm": 2,
+   "left alone": 2,
+   "real_fixed": 0,
+   "real": 4,
+   "real_right": 0,
+   "outcomes": {
+    "fixed": 3,
+    "no fix": 6,
+    "turn limit": 1,
+    "loop": 0
+   },
+   "seconds": 4.4399999999999995,
+   "turns": 2.0
+  },
+  {
+   "model": "granite4:3b",
+   "version": "v2",
+   "right": 1,
+   "wrong": 0,
+   "left": 1,
+   "harm": 1,
+   "left alone": 3,
+   "real_fixed": 0,
+   "real": 4,
+   "real_right": 0,
+   "outcomes": {
+    "fixed": 2,
+    "no fix": 7,
+    "turn limit": 1,
+    "loop": 0
+   },
+   "seconds": 3.888,
+   "turns": 2.0
+  },
+  {
+   "model": "granite4:3b",
+   "version": "v3",
+   "right": 1,
+   "wrong": 0,
+   "left": 1,
+   "harm": 1,
+   "left alone": 3,
+   "real_fixed": 0,
+   "real": 4,
+   "real_right": 0,
+   "outcomes": {
+    "fixed": 2,
+    "no fix": 7,
+    "turn limit": 1,
+    "loop": 0
+   },
+   "seconds": 4.79,
+   "turns": 2.0
+  }
+ ],
+ "chosen": {
+  "model": "qwen3:8b",
+  "version": "v3"
+ },
+ "test_agent": {
+  "model": "qwen3:8b",
+  "version": "v3",
+  "right": 3,
+  "wrong": 1,
+  "left": 1,
+  "harm": 3,
+  "left alone": 0,
+  "real_fixed": 1,
+  "real": 3,
+  "real_right": 0,
+  "outcomes": {
+   "fixed": 8,
+   "no fix": 3,
+   "turn limit": 0,
+   "loop": 0
+  },
+  "seconds": 8.295,
+  "turns": 2
+ },
+ "agent_lines": [
+  {
+   "id": "cookiecutter/cookiecutter:rename_identifier:1",
+   "split": "dev",
+   "file": "docs/advanced/template_extensions.rst",
+   "line": 18,
+   "expected": false,
+   "outcome": "fixed",
+   "text": "        \"_extensions\": [\"jinja2_time.TimeExtension2\"]",
+   "key": null,
+   "verdict": "harm"
+  },
+  {
+   "id": "cookiecutter/cookiecutter:rename_identifier:1",
+   "split": "dev",
+   "file": "docs/advanced/template_extensions.rst",
+   "line": 23,
+   "expected": false,
+   "outcome": "fixed",
+   "text": "In the above example, Cookiecutter provides the additional tag `now`_, after installing the `jinja2_time.TimeExtension2`_ and enabling it in ``cookiecutter.json``.",
+   "key": null,
+   "verdict": "harm"
+  },
+  {
+   "id": "cookiecutter/cookiecutter:rename_identifier:1",
+   "split": "dev",
+   "file": "docs/advanced/template_extensions.rst",
+   "line": 39,
+   "expected": false,
+   "outcome": "fixed",
+   "text": "    need to require ``jinja2_time.TimeExtension2``, since its functionality is",
+   "key": null,
+   "verdict": "harm"
+  },
+  {
+   "id": "cookiecutter/cookiecutter:rename_identifier:1",
+   "split": "dev",
+   "file": "docs/advanced/template_extensions.rst",
+   "line": 126,
+   "expected": false,
+   "outcome": "fixed",
+   "text": ".. _`jinja2_time.TimeExtension2`: https://github.com/hackebrot/jinja2-time",
+   "key": null,
+   "verdict": "harm"
+  },
+  {
+   "id": "Kludex/uvicorn:change_default:1",
+   "split": "dev",
+   "file": "docs/settings.md",
+   "line": 148,
+   "expected": true,
+   "outcome": "fixed",
+   "text": "* `--limit-max-requests-jitter <int>` - Maximum jitter to add to `limit-max-requests`. Each worker adds a random number in the range `[0, jitter]`, staggering restarts to avoid all workers restarting simultaneously. **Default:** *1*.",
+   "key": "* `--limit-max-requests-jitter <int>` - Maximum jitter to add to `limit-max-requests`. Each worker adds a random number in the range `[0, jitter]`, staggering restarts to avoid all workers restarting simultaneously. **Default:** *1*.",
+   "verdict": "right"
+  },
+  {
+   "id": "mkdocs/mkdocs:rename_identifier:2",
+   "split": "test",
+   "file": "docs/dev-guide/plugins.md",
+   "line": 117,
+   "expected": true,
+   "outcome": "fixed",
+   "text": "    skip_checks = c.ListOfItems2(c.Choice(('foo', 'bar', 'baz')), default=[])",
+   "key": ">     skip_checks = c.ListOfItems2(c.Choice(('foo', 'bar', 'baz')), default=[])",
+   "verdict": "wrong"
+  },
+  {
+   "id": "mkdocs/mkdocs:rename_identifier:2",
+   "split": "test",
+   "file": "docs/dev-guide/plugins.md",
+   "line": 153,
+   "expected": true,
+   "outcome": "no fix",
+   "text": null,
+   "key": ">     add_rectangles = c.ListOfItems2(c.SubConfig(_Rectangle))  # required",
+   "verdict": "left"
+  },
+  {
+   "id": "pallets/flask:rename_identifier:1",
+   "split": "test",
+   "file": "docs/cli.rst",
+   "line": 71,
+   "expected": true,
+   "outcome": "fixed",
+   "text": "The :func:`run <cli.run_command2>` command will start the development server. It",
+   "key": "The :func:`run <cli.run_command2>` command will start the development server. It",
+   "verdict": "right"
+  },
+  {
+   "id": "psf/black:raise_python:1",
+   "split": "dev",
+   "file": "docs/integrations/editors.md",
+   "line": 235,
+   "expected": true,
+   "outcome": "fixed",
+   "text": "This plugin **requires Vim 7.0+ built with Python 3.12+ support**. It needs Python 3.12",
+   "key": "This plugin **requires Vim 7.0+ built with Python 3.12+ support**. It needs Python 3.12",
+   "verdict": "right"
+  },
+  {
+   "id": "PyCQA/isort:rename_identifier:2",
+   "split": "test",
+   "file": "README.md",
+   "line": 275,
+   "expected": false,
+   "outcome": "fixed",
+   "text": "[More info here.](docs/configuration/git_hook2.md)",
+   "key": null,
+   "verdict": "harm"
+  },
+  {
+   "id": "PyCQA/isort:rename_identifier:2",
+   "split": "test",
+   "file": "docs/index.rst",
+   "line": 34,
+   "expected": false,
+   "outcome": "fixed",
+   "text": "    configuration/git_hook2",
+   "key": null,
+   "verdict": "harm"
+  },
+  {
+   "id": "pypa/pipx:raise_python:1",
+   "split": "test",
+   "file": "docs/explanation/comparisons.rst",
+   "line": 227,
+   "expected": false,
+   "outcome": "fixed",
+   "text": "install black --python=python3.13",
+   "key": null,
+   "verdict": "harm"
+  },
+  {
+   "id": "pypa/pipx:raise_python:1",
+   "split": "test",
+   "file": "docs/how-to/install-pipx.rst",
+   "line": 17,
+   "expected": true,
+   "outcome": "fixed",
+   "text": "Installing pipx needs Python 3.13 or newer; the apps it runs can target Python 3.3 or newer. Without Python 3.13, see",
+   "key": "Installing pipx needs Python 3.13 or newer; the apps it runs can target Python 3.3 or newer. Without Python 3.13, see",
+   "verdict": "right"
+  },
+  {
+   "id": "sqlalchemy/alembic:rename_identifier:2",
+   "split": "test",
+   "file": "docs/build/cookbook.rst",
+   "line": 1525,
+   "expected": true,
+   "outcome": "fixed",
+   "text": "        directory = script.ScriptDirectory2.from_config(alembic_cfg)",
+   "key": "        directory = script.ScriptDirectory2.from_config(alembic_cfg)",
+   "verdict": "right"
+  }
+ ],
+ "real": [
+  {
+   "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:47",
+   "split": "dev",
+   "repo": "callowayproject/bump-my-version",
+   "file": "docs/explanation/show-subcommand.md",
+   "line": 47,
+   "command": "bump-my-version --increment patch show",
+   "message": "No such option '--increment'.",
+   "outcome": "fixed",
+   "fix": {
+    "file": "docs/explanation/show-subcommand.md",
+    "line": 47,
+    "old": [
+     "$ bump-my-version --increment patch show"
+    ],
+    "new": [
+     "$ bump-my-version show --increment patch"
+    ],
+    "how": "agent",
+    "reason": "The '--increment' option is associated with the 'show' subcommand, but the command line format should be 'bump-my-version show --increment patch' instead of 'bump-my-version --increment patch show'."
+   },
+   "proof": [
+    {
+     "argv": [
+      "bump-my-version",
+      "show",
+      "--increment",
+      "patch"
+     ],
+     "outcome": "succeeded",
+     "message": ""
+    }
+   ],
+   "verdict": "wrong",
+   "why": "The option is now after `show`, but with no name after it, `show` prints the whole configuration, not the 1.0.2 shown under it: run normally, `bump-my-version show --increment patch` prints a dict of every setting, and `bump-my-version show --increment patch new_version` prints the version."
+  },
+  {
+   "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:49",
+   "split": "dev",
+   "repo": "callowayproject/bump-my-version",
+   "file": "docs/explanation/show-subcommand.md",
+   "line": 49,
+   "command": "bump-my-version --increment minor show",
+   "message": "No such option '--increment'.",
+   "outcome": "fixed",
+   "fix": {
+    "file": "docs/explanation/show-subcommand.md",
+    "line": 49,
+    "old": [
+     "$ bump-my-version --increment minor show"
+    ],
+    "new": [
+     "$ bump-my-version show --increment minor"
+    ],
+    "how": "agent",
+    "reason": "The `--increment` option is associated with the `show` subcommand, so the command should be `bump-my-version show --increment minor`."
+   },
+   "proof": [
+    {
+     "argv": [
+      "bump-my-version",
+      "show",
+      "--increment",
+      "minor"
+     ],
+     "outcome": "succeeded",
+     "message": ""
+    }
+   ],
+   "verdict": "wrong",
+   "why": "The option is now after `show`, but with no name after it, `show` prints the whole configuration, not the 1.1.0 shown under it: run normally, `bump-my-version show --increment patch` prints a dict of every setting, and `bump-my-version show --increment patch new_version` prints the version."
+  },
+  {
+   "task": "audit|callowayproject/bump-my-version|docs/explanation/show-subcommand.md:51",
+   "split": "dev",
+   "repo": "callowayproject/bump-my-version",
+   "file": "docs/explanation/show-subcommand.md",
+   "line": 51,
+   "command": "bump-my-version --increment major show",
+   "message": "No such option '--increment'.",
+   "outcome": "fixed",
+   "fix": {
+    "file": "docs/explanation/show-subcommand.md",
+    "line": 51,
+    "old": [
+     "$ bump-my-version --increment major show"
+    ],
+    "new": [
+     "$ bump-my-version show --increment major"
+    ],
+    "how": "agent",
+    "reason": "The '--increment' option is associated with the 'show' subcommand, but it should be specified after the subcommand."
+   },
+   "proof": [
+    {
+     "argv": [
+      "bump-my-version",
+      "show",
+      "--increment",
+      "major"
+     ],
+     "outcome": "succeeded",
+     "message": ""
+    }
+   ],
+   "verdict": "wrong",
+   "why": "The option is now after `show`, but with no name after it, `show` prints the whole configuration, not the 2.0.0 shown under it: run normally, `bump-my-version show --increment patch` prints a dict of every setting, and `bump-my-version show --increment patch new_version` prints the version."
+  },
+  {
+   "task": "audit|simonw/llm|docs/help.md:647",
+   "split": "dev",
+   "repo": "simonw/llm",
+   "file": "docs/help.md",
+   "line": 647,
+   "command": "llm schema dsl name, age int, bio: their bio",
+   "message": "Got unexpected extra arguments (dsl name, age int, bio: their bio)",
+   "outcome": "fixed",
+   "fix": {
+    "file": "docs/help.md",
+    "line": 647,
+    "old": [
+     "      llm schema dsl 'name, age int, bio: their bio'"
+    ],
+    "new": [
+     "       llm schemas dsl 'name, age int, bio: their bio'"
+    ],
+    "how": "agent",
+    "reason": "The command should use 'schemas' instead of 'schema' as per the usage line."
+   },
+   "proof": [
+    {
+     "argv": [
+      "llm",
+      "schemas",
+      "dsl",
+      "name, age int, bio: their bio"
+     ],
+     "outcome": "accepted",
+     "message": ""
+    }
+   ],
+   "verdict": "right",
+   "why": "The command is `schemas`, as the usage line above it says; run normally, `llm schemas dsl` prints the JSON schema. The line is copied from the help in llm/cli.py (line 2807), so the fix that lasts is made there."
+  },
+  {
+   "task": "audit|pypa/pipx|docs/how-to/configure-paths.rst:99",
+   "split": "test",
+   "repo": "pypa/pipx",
+   "file": "docs/how-to/configure-paths.rst",
+   "line": 99,
+   "command": "pipx --global install pycowsay",
+   "message": "unrecognized arguments: --global",
+   "outcome": "no fix",
+   "fix": null,
+   "proof": [],
+   "verdict": null,
+   "why": null
+  },
+  {
+   "task": "audit|simonw/sqlite-utils|docs/cli.rst:2753",
+   "split": "test",
+   "repo": "simonw/sqlite-utils",
+   "file": "docs/cli.rst",
+   "line": 2753,
+   "command": "sqlite-utils populate-fts mydb.db documents title summary --tokenize=porter",
+   "message": "No such option '--tokenize'.",
+   "outcome": "no fix",
+   "fix": null,
+   "proof": [],
+   "verdict": null,
+   "why": null
+  },
+  {
+   "task": "audit|sqlalchemy/alembic|docs/build/branches.rst:678",
+   "split": "test",
+   "repo": "sqlalchemy/alembic",
+   "file": "docs/build/branches.rst",
+   "line": 678,
+   "command": "alembic revision -m add ip account table \\ --head=networking@head \\ --depends-on=55af2cb1c267 --depends-on=d747a --depends-on=fa445",
+   "message": "unrecognized arguments: \\ \\",
+   "outcome": "fixed",
+   "fix": {
+    "file": "docs/build/branches.rst",
+    "line": 678,
+    "old": [
+     "    $ alembic revision -m \"add ip account table\" \\\\"
+    ],
+    "new": [
+     "    $ alembic revision -m \"add ip account table\" --head=networking@head --depends-on=55af2cb1c267 --depends-on=d747a --depends-on=fa445"
+    ],
+    "how": "agent",
+    "reason": "The command line had incorrect backslashes that caused the arguments to be unrecognized. The corrected command removes these backslashes."
+   },
+   "proof": [
+    {
+     "argv": [
+      "alembic",
+      "revision",
+      "-m",
+      "add ip account table",
+      "--head=networking@head",
+      "--depends-on=55af2cb1c267",
+      "--depends-on=d747a",
+      "--depends-on=fa445"
+     ],
+     "outcome": "accepted",
+     "message": ""
+    }
+   ],
+   "verdict": "wrong",
+   "why": "It joins the whole command onto line 678 but leaves lines 679 and 680, which still end in two backslashes and now repeat its options under the command. The fix is one backslash at the end of each line."
+  }
+ ]
+}

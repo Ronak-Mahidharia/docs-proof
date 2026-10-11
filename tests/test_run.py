@@ -243,3 +243,26 @@ def test_the_sandbox_keeps_its_limits():
     assert text.startswith(f"FROM {BASE}\n") and "@sha256:" in BASE  # the base image is pinned by digest
     assert "\nUSER sandbox\n" in text  # commands never run as root
     assert "--no-deps -r /pins/pallets__flask.txt" in text and "--exclude-newer" in text
+
+
+def test_a_captured_command_returns_what_it_printed(tmp_path):
+    from docsproof.sandbox_run import run
+    env_bin = tmp_path / "bin"
+    env_bin.mkdir()
+    script = tmp_path / "tiny.py"
+    script.write_text("import argparse\np = argparse.ArgumentParser(prog='tiny')\n"
+                      "p.add_argument('--limit', help='at most N')\np.parse_args()\n", encoding="utf-8")
+    program = env_bin / "tiny"  # a wrapper, since a #! line can't hold a path with a space in it
+    program.write_text(f'#!/bin/sh\nexec "{sys.executable}" "{script}" "$@"\n', encoding="utf-8")
+    program.chmod(0o755)
+    captured = run({"id": 0, "argv": ["tiny", "--help"], "capture": True}, tmp_path, env_bin, 30)
+    assert captured["outcome"] == "succeeded" and "--limit LIMIT  at most N" in captured["output"]
+    plain = run({"id": 1, "argv": ["tiny", "--help"]}, tmp_path, env_bin, 30)
+    assert plain == {"id": 1, "outcome": "succeeded", "exit": 0, "unknown": [], "message": ""}  # as before: no output
+
+
+def test_a_job_asks_for_output_only_when_told_to():
+    from docsproof.run import job_commands
+    keys = [(("tiny", "--help"), ())]
+    assert job_commands(keys) == [{"id": 0, "argv": ["tiny", "--help"], "env": {}}]
+    assert job_commands(keys, capture=True) == [{"id": 0, "argv": ["tiny", "--help"], "env": {}, "capture": True}]

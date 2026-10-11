@@ -31,6 +31,7 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
 
    **Done:** on test, a wide search finds all 25 changed-value lines, with 10 false alarms; a local model (qwen3:8b, chosen on dev) removes 3 of them but drops 2 right lines, so F1 stays about the same (0.837 against 0.833) ([results](results/values.md)).
 4. **Suggested fixes.** It opens a fix pull request only after approval: an agent with step limits and loop detection.
+   **Done:** on test, the rules fix 370 of the 375 lines the change made wrong, all right, and the agent fixes 3 of the other 5 right; but every false alarm gets a fix too (17 of 17), so a fix waits for a person's yes ([results](results/fixes.md)).
 5. **The tools:**
    - a command-line tool
    - a GitHub Action that comments on pull requests
