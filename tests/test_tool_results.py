@@ -34,4 +34,13 @@ def test_readme_and_plan_numbers_for_the_tool():
     fixes = sum(TOOL[s]["fixes"] for s in TOOL)
     assert (f"on all {cases} cases, it flags exactly the {flagged} lines that the exact checks, the commands read, and "
             f"the changed-value search flag, and offers exactly step 4's {fixes} rule fixes") in readme
-    assert f"On all {cases} cases it flags exactly the {flagged} lines the measured steps flag, and offers exactly step 4's {fixes} rule fixes" in plan
+    assert f"the command-line tool: on all {cases} cases it flags exactly the {flagged} lines the measured steps flag, and offers exactly step 4's {fixes} rule fixes" in plan
+
+
+def test_readme_numbers_for_the_mcp_server():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    pins = [line for line in (ROOT / "requirements-mcp.txt").read_text(encoding="utf-8").splitlines()
+            if line and not line.startswith("#")]
+    mcp = next(line.split("==")[1] for line in pins if line.startswith("mcp=="))
+    assert all("==" in line for line in pins)  # every package pinned exactly
+    assert f"mcp {mcp} and the {len(pins) - 1} packages it installs" in readme

@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the command-line tool, and the GitHub Action. Next: an MCP server, so Claude Code and other assistants can use it. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), and the tools: a command-line tool, a GitHub Action, and an MCP server. Next is step 6: real history as a second answer key. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -101,6 +101,18 @@ jobs:
 - **Inputs:** `base` and `head` (commits), `path` (the repository's folder), and `fail-on-findings: false` to report without failing the check. **Outputs:** `findings`, `fixes`, and `patch`, the suggested fixes as a file.
 - **Safe with what a pull request contains:** every input reaches the script through the environment, never pasted into it, and text from the docs is shown only inside code blocks that nothing in it can end.
 - **Checked on GitHub's runner** with Python 3.12, in this repository's CI. On a throwaway repository with one option renamed, it must flag that one line, with its fix. It also runs on every pull request here.
+
+### With Claude Code and other assistants (MCP)
+The MCP server gives AI assistants two read-only tools: `check_repository` (a change in a git repository, by default the working tree against where the branch started from main) and `check_folders` (the change between two folders). They run the same check as the command. They change no file, run no code, and send nothing anywhere. To make a suggested fix, the assistant edits the doc itself, and Claude Code asks you first.
+
+```bash
+pip install -e . -r requirements-mcp.txt        # the official MCP Python SDK and its pinned dependencies
+claude mcp add --scope user docs-proof -- "$PWD/.venv/bin/python" -m docsproof.mcp_server
+```
+
+- **The same answers as the command:** its tests compare the two, through a real MCP client, in-process and over stdio.
+- **Its dependencies:** mcp 2.3.0 and the 27 packages it installs, all with permissive licenses, pinned in [requirements-mcp.txt](requirements-mcp.txt). pip-audit found no known vulnerabilities in them. The rest of docs-proof still uses only Python's standard library.
+- **Other MCP clients** start it the same way: `python -m docsproof.mcp_server`, over stdio.
 
 ## Reproduce
 ```bash

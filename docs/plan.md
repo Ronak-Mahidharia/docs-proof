@@ -37,8 +37,10 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
    - a GitHub Action that comments on pull requests
    - an MCP server for Claude Code and other MCP clients
 
-   **Done so far:** the command-line tool. On all 246 cases it flags exactly the 626 lines the measured steps flag, and offers exactly step 4's 612 rule fixes ([the check](../scripts/check_tool.py)).
-   And the GitHub Action ([action.yml](../action.yml)): it reports in the job summary and with warnings on the flagged lines, needs no write permission, and comments on the pull request only when asked to. CI runs it on a throwaway repository and on every pull request here.
+   **Done:**
+   - the command-line tool: on all 246 cases it flags exactly the 626 lines the measured steps flag, and offers exactly step 4's 612 rule fixes ([the check](../scripts/check_tool.py))
+   - the GitHub Action ([action.yml](../action.yml)): it reports in the job summary and with warnings on the flagged lines, needs no write permission, and comments on the pull request only when asked to. CI runs it on a throwaway repository and on every pull request here
+   - the MCP server ([src/docsproof/mcp_server.py](../src/docsproof/mcp_server.py)): two read-only tools that give assistants such as Claude Code the command's findings; its tests compare the two, in-process and over stdio
 6. **Real history** as a second answer key, plus a check on my own repositories.
 7. **The write-up and a demo.**
 
