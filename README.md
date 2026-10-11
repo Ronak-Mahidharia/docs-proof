@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, and a check on my own projects. Next is a fix that check pointed to (names that are also ordinary words), then the write-up. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), real history as a second answer key, a check on my own projects, and a rule for names that could be ordinary words. Next: the fixes, measured on the real-history key, then the write-up. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -29,6 +29,8 @@ All on the test split (15 repositories, 130 cases). Only the last part uses AI.
 - **Controls** (28 cases): no false alarms.
 
 For renames, the expected lines are the doc lines that still mention the old name, so a search for removed names finds all of them by design. Those cases mostly test false alarms: the 7 are lines the change doesn't make wrong, such as another tool's option with the same name. Changed values are found in step 3, below.
+
+**A name that could be an ordinary word,** such as a function named `records`, counts only where the doc marks it as code: in a code block, in backticks, as a call, or after a dot. Otherwise every sentence that uses the word is flagged, as on one of my own projects (below). The answer key renames only names that can't be ordinary words, such as `fetch_items` or `PluginSQL`, so the rule changed no result on either answer key. For the same reason, neither key can measure what it costs: a real mention of such a name in a plain sentence.
 
 **Commands in the docs, read:** each documented command is read the way a shell reads it, and its options are compared with the options the code declares ([docs/results/commands.md](docs/results/commands.md)).
 - **Renamed options** (37 cases, 175 lines): flagged 48 lines in commands, with no false alarms, each with its proof, such as "`flask` declares no --host option in the code".
@@ -66,8 +68,8 @@ The planted changes measure what docs-proof was built to find. A second answer k
 ## On my own projects
 docs-proof checked every pull request merged into main in my two public projects, [Car Safety Checker](https://github.com/Ronak-Mahidharia/car-safety-checker) and [Control Finder](https://github.com/Ronak-Mahidharia/control-finder), the way its GitHub Action would have: just before and just after each merge, with no AI ([docs/results/own.md](docs/results/own.md)).
 - **Control Finder** (15 merges): nothing flagged.
-- **Car Safety Checker** (18 merges): 23 lines flagged, all in one pull request, and all false alarms. That pull request removed a function named `records`, and every flagged line uses "records" as an ordinary word, such as "NHTSA's own records". The suggested fix was wrong too: it paired `records` with an unrelated new function, `words`.
-- **What it shows:** a removed name that's also an ordinary word should count only where the docs mark it as code, such as `records()` in backticks. That's the next change, measured on both answer keys before it's kept.
+- **Car Safety Checker** (18 merges): nothing flagged since the rule for ordinary words (above). Before it, 23 lines were flagged, all in one pull request and all false alarms: that pull request removed a function named `records`, and every flagged line uses "records" as an ordinary word, such as "NHTSA's own records". The suggested fix was wrong too: it paired `records` with an unrelated new function, `words`.
+- **What it showed:** neither answer key has a name like this, so checking real projects found a problem the keys couldn't. How an old name is paired with a new one is measured next, on the real-history key.
 
 ## Use it
 `docs-proof` checks a change in a Python project's git repository. It uses no AI unless you ask for it, and sends nothing anywhere.

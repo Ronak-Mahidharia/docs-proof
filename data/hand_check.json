@@ -1222,9 +1222,10 @@
  },
  "own_repositories": {
   "checked_on": "2026-10-11",
-  "about": "Hand checks of every line docs-proof flagged in my own public projects (step 6), with the pull request's diff and the doc line in front of me. Each verdict is for a group of lines flagged for the same removed name in the same merge.",
+  "about": "Hand checks of every line docs-proof flagged in my own public projects (step 6), with the pull request's diff and the doc line in front of me. Each verdict is for a group of lines flagged for the same removed name in the same merge. Lines a later rule stopped flagging keep their verdicts under \"before_the_rule\"; the ordinary-word rule (src/docsproof/exact.py) stopped flagging all 23 lines read on Oct 11, 2026.",
   "criteria": "A line is wrong when the merge removed or renamed, in the project's code, the thing the line names as code, and the line still names it. A line that uses the same letters as an ordinary word is a false alarm.",
-  "lines": [
+  "lines": [],
+  "before_the_rule": [
    {
     "repo": "Ronak-Mahidharia/car-safety-checker",
     "commit": "3f15f7e80adbf7597addac3c0a30e1b353f1c262",
