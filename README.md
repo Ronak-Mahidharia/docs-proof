@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), and suggested fixes (rules, then an agent, with approval before anything changes). Next is step 5: the tools. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), and the command-line tool. Next: a GitHub Action that comments on pull requests, and an MCP server. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -54,6 +54,31 @@ For renames, the expected lines are the doc lines that still mention the old nam
 - **Every false alarm got a fix too** (17 of 17), so each fix needs a person's yes.
 - **The doc lines step 2 found out of date:** on test's 3, the agent left 2 for a person and fixed 1 wrong: it joined alembic's command onto one line and left the old lines under it. On dev, it fixed llm's `schema dsl` to `schemas dsl`, as the usage line above it says.
 
+## Use it
+`docs-proof` checks a change in a Python project's git repository. It uses no AI unless you ask for it, and sends nothing anywhere.
+
+```bash
+pip install -e .                       # from this repository: Python 3.12 or newer, no other packages
+docs-proof                             # the working tree, against where the branch started from main
+docs-proof --base v1.2 --head HEAD     # between two commits, branches, or tags
+docs-proof --patch fixes.patch         # the suggested fixes, as a patch to read, then git apply
+docs-proof --apply                     # show the fixes, and make them only after a yes
+```
+
+For each doc line it flags, it prints the line, the proof, and the rules' fix. Here, after renaming pyupgrade's `--keep-mock` to `--keep-mock2` (one of the planted changes):
+
+```
+README.md:316
+    - [Unless `--keep-mock` is passed on the commandline](https://github.com/asottile/pyupgrade/issues/314).
+  why: --keep-mock was at pyupgrade/_main.py:345 before the change and is gone
+  fix: - [Unless `--keep-mock2` is passed on the commandline](https://github.com/asottile/pyupgrade/issues/314).
+```
+
+- **The same as the measured steps:** on all 246 cases, it flags exactly the 626 lines that the exact checks, the commands read, and the changed-value search flag, and offers exactly step 4's 612 rule fixes ([scripts/check_tool.py](scripts/check_tool.py)).
+- **For scripts and CI:** the exit status is 0 when nothing is flagged, 1 when something is, and 2 when the check couldn't run. `--json` prints the findings, and `--before`/`--after` compare two folders without git.
+- **Optional AI:** `--model qwen3:8b` adds step 3's local model for changed values, through Ollama on your computer.
+- **Not in it yet:** the sandbox runs, which need an environment built for each project, and the agent.
+
 ## Reproduce
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
@@ -66,6 +91,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python scripts/run_values.py           # the changed-value search
 .venv/bin/python scripts/run_model.py            # the model's scores, from its kept answers
 .venv/bin/python scripts/run_fixes.py            # the fixes and their scores, from the kept runs and answers
+.venv/bin/python scripts/check_tool.py           # the docs-proof tool on every case, against the measured steps
 ```
 
 To ask the models again (Ollama, with qwen3:8b and granite4:3b, about 15 minutes): `.venv/bin/python scripts/run_model.py --ask`. It asks only for answers that aren't kept yet, so first delete `data/results/model-answers.jsonl`.

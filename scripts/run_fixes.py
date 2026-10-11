@@ -38,9 +38,9 @@ from docsproof import agent  # noqa: E402
 from docsproof.commands import Command, code_block_lines, console_scripts, doc_commands, main_packages  # noqa: E402
 from docsproof.docs import qualifiers, read_lines, token_pattern  # noqa: E402
 from docsproof.exact import TOKEN_KIND  # noqa: E402
-from docsproof.fix import (Fix, apply, changes_value, check_shape, rename_fix, renames, stale_name,  # noqa: E402
-                           value_fix, value_pattern)
-from docsproof.model import describe, setting  # noqa: E402
+from docsproof.fix import (Fix, apply, changes_value, check_shape, renames, rule_fix, stale_name,  # noqa: E402
+                           value_pattern)
+from docsproof.model import describe  # noqa: E402
 from docsproof.names import packages  # noqa: E402
 from docsproof.plant import apply as plant  # noqa: E402
 from docsproof.run import missing_input, refused, run_in_sandbox, runnable  # noqa: E402
@@ -70,25 +70,11 @@ def hand() -> dict:
 # --- 1 and 2: the flagged lines, and the rules' fixes ---------------------------------------------------------
 
 def rule(text: str, names: list[list[str]], values: list[dict], pairs: dict, own: set[str]) -> dict:
-    """The rules' fix for one flagged line ({"new", "reason"}), or why they decline it ({"declined"})."""
-    new, reasons = text, []
-    for kind, name in names:
-        target = pairs.get(f"{kind} {name}")
-        if target is None:
-            return {"declined": f"the change added no name to put in place of `{name}`"}
-        fixed = rename_fix(new, kind, name, target, own)
-        if fixed is None:
-            return {"declined": f"`{name}` is there only under another package's name or in a file path"}
-        new = fixed
-        reasons.append(f"`{name}` is now `{target}`")
-    for d in values:
-        change = change_of(d)
-        fixed = value_fix(new, change)
-        if fixed is None:
-            return {"declined": f"{change.old} is in the line {len(value_pattern(change).findall(new))} times"}
-        new = fixed
-        reasons.append(f"{setting(d)} is now {change.new}")
-    return {"new": new, "reason": "; ".join(reasons)}
+    """The rules' fix for one flagged line ({"new", "reason"}), or why they decline it ({"declined"}), from the
+    line as kept in data/results/fixes.jsonl (fix.rule_fix does the work)."""
+    new, why = rule_fix(text, [(kind, name) for kind, name in names], [change_of(d) for d in values],
+                        {tuple(k.split(" ", 1)): v for k, v in pairs.items()}, own)
+    return {"declined": why} if new is None else {"new": new, "reason": why}
 
 
 def fixed_commands(rel: str, lines: list[str], fixes: list[Fix], scripts: set[str], mains: set[str],

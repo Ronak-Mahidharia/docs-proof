@@ -44,3 +44,25 @@ def test_docs_changed_after_the_patch_was_made_stop_everything(tmp_path):
 def test_only_yes_is_a_yes():
     for answer, expected in (("y", True), ("YES", True), ("", False), ("n", False), ("sure", False)):
         assert ask("diff", read=lambda prompt: answer, show=lambda text: None) is expected
+
+
+def test_local_fixes_are_made_only_after_a_yes(tmp_path):
+    from docsproof.approve import apply_locally
+    root = repo(tmp_path)
+    assert not apply_locally(root, [FIX], lambda diff: False)
+    assert (root / "README.md").read_text(encoding="utf-8") == "# tiny\nUse --limit here.\n"
+    assert apply_locally(root, [FIX], lambda diff: True)
+    assert (root / "README.md").read_text(encoding="utf-8") == "# tiny\nUse --cap here.\n"
+
+
+def test_local_fixes_stop_if_the_docs_changed_after_the_patch(tmp_path):
+    from docsproof.approve import apply_locally
+    root = repo(tmp_path)
+
+    def approve_while_someone_edits(diff):
+        (root / "README.md").write_text("# tiny, edited\nUse --limit here.\n", encoding="utf-8")
+        return True
+
+    with pytest.raises(RuntimeError, match="changed after the patch was made"):
+        apply_locally(root, [FIX], approve_while_someone_edits)
+    assert (root / "README.md").read_text(encoding="utf-8") == "# tiny, edited\nUse --limit here.\n"

@@ -33,16 +33,18 @@ def repo_files(root: Path) -> set[str]:
     return out
 
 
-def removed_names(before: Path, after: Path, cache: dict | None = None) -> list[tuple[str, str, str]]:
+def removed_names(before: Path, after: Path, cache: dict | None = None,
+                  after_code: Code | None = None) -> list[tuple[str, str, str]]:
     """(kind, name, where it was) for every name the change removed from the code. A cache dict lets many
-    changes to the same "before" tree share one parse of it."""
+    changes to the same "before" tree share one parse of it, and after_code is the "after" tree, if it's
+    already parsed."""
     if cache is not None and str(before) in cache:
         old, old_files = cache[str(before)]
     else:
         old, old_files = Code(before), repo_files(before)
         if cache is not None:
             cache[str(before)] = (old, old_files)
-    new = Code(after)
+    new = Code(after) if after_code is None else after_code
     found = []
     for kind, read in (("option", Code.options), ("identifier", Code.defined_names), ("env", Code.env_vars)):
         was, now = read(old), read(new)
@@ -56,11 +58,11 @@ def removed_names(before: Path, after: Path, cache: dict | None = None) -> list[
 TOKEN_KIND = {"option": "option", "path": "path", "identifier": "identifier", "env": "identifier"}
 
 
-def find(before: Path, after: Path, cache: dict | None = None) -> list[Finding]:
+def find(before: Path, after: Path, cache: dict | None = None, after_code: Code | None = None) -> list[Finding]:
     """The doc lines that still mention a name the change removed."""
     docs = doc_files(after)
     findings = []
-    for kind, name, where in removed_names(before, after, cache):
+    for kind, name, where in removed_names(before, after, cache, after_code):
         proof = (f"{name} was at {where} before the change and is gone" if kind != "path"
                  else f"{name} existed before the change and is gone")
         for m in mentions(after, name, TOKEN_KIND[kind], docs):
