@@ -1,6 +1,8 @@
-# Exact versions for the tests. The code itself uses only Python's standard library so far; click is here
-# only so the tests can check the sandbox hooks against a real click program.
+# Exact versions for the tests. docs-proof itself uses only Python's standard library, except the optional MCP
+# server; click is here so the tests can check the sandbox hooks against a real click program.
 # Install with: pip install -r requirements-dev.txt
+# The MCP server's pins, so its tests run too:
+-r requirements-mcp.txt
 click==8.5.0
 iniconfig==2.3.0
 packaging==26.3
