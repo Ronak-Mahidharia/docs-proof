@@ -28,6 +28,8 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
    - **Search first:** it reads the diff and the doc sections that a search finds (RAG).
    - **Structured findings:** each finding must quote the doc line and the code line, and a finding without both quotes is dropped.
    - **Routing:** exact checks run first, and the model handles only the rest. Local models through Ollama come first.
+
+   **Done:** on test, a wide search finds all 25 changed-value lines, with 10 false alarms; a local model (qwen3:8b, chosen on dev) removes 3 of them but drops 2 right lines, so F1 stays about the same (0.837 against 0.833) ([results](results/values.md)).
 4. **Suggested fixes.** It opens a fix pull request only after approval: an agent with step limits and loop detection.
 5. **The tools:**
    - a command-line tool
