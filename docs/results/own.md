@@ -6,10 +6,16 @@ docs-proof checked every pull request merged into main in my two public projects
 
 | Project | Merges checked | Merges with a flagged line | Lines flagged | Left wrong by the merge | False alarms |
 |---|---|---|---|---|---|
-| [Ronak-Mahidharia/car-safety-checker](https://github.com/Ronak-Mahidharia/car-safety-checker) at `8a8fab1` | 18 | 1 | 23 | 0 | 23 |
+| [Ronak-Mahidharia/car-safety-checker](https://github.com/Ronak-Mahidharia/car-safety-checker) at `8a8fab1` | 18 | 0 | 0 | 0 | 0 |
 | [Ronak-Mahidharia/control-finder](https://github.com/Ronak-Mahidharia/control-finder) at `2448c23` | 15 | 0 | 0 | 0 | 0 |
 
 ## What it flagged
+
+Nothing.
+
+## Before the rule for ordinary words
+
+A removed function or class whose name could be an ordinary word, such as `records`, now counts only where the doc marks it as code: in a code block, in backticks, as a call, or after a dot (`ordinary()` and `as_code()` in [src/docsproof/exact.py](../../src/docsproof/exact.py)). Before that rule, docs-proof flagged these lines, and none of them marks the name as code:
 
 - **Ronak-Mahidharia/car-safety-checker, pull request #8** (`3f15f7e`, "Vehicle names: tell vehicles apart by NHTSA's own records"): 23 lines flagged for `records`, all false alarms. The pull request removed the top-level function `records()` from `src/carsafety/nhtsa.py`, and no doc line ever named it as code. Every flagged line uses "records" as an ordinary word, such as "NHTSA's own records" or "complaint records". The suggested fix was wrong too: it paired `records` with `words()`, a new and unrelated helper in `src/carsafety/vehicles.py`.
 
@@ -24,7 +30,7 @@ docs-proof checked every pull request merged into main in my two public projects
 | car-safety-checker | #5 Website: a vehicle's recalls and the closest owner complaints, all in the browser | `ad16842` | 0 |
 | car-safety-checker | #6 MCP server: AI assistants can look up a car problem in NHTSA's records | `0a3d7c1` | 0 |
 | car-safety-checker | #7 MCP server: report the over-the-air mark only when NHTSA sets it | `5dd7514` | 0 |
-| car-safety-checker | #8 Vehicle names: tell vehicles apart by NHTSA's own records | `3f15f7e` | 23 |
+| car-safety-checker | #8 Vehicle names: tell vehicles apart by NHTSA's own records | `3f15f7e` | 0 |
 | car-safety-checker | #9 CI: pin the runner image to ubuntu-24.04 | `50e8e31` | 0 |
 | car-safety-checker | #10 CI: explain the ubuntu-26.04 runner pin | `c57cd9f` | 0 |
 | car-safety-checker | #11 Vehicle names: names NHTSA doesn't list, and recalls under shorter names | `15725ec` | 0 |
