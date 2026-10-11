@@ -151,3 +151,35 @@ def test_the_history_must_be_at_the_pinned_commit(history):
     root, at = history
     with pytest.raises(SystemExit, match="isn't at the pinned commit"):
         mine.build({"repo": "test/tiny", "split": "dev", "commit": at["c"]}, mine.History(root))
+
+
+def test_the_window_starts_at_midnight_utc_at_any_hour_and_in_any_time_zone(tmp_path, monkeypatch):
+    """Git reads a bare date such as 2020-01-01 at the current time of day, so the miner's window used to move with
+    the clock (alembic's count of commits touching docs was 401 at 15:36 EDT and 400 at 17:10). Written with its time
+    and zone, it starts at the same moment wherever and whenever the miner runs."""
+    from fetch_history import SINCE, SINCE_GIT
+    root = write(tmp_path / "tiny", FILES)
+    git(root, "init", "-q", "-b", "main")
+
+    def commit_at(when: str, message: str) -> str:
+        env = {**os.environ, "GIT_AUTHOR_DATE": when, "GIT_COMMITTER_DATE": when}
+        for args in (("add", "-A"), ("commit", "-q", "-m", message)):
+            subprocess.run(["git", "-C", str(root), "-c", "user.name=Test", "-c", "user.email=test@example.com",
+                            "-c", "commit.gpgsign=false", *args], check=True, capture_output=True, env=env)
+        return git(root, "rev-parse", "HEAD").strip()
+    commit_at("2019-12-30T12:00:00+00:00", "start")
+    for when in ("2019-12-31T23:30:00+00:00", "2020-01-01T00:30:00+00:00", "2020-01-01T23:30:00+00:00"):
+        (root / "docs" / "usage.md").write_text(f"Edited at {when}.\n", encoding="utf-8")
+        last = commit_at(when, f"a doc edit at {when}")
+    git(root, "update-ref", REF, last)
+    counts, bare = set(), set()
+    for now in ("1791760000", "1791780000"):  # two times of day on Oct 11, 2026
+        for tz in ("UTC", "Asia/Kolkata", "America/New_York"):
+            monkeypatch.setenv("GIT_TEST_DATE_NOW", now)
+            monkeypatch.setenv("TZ", tz)
+            _, funnel = mine.build({"repo": "test/tiny", "split": "dev", "commit": last}, mine.History(root))
+            counts.add(funnel["commits_touching_docs"])
+            bare.add(len(git(root, "rev-list", "--first-parent", f"--since={SINCE}", last).split()))
+    assert counts == {2}  # the two edits after midnight UTC, at any hour, in any zone
+    assert len(bare) > 1  # a bare date gives a different window depending on the hour and the zone
+    assert SINCE_GIT == f"{SINCE} 00:00:00 +0000"

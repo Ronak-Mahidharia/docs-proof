@@ -39,7 +39,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from docsproof.docs import is_doc, split_lines, token_pattern  # noqa: E402
-from fetch_history import REF, SINCE, place  # noqa: E402
+from fetch_history import REF, SINCE, SINCE_GIT, place  # noqa: E402
 
 CODE = ["*.py", ":(exclude)tests/*", ":(exclude)test/*", ":(exclude)docs/*", ":(exclude)doc/*"]
 OPTION = re.compile(r"(?<![\w-])--[A-Za-z0-9][\w-]*")
@@ -162,7 +162,7 @@ def hunks(h: History, before: str, commit: str, files: list[str]) -> list[dict]:
 def doc_fixes(h: History, pinned: str, funnel: dict) -> list[dict]:
     """The later doc fixes: a reference removed from a doc line after it had left the code."""
     found = []
-    for commit in h.git("rev-list", "--first-parent", "--reverse", f"--since={SINCE}", pinned).stdout.split():
+    for commit in h.git("rev-list", "--first-parent", "--reverse", f"--since={SINCE_GIT}", pinned).stdout.split():
         before = h.parent(commit)
         if not before:
             continue
