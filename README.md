@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), and the tools: a command-line tool, a GitHub Action, and an MCP server. Next is step 6: real history as a second answer key. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), suggested fixes (rules, then an agent, with approval before anything changes), the tools (a command-line tool, a GitHub Action, and an MCP server), and real history as a second answer key. Next is the rest of step 6, a check on my own repositories. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -53,6 +53,15 @@ For renames, the expected lines are the doc lines that still mention the old nam
 - **Together:** 373 of the 375 lines fixed right.
 - **Every false alarm got a fix too** (17 of 17), so each fix needs a person's yes.
 - **The doc lines step 2 found out of date:** on test's 3, the agent left 2 for a person and fixed 1 wrong: it joined alembic's command onto one line and left the old lines under it. On dev, it fixed llm's `schema dsl` to `schemas dsl`, as the usage line above it says.
+
+## Real history
+The planted changes measure what docs-proof was built to find. A second answer key measures what it would have caught in practice: it comes from the same 30 repositories' own history since 2020, and nobody planted it ([docs/results/real.md](docs/results/real.md)).
+- **A case** is a commit that removed an option, a name, an environment variable, or a file from the code while doc lines still mentioned it. Its expected lines are the ones a later commit had to fix.
+- **Mined, then checked by hand:** the mining rules were worked out on dev only, and fixed before test was mined. Every case was read by hand before docs-proof ran on any of them, and 27 of the 36 were real ([data/hand_check.json](data/hand_check.json)).
+- **Test** (12 cases, 23 lines): reading the code just before and just after each change, with no AI, docs-proof would have flagged 7 of the 23 lines (30.4%), and every line in 4 of the 12 cases. On dev, it would have flagged 19 of 30 (63.3%).
+- **Why it misses:** it flagged every line whose name its exact check compares, 7 of 7 on test (19 of 19 on dev). The other 16 test lines name what it doesn't compare: a method (alembic's `compare_against_backend()`), another library's name (livereload's `Server`), a dependency (`sphinx_rtd_theme`), or a value (autopep8's `W690` fixer). So on real history, its misses come from what it compares, not from how it matches doc lines.
+- **How long the lines stayed wrong:** on test, a median of 447 days over the 23 lines, and up to 1,424 days (alembic's `SafeConfigParser`, almost 4 years). On dev, a median of 18 days, with 9 of the 30 lines fixed the same day.
+- **Not scored:** it also flagged 30 lines the key doesn't list, since the key lists only the lines its rules matched to a later fix. By the pinned commit, 20 of them had changed, 13 in a commit that fixed one of the case's key lines. A hand check of the 10 still there found 4 false alarms and 6 unclear.
 
 ## Use it
 `docs-proof` checks a change in a Python project's git repository. It uses no AI unless you ask for it, and sends nothing anywhere.
@@ -127,6 +136,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python scripts/run_model.py            # the model's scores, from its kept answers
 .venv/bin/python scripts/run_fixes.py            # the fixes and their scores, from the kept runs and answers
 .venv/bin/python scripts/check_tool.py           # the docs-proof tool on every case, against the measured steps
+.venv/bin/python scripts/run_real.py             # the real-history scores, from the kept results
 ```
 
 To ask the models again (Ollama, with qwen3:8b and granite4:3b, about 15 minutes): `.venv/bin/python scripts/run_model.py --ask`. It asks only for answers that aren't kept yet, so first delete `data/results/model-answers.jsonl`.
@@ -139,6 +149,14 @@ To run the commands again, with Docker (about 20 minutes on a 10-core Mac; the i
 ```
 
 To run the agent again (Ollama and Docker, about 15 minutes), delete `data/results/agent-answers.jsonl`, then run `.venv/bin/python scripts/run_fixes.py --agent dev` (every setting) and `--agent test` (the setting chosen on dev). Its fixes for the doc lines step 2 found out of date are judged by hand in `data/hand_check.json`, and the scores aren't written until every new fix is judged.
+
+To mine the real history again (about 6 minutes on a 10-core Mac; the histories are about 218 MB):
+```bash
+.venv/bin/python scripts/fetch_history.py        # each repository's history since 2020, up to its pinned commit
+.venv/bin/python scripts/build_real_cases.py     # mines the cases, then keeps the ones the hand check found real
+.venv/bin/python scripts/run_real.py --run       # runs docs-proof on each case, the way it would have run on the day
+```
+The mining stops if it finds a case that hasn't been checked by hand, and the scores aren't written until every flagged line that's still there has been read.
 
 ## License
 MIT for the code in this repository. The repositories used for measurement keep their own licenses; they're cloned at a pinned commit when the measurement runs, and never copied here.

@@ -1,0 +1,70 @@
+{
+ "dev": {
+  "cases": 15,
+  "lines": 30,
+  "found": 19,
+  "recall": 0.633,
+  "cases_all_found": 7,
+  "kinds": {
+   "option": {
+    "lines": 16,
+    "found": 16
+   },
+   "path": {
+    "lines": 1,
+    "found": 1
+   },
+   "env": {
+    "lines": 2,
+    "found": 0
+   },
+   "identifier": {
+    "lines": 11,
+    "found": 2
+   }
+  },
+  "compared_lines": 19,
+  "compared_found": 19,
+  "other": {
+   "flagged": 6,
+   "still_there": 4,
+   "changed": 2,
+   "changed_in_a_fix": 1,
+   "unseen_by_key_rules": 0,
+   "name_kept": 2
+  },
+  "days_median": 18.0,
+  "days_max": 917,
+  "fixed_same_day": 9
+ },
+ "test": {
+  "cases": 12,
+  "lines": 23,
+  "found": 7,
+  "recall": 0.304,
+  "cases_all_found": 4,
+  "kinds": {
+   "env": {
+    "lines": 3,
+    "found": 3
+   },
+   "identifier": {
+    "lines": 20,
+    "found": 4
+   }
+  },
+  "compared_lines": 7,
+  "compared_found": 7,
+  "other": {
+   "flagged": 24,
+   "still_there": 6,
+   "changed": 18,
+   "changed_in_a_fix": 12,
+   "unseen_by_key_rules": 18,
+   "name_kept": 0
+  },
+  "days_median": 447,
+  "days_max": 1424,
+  "fixed_same_day": 1
+ }
+}

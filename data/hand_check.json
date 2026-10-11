@@ -898,5 +898,326 @@
    }
   ],
   "real_rule": "Written before the agent's dev runs were judged. A fix for one of the out-of-date doc lines is right when the fixed line says what the project really does: the program accepts the fixed command, and the command does what the doc around it shows (such as the output printed under it), with nothing else in the line changed. A fix that makes the program accept a command by dropping part of it is wrong. Judged by reading the project's code."
+ },
+ "real_history": {
+  "checked_on": "2026-10-11",
+  "about": "Hand checks of the real-history key (step 6): every mined case was read, with the change's diff, the doc line, and the later fix. The mining rules were worked out on dev only and fixed before the test cases were mined; these verdicts were written before docs-proof was run on any case.",
+  "criteria": "A doc line counts when (1) the change removed or renamed, in the project's own code, the thing the line names; (2) the line was there before the change, unchanged by it, and after it described what no longer existed; and (3) the later fix changed the line because of that. Example output from an old version, words that only look like code names, other programs' options, and version-history notes don't count.",
+  "cases": [
+   {
+    "case": "callowayproject/bump-my-version@a05ee53327",
+    "verdict": "real",
+    "why": "The change deleted requirements/dev.txt; CONTRIBUTING.md still installed it with pip until a fix 92 days later."
+   },
+   {
+    "case": "coveragepy/coveragepy@469d26f116",
+    "verdict": "real",
+    "why": "The COVERAGE_NO_CTRACER, COVERAGE_NO_PYTRACER, and COVERAGE_ONE_TRACER test variables were replaced by COVERAGE_*_CORE; doc/contributing.rst still described the old ones."
+   },
+   {
+    "case": "coveragepy/coveragepy@e6e6bdfa70",
+    "verdict": "not real",
+    "why": "--quiet is setup.py's option, in an example of tox output; removing a test that used it didn't make the example wrong."
+   },
+   {
+    "case": "encode/httpx@3046e920ea",
+    "verdict": "not real",
+    "why": "The lines are example log output from an older version that happens to show h2's MAX_CONCURRENT_STREAMS setting; a later rewrite of the log examples replaced them."
+   },
+   {
+    "case": "encode/httpx@57daabf673",
+    "verdict": "real",
+    "why": "The change dropped the rfc3986 requirement and updated the English README, not the Chinese one."
+   },
+   {
+    "case": "encode/httpx@61188feeae",
+    "verdict": "real",
+    "why": "Version 0.21 dropped the `backend` parameter; docs/async.md still showed AsyncHTTPTransport(backend=...)."
+   },
+   {
+    "case": "encode/httpx@77246617ca",
+    "verdict": "real",
+    "why": "The change dropped httpx.Proxy's mode argument; the docs still set mode to FORWARD_ONLY or TUNNEL_ONLY."
+   },
+   {
+    "case": "encode/httpx@d0fe113945",
+    "verdict": "real",
+    "why": "The change dropped chardet; the README and docs still listed it as a dependency."
+   },
+   {
+    "case": "encode/httpx@f932af9172",
+    "verdict": "real",
+    "why": "Version 0.15 renamed max_keepalive to max_keepalive_connections; the docs kept the old name for 521 days."
+   },
+   {
+    "case": "hhatto/autopep8@7c7c95eec8",
+    "verdict": "real",
+    "why": "The W690 fixer was removed with lib2to3; the README still said 'if W690 is enabled'."
+   },
+   {
+    "case": "mkdocs/mkdocs@30cdac47a9",
+    "verdict": "not real",
+    "why": "The lines are about Jinja's i18n extension; the change only removed mkdocs's i18n extra from setup.py."
+   },
+   {
+    "case": "mkdocs/mkdocs@3eb834ebd1",
+    "verdict": "real",
+    "why": "The extract_messages command was removed; the contributing guide still told translators to run it."
+   },
+   {
+    "case": "mkdocs/mkdocs@a444c43474",
+    "verdict": "real",
+    "why": "mkdocs replaced livereload.Server with its own LiveReloadServer; the plugin docs still said the event gets a livereload.Server."
+   },
+   {
+    "case": "pallets/flask@024f0d384c",
+    "verdict": "real",
+    "why": "The tutorial project's setup.py metadata moved to setup.cfg; the tutorial still explained packages, find_packages(), and include_package_data in setup.py. Its blinker and flaskr lines aren't counted: blinker stayed an optional dependency, and the flaskr app still exists."
+   },
+   {
+    "case": "pallets/flask@78b42b9ac2",
+    "verdict": "not real",
+    "why": "The lines are about async/await; the change only removed the 'async' extra from setup.py."
+   },
+   {
+    "case": "pallets/flask@ae547270e9",
+    "verdict": "not real",
+    "why": "FLASK_APP still works after the change (click reads it through the FLASK_ prefix); the docs were changed later to prefer --app."
+   },
+   {
+    "case": "psf/black@e401b6bb1e",
+    "verdict": "real",
+    "why": "Removing Python 2 support removed the unicode_literals check; the docs still described the u-prefix rule as depending on it."
+   },
+   {
+    "case": "simonw/datasette@1d33fd03b3",
+    "verdict": "real",
+    "why": "The docs theme switched from sphinx_rtd_theme to Furo; the contributing guide still said to install sphinx_rtd_theme."
+   },
+   {
+    "case": "simonw/datasette@3664ddd400",
+    "verdict": "not real",
+    "why": "--help is click's own option, never declared in datasette's code; the change only removed a script that called it."
+   },
+   {
+    "case": "simonw/datasette@5feb5fcf5d",
+    "verdict": "real",
+    "why": "The permission_allowed hook was removed; docs/authentication.rst still described plugins implementing it."
+   },
+   {
+    "case": "simonw/datasette@b9c6e7a0f6",
+    "verdict": "real",
+    "why": "PluginSQL was renamed PermissionSQL; the plugin hook docs still named PluginSQL."
+   },
+   {
+    "case": "simonw/datasette@cefd058c1c",
+    "verdict": "not real",
+    "why": "--tags is git's option ('git push --tags'); the change only removed versioneer's git calls."
+   },
+   {
+    "case": "simonw/llm@2066397aae",
+    "verdict": "real",
+    "why": "--prompts became -s/--short; docs/help.md and docs/logging.md still showed --prompts."
+   },
+   {
+    "case": "simonw/llm@255f768707",
+    "verdict": "real",
+    "why": "._response_json was renamed .response_json; the plugin tutorial still used the old name."
+   },
+   {
+    "case": "simonw/llm@88d839fa85",
+    "verdict": "real",
+    "why": "--chat was replaced by --cid/--conversation; docs/help.md and docs/usage.md still showed --chat."
+   },
+   {
+    "case": "simonw/sqlite-utils@4f12c7a452",
+    "verdict": "real",
+    "why": "The flake8 and mypy extras were dropped; 'pip install -e .[flake8,mypy]' no longer worked. Only that line is counted: the lines that run flake8 and mypy are still right."
+   },
+   {
+    "case": "sqlalchemy/alembic@3ddf82e1e2",
+    "verdict": "real",
+    "why": "Autogenerate stopped calling a type's compare_against_backend(); the docs still told users to implement it. The versionadded note isn't counted: a version note stays true."
+   },
+   {
+    "case": "sqlalchemy/alembic@79f84f71e1",
+    "verdict": "real",
+    "why": "Dropping Python 2 removed SafeConfigParser; the tutorial still said the file is read with it."
+   },
+   {
+    "case": "sqlfluff/sqlfluff@969c11edb3",
+    "verdict": "real",
+    "why": "FileSegment.from_raw was removed; the architecture docs still said the lexer is called through it."
+   },
+   {
+    "case": "theskumar/python-dotenv@17dba65244",
+    "verdict": "not real",
+    "why": "os.getenv is Python's own; the README's mention of it stayed true when python-dotenv stopped calling it."
+   },
+   {
+    "case": "tldr-pages/tldr-python-client@21a712e115",
+    "verdict": "real",
+    "why": "The code read LANGUAGE instead of LANGUAGES; the README still documented LANGUAGES."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@000c15a4ca",
+    "verdict": "real",
+    "why": "The android_agegate player client was removed; the README still listed it."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@06e57990f7",
+    "verdict": "real",
+    "why": "--config-location became --config-locations; the README's option list still had the old name."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@0e30a7b973",
+    "verdict": "not real",
+    "why": "A playlist id dropped from an extractor's test; the README's example commands with that playlist weren't made wrong by it."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@73922e66e4",
+    "verdict": "real",
+    "why": "The install_deps script dropped --include; CONTRIBUTING.md and the README still used it."
+   },
+   {
+    "case": "yt-dlp/yt-dlp@b1a7cd056a",
+    "verdict": "real",
+    "why": "--match-filter became --match-filters; the README still named the old option (optparse still takes it as a prefix)."
+   }
+  ],
+  "drop_lines": [
+   [
+    "pallets/flask@024f0d384c",
+    "docs/api.rst",
+    445
+   ],
+   [
+    "pallets/flask@024f0d384c",
+    "docs/signals.rst",
+    7
+   ],
+   [
+    "pallets/flask@024f0d384c",
+    "docs/testing.rst",
+    30
+   ],
+   [
+    "pallets/flask@024f0d384c",
+    "docs/testing.rst",
+    50
+   ],
+   [
+    "pallets/flask@024f0d384c",
+    "docs/testing.rst",
+    90
+   ],
+   [
+    "pallets/flask@024f0d384c",
+    "docs/testing.rst",
+    96
+   ],
+   [
+    "pallets/flask@024f0d384c",
+    "docs/testing.rst",
+    132
+   ],
+   [
+    "pallets/flask@024f0d384c",
+    "docs/testing.rst",
+    207
+   ],
+   [
+    "simonw/sqlite-utils@4f12c7a452",
+    "docs/contributing.rst",
+    71
+   ],
+   [
+    "simonw/sqlite-utils@4f12c7a452",
+    "docs/contributing.rst",
+    77
+   ],
+   [
+    "simonw/sqlite-utils@4f12c7a452",
+    "docs/contributing.rst",
+    78
+   ],
+   [
+    "sqlalchemy/alembic@3ddf82e1e2",
+    "docs/build/autogenerate.rst",
+    515
+   ]
+  ],
+  "other_still_there": [
+   {
+    "case": "callowayproject/bump-my-version@a05ee53327",
+    "file": "docs/howtos/avoid-incorrect-replacements.md",
+    "line": 3,
+    "verdict": "false alarm",
+    "why": "The docs use `requirements.txt` as a user's example file; the change deleted the repository's own requirements.txt."
+   },
+   {
+    "case": "callowayproject/bump-my-version@a05ee53327",
+    "file": "docs/howtos/avoid-incorrect-replacements.md",
+    "line": 17,
+    "verdict": "false alarm",
+    "why": "The docs use `requirements.txt` as a user's example file; the change deleted the repository's own requirements.txt."
+   },
+   {
+    "case": "callowayproject/bump-my-version@a05ee53327",
+    "file": "docs/howtos/avoid-incorrect-replacements.md",
+    "line": 26,
+    "verdict": "false alarm",
+    "why": "The docs use `requirements.txt` as a user's example file; the change deleted the repository's own requirements.txt."
+   },
+   {
+    "case": "callowayproject/bump-my-version@a05ee53327",
+    "file": "docs/reference/configuration/file.md",
+    "line": 230,
+    "verdict": "false alarm",
+    "why": "The docs use `requirements.txt` as a user's example file; the change deleted the repository's own requirements.txt."
+   },
+   {
+    "case": "mkdocs/mkdocs@3eb834ebd1",
+    "file": "docs/dev-guide/themes.md",
+    "line": 1023,
+    "verdict": "unclear",
+    "why": "It names one of Babel's own commands, which mkdocs's code no longer wraps since the change; Babel still provides it to projects built with setuptools, so the line may still be right for themes that are."
+   },
+   {
+    "case": "mkdocs/mkdocs@3eb834ebd1",
+    "file": "docs/dev-guide/themes.md",
+    "line": 1024,
+    "verdict": "unclear",
+    "why": "It names one of Babel's own commands, which mkdocs's code no longer wraps since the change; Babel still provides it to projects built with setuptools, so the line may still be right for themes that are."
+   },
+   {
+    "case": "mkdocs/mkdocs@3eb834ebd1",
+    "file": "docs/dev-guide/themes.md",
+    "line": 1032,
+    "verdict": "unclear",
+    "why": "It names one of Babel's own commands, which mkdocs's code no longer wraps since the change; Babel still provides it to projects built with setuptools, so the line may still be right for themes that are."
+   },
+   {
+    "case": "mkdocs/mkdocs@3eb834ebd1",
+    "file": "docs/dev-guide/themes.md",
+    "line": 1034,
+    "verdict": "unclear",
+    "why": "It names one of Babel's own commands, which mkdocs's code no longer wraps since the change; Babel still provides it to projects built with setuptools, so the line may still be right for themes that are."
+   },
+   {
+    "case": "mkdocs/mkdocs@3eb834ebd1",
+    "file": "docs/dev-guide/themes.md",
+    "line": 1041,
+    "verdict": "unclear",
+    "why": "It names one of Babel's own commands, which mkdocs's code no longer wraps since the change; Babel still provides it to projects built with setuptools, so the line may still be right for themes that are."
+   },
+   {
+    "case": "mkdocs/mkdocs@3eb834ebd1",
+    "file": "docs/dev-guide/translations.md",
+    "line": 92,
+    "verdict": "unclear",
+    "why": "It names one of Babel's own commands, which mkdocs's code no longer wraps since the change; Babel still provides it to projects built with setuptools, so the line may still be right for themes that are. This page shows `pybabel init` right after it."
+   }
+  ]
  }
 }
