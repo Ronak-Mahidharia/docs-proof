@@ -105,6 +105,7 @@ jobs:
           python scripts/run_fixes.py  # the fixes, from the kept sandbox runs and agent answers (those need Docker and Ollama)
           python scripts/check_tool.py  # the docs-proof tool on every case: it must match the measured steps
           python scripts/run_real.py  # the real-history scores, from the kept results (mining needs the fetched history)
+          python scripts/check_own.py  # the check on my own projects, from the kept results (rerunning fetches their history)
       - name: Check that nothing changed
         run: |
           git diff --exit-code
