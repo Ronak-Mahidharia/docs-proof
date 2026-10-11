@@ -1,0 +1,289 @@
+{
+ "since": "2020-01-01",
+ "funnel": {
+  "asottile/pyupgrade": {
+   "commits_touching_docs": 197,
+   "references_removed": 33,
+   "already_gone": 2,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "callowayproject/bump-my-version": {
+   "commits_touching_docs": 44,
+   "references_removed": 116,
+   "already_gone": 40,
+   "with_a_removal_commit": 1,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 1
+  },
+  "cookiecutter/cookiecutter": {
+   "commits_touching_docs": 108,
+   "references_removed": 33,
+   "already_gone": 16,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "coveragepy/coveragepy": {
+   "commits_touching_docs": 435,
+   "references_removed": 159,
+   "already_gone": 57,
+   "with_a_removal_commit": 6,
+   "lines_changed_before_the_fix": 2,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 4
+  },
+  "Delgan/loguru": {
+   "commits_touching_docs": 102,
+   "references_removed": 26,
+   "already_gone": 14,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "encode/httpx": {
+   "commits_touching_docs": 222,
+   "references_removed": 210,
+   "already_gone": 77,
+   "with_a_removal_commit": 27,
+   "lines_changed_before_the_fix": 2,
+   "lines_new_in_the_change": 20,
+   "expected_lines": 11
+  },
+  "gleitz/howdoi": {
+   "commits_touching_docs": 45,
+   "references_removed": 13,
+   "already_gone": 2,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "hhatto/autopep8": {
+   "commits_touching_docs": 21,
+   "references_removed": 5,
+   "already_gone": 3,
+   "with_a_removal_commit": 1,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 1
+  },
+  "jazzband/pip-tools": {
+   "commits_touching_docs": 96,
+   "references_removed": 15,
+   "already_gone": 4,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "Kludex/uvicorn": {
+   "commits_touching_docs": 150,
+   "references_removed": 156,
+   "already_gone": 39,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "mkdocs/mkdocs": {
+   "commits_touching_docs": 152,
+   "references_removed": 158,
+   "already_gone": 45,
+   "with_a_removal_commit": 3,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 6
+  },
+  "nvbn/thefuck": {
+   "commits_touching_docs": 34,
+   "references_removed": 3,
+   "already_gone": 2,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "pallets/flask": {
+   "commits_touching_docs": 178,
+   "references_removed": 535,
+   "already_gone": 199,
+   "with_a_removal_commit": 11,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 18
+  },
+  "psf/black": {
+   "commits_touching_docs": 475,
+   "references_removed": 341,
+   "already_gone": 104,
+   "with_a_removal_commit": 5,
+   "lines_changed_before_the_fix": 4,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 1
+  },
+  "psf/requests": {
+   "commits_touching_docs": 91,
+   "references_removed": 15,
+   "already_gone": 8,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "PyCQA/bandit": {
+   "commits_touching_docs": 70,
+   "references_removed": 46,
+   "already_gone": 10,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "PyCQA/isort": {
+   "commits_touching_docs": 285,
+   "references_removed": 120,
+   "already_gone": 18,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "pypa/hatch": {
+   "commits_touching_docs": 330,
+   "references_removed": 100,
+   "already_gone": 38,
+   "with_a_removal_commit": 1,
+   "lines_changed_before_the_fix": 1,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "pypa/pipx": {
+   "commits_touching_docs": 218,
+   "references_removed": 180,
+   "already_gone": 44,
+   "with_a_removal_commit": 4,
+   "lines_changed_before_the_fix": 4,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "pypa/twine": {
+   "commits_touching_docs": 59,
+   "references_removed": 128,
+   "already_gone": 40,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "simonw/datasette": {
+   "commits_touching_docs": 830,
+   "references_removed": 755,
+   "already_gone": 275,
+   "with_a_removal_commit": 16,
+   "lines_changed_before_the_fix": 1,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 28
+  },
+  "simonw/llm": {
+   "commits_touching_docs": 587,
+   "references_removed": 141,
+   "already_gone": 25,
+   "with_a_removal_commit": 6,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 7
+  },
+  "simonw/shot-scraper": {
+   "commits_touching_docs": 151,
+   "references_removed": 141,
+   "already_gone": 22,
+   "with_a_removal_commit": 0,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "simonw/sqlite-utils": {
+   "commits_touching_docs": 410,
+   "references_removed": 136,
+   "already_gone": 23,
+   "with_a_removal_commit": 2,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 4
+  },
+  "sqlalchemy/alembic": {
+   "commits_touching_docs": 401,
+   "references_removed": 48,
+   "already_gone": 12,
+   "with_a_removal_commit": 3,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 7
+  },
+  "sqlfluff/sqlfluff": {
+   "commits_touching_docs": 423,
+   "references_removed": 168,
+   "already_gone": 86,
+   "with_a_removal_commit": 5,
+   "lines_changed_before_the_fix": 4,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 1
+  },
+  "theskumar/python-dotenv": {
+   "commits_touching_docs": 35,
+   "references_removed": 27,
+   "already_gone": 13,
+   "with_a_removal_commit": 2,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 2
+  },
+  "tldr-pages/tldr-python-client": {
+   "commits_touching_docs": 36,
+   "references_removed": 8,
+   "already_gone": 3,
+   "with_a_removal_commit": 1,
+   "lines_changed_before_the_fix": 0,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 2
+  },
+  "tox-dev/pipdeptree": {
+   "commits_touching_docs": 48,
+   "references_removed": 103,
+   "already_gone": 22,
+   "with_a_removal_commit": 2,
+   "lines_changed_before_the_fix": 2,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 0
+  },
+  "yt-dlp/yt-dlp": {
+   "commits_touching_docs": 806,
+   "references_removed": 794,
+   "already_gone": 123,
+   "with_a_removal_commit": 25,
+   "lines_changed_before_the_fix": 13,
+   "lines_new_in_the_change": 0,
+   "expected_lines": 15
+  }
+ },
+ "hand_check": {
+  "dev": {
+   "mined_cases": 17,
+   "mined_lines": 37,
+   "cases": 15,
+   "lines": 30
+  },
+  "test": {
+   "mined_cases": 19,
+   "mined_lines": 71,
+   "cases": 12,
+   "lines": 23
+  }
+ }
+}

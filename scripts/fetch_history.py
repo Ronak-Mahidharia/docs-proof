@@ -1,0 +1,56 @@
+"""Download each measurement repository's history (step 6): its pinned commit and every commit before it back to
+SINCE, into data/history/, as a bare repository with no files checked out.
+
+The pinned commit is fetched by its hash, with git fetch --shallow-since, so the history is the same on every run.
+A local ref keeps it, and the hash is checked afterwards. The copies are never committed here; each keeps its own
+license.
+
+    python scripts/fetch_history.py
+"""
+from __future__ import annotations
+
+import json
+import subprocess
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+HISTORY = ROOT / "data" / "history"
+SINCE = "2020-01-01"
+REF = "refs/heads/pinned"
+
+
+def place(repo: str) -> Path:
+    return HISTORY / (repo.replace("/", "__") + ".git")
+
+
+def git(target: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", "-C", str(target), *args], capture_output=True, text=True, check=check)
+
+
+def fetch(entry: dict) -> str:
+    target = place(entry["repo"])
+    if target.is_dir() and git(target, "rev-parse", "--verify", "--quiet", REF, check=False).stdout.strip() == entry["commit"]:
+        return f"{entry['repo']}: already there"
+    target.mkdir(parents=True, exist_ok=True)
+    git(target, "init", "-q", "--bare")
+    if "origin" not in git(target, "remote").stdout.split():
+        git(target, "remote", "add", "origin", entry["url"])
+    git(target, "fetch", "-q", f"--shallow-since={SINCE}", "origin", entry["commit"])
+    git(target, "update-ref", REF, entry["commit"])
+    got = git(target, "rev-parse", REF).stdout.strip()
+    if got != entry["commit"]:
+        raise SystemExit(f"{entry['repo']}: got {got}, pinned {entry['commit']}")
+    count = git(target, "rev-list", "--count", REF).stdout.strip()
+    return f"{entry['repo']}: {count} commits since {SINCE}"
+
+
+def main() -> None:
+    repos = json.loads((ROOT / "data" / "repos.json").read_text(encoding="utf-8"))["repos"]
+    with ThreadPoolExecutor(6) as pool:
+        for line in pool.map(fetch, repos):
+            print(line)
+
+
+if __name__ == "__main__":
+    main()

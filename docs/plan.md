@@ -12,7 +12,7 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
    - a removed option or command
 
    **A lesson from an earlier project:** an answer key that plain text search already solves can't tell better methods apart. So the key mixes changes that leave the old name in the docs, which exact search can find, with changes it can't find by name, such as a changed default described in a sentence. Each kind is scored separately.
-2. **Real history (step 6).** Pull requests in public repositories whose docs were corrected by a later commit. The correction shows which lines were wrong.
+2. **Real history (step 6).** Commits in the same repositories' history that left doc lines wrong, found from the later commit that corrected them. The correction shows which lines were wrong; nothing is planted.
 
 **What's committed:** repository names, commit hashes, the planted edits, line numbers, and a hash of each expected line; the hand-check notes quote a few words where a decision needs it. The repositories are cloned at run time, and their licenses are recorded.
 
@@ -42,6 +42,7 @@ Two kinds of cases. Both are split into dev and test by repository, so no reposi
    - the GitHub Action ([action.yml](../action.yml)): it reports in the job summary and with warnings on the flagged lines, needs no write permission, and comments on the pull request only when asked to. CI runs it on a throwaway repository and on every pull request here
    - the MCP server ([src/docsproof/mcp_server.py](../src/docsproof/mcp_server.py)): two read-only tools that give assistants such as Claude Code the command's findings; its tests compare the two, in-process and over stdio
 6. **Real history** as a second answer key, plus a check on my own repositories.
+   **Done:** the key: 27 real cases, of 36 mined, in the 30 repositories' history since 2020. On test, docs-proof would have flagged 7 of the 23 lines a later commit fixed (30.4%), including every line whose name it compares ([results](results/real.md)). Next: the check on my own repositories.
 7. **The write-up and a demo.**
 
 ## Rules
