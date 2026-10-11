@@ -1,0 +1,56 @@
+{"id": "cookiecutter/cookiecutter:rename_option:2", "argv": ["cookiecutter", "--replay-file2", "./cookiedozer.json", "gh:hackebrot/cookiedozer"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "cookiecutter/cookiecutter:rename_option:3", "argv": ["cookiecutter", "--replay2", "gh:hackebrot/cookiedozer"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "jazzband/pip-tools:rename_option:1", "argv": ["pip-compile", "--all-build-deps", "--all-extras", "--output-file=constraints.txt", "--strip-extras2", "pyproject.toml"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "jazzband/pip-tools:rename_env_var:1", "argv": ["pip-compile", "requirements.in"], "env": [["CUSTOM_COMPILE_COMMAND2", "./pipcompilewrapper"]], "outcome": "rejected", "exit": 2, "unknown": [], "message": "Invalid value for '[SRC_FILES]...': Path 'requirements.in' does not exist."}
+{"id": "mkdocs/mkdocs:rename_option:2", "argv": ["mkdocs", "build", "--strict2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:1", "argv": ["flask", "--app2", "flaskr", "init-db"], "env": [], "outcome": "rejected", "exit": 2, "unknown": ["init-db"], "message": "No such command 'init-db'."}
+{"id": "pallets/flask:rename_option:1", "argv": ["flask", "--app2", "flaskr", "run", "--debug"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:1", "argv": ["flask", "--app2", "hello", "--debug", "run"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:1", "argv": ["flask", "--app2", "hello", "run"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:1", "argv": ["flask", "--app2", "hello", "run", "--debug"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:1", "argv": ["flask", "--app2", "hello", "run", "--debug", "--no-debugger", "--no-reload"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:1", "argv": ["flask", "--app2", "hello:create_app(local_auth=True)", "run"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:1", "argv": ["flask", "--app2", "yourapplication", "run"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:2", "argv": ["flask", "--app", "hello", "run", "--debug", "--no-debugger2", "--no-reload"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pallets/flask:rename_option:3", "argv": ["flask", "run", "--host2=0.0.0.0"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "psf/black:rename_option:2", "argv": ["black", "--line-length=10", "--target-version2=py34", "--target-version2=py35", "-c", "f(a, *args)"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "psf/black:rename_option:2", "argv": ["black", "--line-length=10", "--target-version2=py34", "-c", "f(a, *args)"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "psf/black:rename_option:2", "argv": ["black", "--line-length=10", "--target-version2=py35", "-c", "f(a, *args)"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "psf/black:rename_option:3", "argv": ["blackd", "--bind-port2", "9090"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/hatch:rename_option:2", "argv": ["hatch", "python", "find", "3.12", "--parent2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:1", "argv": ["pipx", "list", "--include-injected2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:2", "argv": ["pipx", "environment", "--value2", "PIPX_BIN_DIR"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:2", "argv": ["pipx", "environment", "--value2", "PIPX_COOLDOWN"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:2", "argv": ["pipx", "environment", "--value2", "PIPX_DEFAULT_PYTHON"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:2", "argv": ["pipx", "environment", "--value2", "PIPX_HOME"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:2", "argv": ["pipx", "environment", "--value2", "PIPX_LOG_DIR"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:2", "argv": ["pipx", "environment", "--value2", "PIPX_RESOLVED_BACKEND"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:2", "argv": ["pipx", "environment", "--value2", "PIPX_TRASH_DIR"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:2", "argv": ["pipx", "environment", "--value2", "PIPX_VENV_CACHEDIR"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_option:3", "argv": ["pipx", "run", "--path2", "test.py"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_env_var:1", "argv": ["pipx", "environment", "--value", "PIPX_COOLDOWN2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "pypa/pipx:rename_env_var:1", "argv": ["pipx", "install", "httpie"], "env": [["PIPX_COOLDOWN2", "lots"]], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/datasette:rename_option:2", "argv": ["datasette", "--memory", "--actor2", "{\"id\": \"root\"}", "--get", "/-/actor.json"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/datasette:rename_env_var:1", "argv": ["datasette", "mydb.db"], "env": [["DATASETTE_TRACE_PLUGINS2", "1"]], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/datasette:rename_env_var:2", "argv": ["datasette", "plugins"], "env": [["DATASETTE_LOAD_PLUGINS2", "datasette-vega"]], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:1", "argv": ["llm", "embed", "phrases", "hound", "-c", "my happy hound", "--store2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:1", "argv": ["llm", "embed", "phrases", "hound", "-m", "3-small", "-c", "my happy hound", "--metadata", "{\"name\": \"Hound\"}", "--store2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:1", "argv": ["llm", "embed-multi", "documentation", "-m", "3-small", "--files", "docs", "**/*.md", "-d", "documentation.db", "--store2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:1", "argv": ["llm", "embed-multi", "documentation", "-m", "3-small", "--files", "docs", "**/*.md", "-d", "documentation.db", "--store2", "--prefix", "llm-docs/"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:1", "argv": ["llm", "embed-multi", "items", "mydata.json", "-d", "docs.db", "-m", "3-small", "--prefix", "my-items/", "--store2"], "env": [], "outcome": "rejected", "exit": 2, "unknown": [], "message": "Invalid value for '[INPUT_PATH]': File 'mydata.json' does not exist."}
+{"id": "simonw/llm:rename_option:1", "argv": ["llm", "embed-multi", "symbols", "-", "--format", "nl", "--database", "embeddings.db", "--store2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:2", "argv": ["llm", "logs", "--schema-multi", "name, ten_word_bio", "--data-key", "items", "--data-ids2"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:3", "argv": ["llm", "--cid2", "ID"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:3", "argv": ["llm", "-c"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:3", "argv": ["llm", "More names", "--cid2", "01h53zma5txeby33t1kbe3xk8q"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:3", "argv": ["llm", "chat"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/llm:rename_option:3", "argv": ["llm", "logs", "--cid2", "01h82n0q9crqtnzmf13gkyxawg"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/shot-scraper:rename_option:2", "argv": ["shot-scraper", "https://simonwillison.net/", "-o", "simonwillison-modified.png", "--js-file2", "remove-banners.js"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/sqlite-utils:rename_option:1", "argv": ["sqlite-utils", "analyze-tables", "github.db", "--save2"], "env": [], "outcome": "rejected", "exit": 2, "unknown": [], "message": "Invalid value for 'PATH': File 'github.db' does not exist."}
+{"id": "simonw/sqlite-utils:rename_option:1", "argv": ["sqlite-utils", "memory", "dogs.csv", "--save2", "dogs.db"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/sqlite-utils:rename_option:2", "argv": ["sqlite-utils", "dogs.db", "select * from dogs", "--fmt2", "rst"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "simonw/sqlite-utils:rename_option:2", "argv": ["sqlite-utils", "memory", "select sqlite_version()", "--fmt2", "grid"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "sqlalchemy/alembic:rename_option:1", "argv": ["alembic", "--name2", "schema2", "revision", "-m", "new rev for schema 2", "--autogenerate"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "sqlfluff/sqlfluff:rename_option:1", "argv": ["sqlfluff", "lint", "test.sql", "--dialect2", "ansi"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "sqlfluff/sqlfluff:rename_option:1", "argv": ["sqlfluff", "parse", "test.sql", "--dialect2", "tsql"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}
+{"id": "theskumar/python-dotenv:rename_option:1", "argv": ["dotenv", "list", "--format2=json"], "env": [], "outcome": "accepted", "exit": 0, "unknown": [], "message": ""}

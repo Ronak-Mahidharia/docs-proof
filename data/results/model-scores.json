@@ -142,7 +142,7 @@
   "dev": {
    "cases": 116,
    "repos": 15,
-   "expected_lines": 227,
+   "expected_lines": 226,
    "kinds": {
     "rename_option": {
      "cases": 34,
@@ -159,7 +159,7 @@
      "cases": 19,
      "tp": 0,
      "fp": 0,
-     "fn": 66,
+     "fn": 65,
      "all_found": 0,
      "false_alarm_cases": 0,
      "precision": null,
@@ -237,7 +237,7 @@
     "cases": 81,
     "tp": 0,
     "fp": 0,
-    "fn": 209,
+    "fn": 208,
     "all_found": 0,
     "false_alarm_cases": 0,
     "precision": null,
@@ -386,7 +386,7 @@
   "dev": {
    "cases": 116,
    "repos": 15,
-   "expected_lines": 227,
+   "expected_lines": 226,
    "kinds": {
     "rename_option": {
      "cases": 34,
@@ -401,14 +401,14 @@
     },
     "rename_identifier": {
      "cases": 19,
-     "tp": 66,
-     "fp": 4,
+     "tp": 65,
+     "fp": 5,
      "fn": 0,
      "all_found": 19,
-     "false_alarm_cases": 1,
-     "precision": 0.943,
+     "false_alarm_cases": 2,
+     "precision": 0.929,
      "recall": 1.0,
-     "f1": 0.971
+     "f1": 0.963
     },
     "rename_env_var": {
      "cases": 13,
@@ -479,14 +479,14 @@
    },
    "name": {
     "cases": 81,
-    "tp": 209,
-    "fp": 4,
+    "tp": 208,
+    "fp": 5,
     "fn": 0,
     "all_found": 81,
-    "false_alarm_cases": 1,
-    "precision": 0.981,
+    "false_alarm_cases": 2,
+    "precision": 0.977,
     "recall": 1.0,
-    "f1": 0.99
+    "f1": 0.988
    },
    "value": {
     "cases": 9,
@@ -630,7 +630,7 @@
   "dev": {
    "cases": 116,
    "repos": 15,
-   "expected_lines": 227,
+   "expected_lines": 226,
    "kinds": {
     "rename_option": {
      "cases": 34,
@@ -645,14 +645,14 @@
     },
     "rename_identifier": {
      "cases": 19,
-     "tp": 66,
-     "fp": 4,
+     "tp": 65,
+     "fp": 5,
      "fn": 0,
      "all_found": 19,
-     "false_alarm_cases": 1,
-     "precision": 0.943,
+     "false_alarm_cases": 2,
+     "precision": 0.929,
      "recall": 1.0,
-     "f1": 0.971
+     "f1": 0.963
     },
     "rename_env_var": {
      "cases": 13,
@@ -723,14 +723,14 @@
    },
    "name": {
     "cases": 81,
-    "tp": 209,
-    "fp": 4,
+    "tp": 208,
+    "fp": 5,
     "fn": 0,
     "all_found": 81,
-    "false_alarm_cases": 1,
-    "precision": 0.981,
+    "false_alarm_cases": 2,
+    "precision": 0.977,
     "recall": 1.0,
-    "f1": 0.99
+    "f1": 0.988
    },
    "value": {
     "cases": 9,

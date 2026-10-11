@@ -3,7 +3,7 @@
   "dev": {
    "cases": 116,
    "repos": 15,
-   "expected_lines": 227,
+   "expected_lines": 226,
    "kinds": {
     "rename_option": {
      "cases": 34,
@@ -20,7 +20,7 @@
      "cases": 19,
      "tp": 0,
      "fp": 0,
-     "fn": 66,
+     "fn": 65,
      "all_found": 0,
      "false_alarm_cases": 0,
      "precision": null,
@@ -98,7 +98,7 @@
     "cases": 81,
     "tp": 0,
     "fp": 0,
-    "fn": 209,
+    "fn": 208,
     "all_found": 0,
     "false_alarm_cases": 0,
     "precision": null,

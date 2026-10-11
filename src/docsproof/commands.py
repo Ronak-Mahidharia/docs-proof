@@ -259,6 +259,11 @@ def _is_markdown(rel: str) -> bool:
     return Path(rel).suffix.lower() not in {".rst", ".txt"}
 
 
+def code_block_lines(rel: str, lines: list[str]) -> set[int]:
+    """The 1-based numbers of the lines inside a doc's code blocks."""
+    return {j + 1 for block in _blocks(lines, _is_markdown(rel)) for j in block}
+
+
 def _doc_commands(lines: list[str], scripts: set[str], mains: set[str], markdown: bool) -> list[tuple]:
     """(0-based line of the program's name, program, text, options, argv, env) for each of the project's
     commands in a doc."""
@@ -287,10 +292,14 @@ def commands(root: Path, scripts: set[str] | None = None, mains: set[str] | None
     if not scripts and not mains:
         return found
     for rel in doc_files(root):
-        for line, program, text, options, argv, env in _doc_commands(read_lines(root / rel), scripts, mains,
-                                                                     _is_markdown(rel)):
-            found.append(Command(rel, line + 1, program, text, tuple((o, i + 1) for o, i in options), argv, env))
+        found += doc_commands(rel, read_lines(root / rel), scripts, mains)
     return found
+
+
+def doc_commands(rel: str, lines: list[str], scripts: set[str], mains: set[str]) -> list[Command]:
+    """The project's commands in one doc, given its lines."""
+    return [Command(rel, line + 1, program, text, tuple((o, i + 1) for o, i in options), argv, env)
+            for line, program, text, options, argv, env in _doc_commands(lines, scripts, mains, _is_markdown(rel))]
 
 
 def problems(root: Path, code: Code | None = None) -> list[Problem]:

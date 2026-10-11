@@ -45,7 +45,7 @@ Exact checks (step 1) find renames, and the changed-value search finds values.
 
 | Split | Names: precision | Names: recall | Values: precision | Values: recall | Controls with a false alarm |
 |---|---|---|---|---|---|
-| dev, with the search alone | 98.1% | 100.0% | 85.7% | 100.0% | 0 of 26 |
+| dev, with the search alone | 97.7% | 100.0% | 85.7% | 100.0% | 0 of 26 |
 | test, with the search alone | 98.0% | 100.0% | 71.4% | 100.0% | 0 of 28 |
-| dev, with qwen3:8b | 98.1% | 100.0% | 94.1% | 88.9% | 0 of 26 |
+| dev, with qwen3:8b | 97.7% | 100.0% | 94.1% | 88.9% | 0 of 26 |
 | test, with qwen3:8b | 98.0% | 100.0% | 76.7% | 92.0% | 0 of 28 |

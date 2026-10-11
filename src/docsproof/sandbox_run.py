@@ -7,6 +7,7 @@ it right after its parser has read the command line, so what it would do is neve
 
 The job: {"repo": "/work/<folder>", "env": "/envs/<folder>", "edit": null or a planted change,
           "timeout": seconds, "commands": [{"id": 0, "argv": ["tiny", "--limit", "3"], "env": {}}]}
+A command with "capture": true also returns what it printed (the start of it), such as its help text.
 """
 from __future__ import annotations
 
@@ -18,6 +19,7 @@ from pathlib import Path
 
 HOOKS = Path(__file__).resolve().parent / "hooks"
 PYTHON = {"python", "python3", "py"}
+OUTPUT = 6000  # characters of a captured command's output that are kept
 
 
 def outcome(events: list[dict], exit_code: int | None, timed_out: bool) -> str:
@@ -59,15 +61,21 @@ def run(command: dict, repo: Path, env_bin: Path, timeout: float) -> dict:
                "LANG": "C.UTF-8", "TERM": "dumb", "NO_COLOR": "1", "COLUMNS": "100",
                "PYTHONDONTWRITEBYTECODE": "1", "PYTHONPATH": str(HOOKS), "DOCSPROOF_EVENTS": str(events),
                **command.get("env", {})}
-        timed_out, exit_code = False, None
+        capture = command.get("capture", False)
+        out = subprocess.PIPE if capture else subprocess.DEVNULL
+        timed_out, exit_code, printed = False, None, b""
         try:
             done = subprocess.run([str(program), *argv[1:]], cwd=repo, env=env, stdin=subprocess.DEVNULL,
-                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=timeout)
-            exit_code = done.returncode
-        except subprocess.TimeoutExpired:
-            timed_out = True
+                                  stdout=out, stderr=subprocess.STDOUT if capture else subprocess.DEVNULL,
+                                  timeout=timeout)
+            exit_code, printed = done.returncode, done.stdout or b""
+        except subprocess.TimeoutExpired as expired:
+            timed_out, printed = True, expired.output or b""
         lines = events.read_text(encoding="utf-8").splitlines() if events.is_file() else []
-    return {"id": command["id"], **summary([json.loads(line) for line in lines], exit_code, timed_out)}
+    result = {"id": command["id"], **summary([json.loads(line) for line in lines], exit_code, timed_out)}
+    if capture:
+        result["output"] = printed.decode("utf-8", errors="replace")[:OUTPUT]
+    return result
 
 
 def main() -> None:

@@ -33,7 +33,7 @@ jobs:
   # differs from what's committed.
   reproduce:
     runs-on: ubuntu-26.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -55,6 +55,7 @@ jobs:
           python scripts/run_sandbox.py  # the sandbox's flags and scores, from its kept runs (the runs need Docker)
           python scripts/run_values.py
           python scripts/run_model.py  # the model's scores, from its kept answers (asking needs Ollama)
+          python scripts/run_fixes.py  # the fixes, from the kept sandbox runs and agent answers (those need Docker and Ollama)
       - name: Check that nothing changed
         run: |
           git diff --exit-code

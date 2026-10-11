@@ -2,7 +2,7 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against an answer key built from real open-source repositories, and every result is published.
 
-**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), and changed values (a search, then a local model). Next is step 4: suggested fixes. The steps are in [docs/plan.md](docs/plan.md).
+**Status:** in progress. Done: the answer key, a baseline of exact checks, the commands in the docs (read, and run in a sandbox), changed values (a search, then a local model), and suggested fixes (rules, then an agent, with approval before anything changes). Next is step 5: the tools. The steps are in [docs/plan.md](docs/plan.md).
 
 ## The problem
 - **Docs drift is common.** In GitHub's 2017 Open Source Survey, "incomplete or outdated documentation is a pervasive problem, observed by 93% of respondents" ([opensourcesurvey.org/2017](https://opensourcesurvey.org/2017/)).
@@ -10,14 +10,15 @@ Finds the lines in your docs that a code change made wrong, and proves each one:
 - **README updates are easy to miss.** In a 2026 study of pull requests from 714 repositories, only 0.8% of all pull requests changed the README, and the study's LLM approach recovered half of the README updates that had really been made (Gao et al., [arXiv:2603.00489](https://arxiv.org/abs/2603.00489)).
 
 ## The answer key
-- **246 planted changes in 30 real repositories.** Popular Python tools and libraries with permissive licenses, each pinned to a commit ([data/repos.json](data/repos.json)), are changed one realistic way at a time: a renamed option, function, environment variable, or file, a changed default, or a raised minimum Python version. Each case records the doc lines the change makes wrong ([data/cases.jsonl](data/cases.jsonl)): 602 lines in all.
+- **246 planted changes in 30 real repositories.** Popular Python tools and libraries with permissive licenses, each pinned to a commit ([data/repos.json](data/repos.json)), are changed one realistic way at a time: a renamed option, function, environment variable, or file, a changed default, or a raised minimum Python version. Each case records the doc lines the change makes wrong ([data/cases.jsonl](data/cases.jsonl)): 601 lines in all.
 - **Split by repository:** 116 dev cases in 15 repositories, and 130 test cases in the other 15.
 - **Controls:** 54 cases change something no doc mentions, so nothing should be flagged.
 - **Checked by hand** ([data/hand_check.json](data/hand_check.json)):
   - every expected line in the 20 cases that change a value, with lines the rules missed added
   - samples of the rename cases: 59 of 60 lines were right on a sample drawn after the rules were final
   - every line of the 15 rename cases that a later fix to the code reading changed: 54 of 61 were right, and the other 7 were removed
-  - every line the exact checks flag that the key leaves out: 4 of 15 named the project's own class or function through a short module name (such as `c.ListOfItems` after `config_options as c`), and were added
+  - every line the exact checks flag that the key leaves out: 4 of 16 named the project's own class or function through a short module name (such as `c.ListOfItems` after `config_options as c`), and were added
+  - the key's fixed lines (step 4): every value line, every name line that mentions the name more than once or under a package's name, and 40 more drawn at random. 5 value lines need a fix of their own, and 1 name line turned out not to be wrong (bandit's `.. automodule:: bandit.plugins.yaml_load` names the module, not the renamed function), so it was removed
 
 ## Results so far
 All on the test split (15 repositories, 130 cases). Only the last part uses AI.
@@ -46,6 +47,13 @@ For renames, the expected lines are the doc lines that still mention the old nam
 - **The false alarms it kept** mention the version in passing, such as an example command, a history note, or a note about which wheel installs.
 - **Proof:** each finding quotes the doc line and the code line, and a finding whose quotes aren't really there is dropped (1 of 35 on test).
 
+**Suggested fixes:** each flagged line gets a fix that's checked before it's offered, and a fixed command is run again in the sandbox, after the change ([docs/results/fixes.md](docs/results/fixes.md)). Nothing in a repository changes without approval: the fixes become one patch, and a pull request is opened only after a person says yes to it.
+- **The rules, with no AI** (on the 392 lines steps 1 and 3 flag): fixed 370 of the 375 lines the change made wrong, all of them right, and declined 5. The program took every one of the 52 fixed lines that are part of a documented command, run again after the change.
+- **An agent for the rest** (qwen3:8b through Ollama, working only through tools, with a turn limit and loop detection; chosen on dev from 2 models and 3 prompts): of the 5 lines, it fixed 3 right and 1 wrong, and left 1 for a person.
+- **Together:** 373 of the 375 lines fixed right.
+- **Every false alarm got a fix too** (17 of 17), so each fix needs a person's yes.
+- **The doc lines step 2 found out of date:** on test's 3, the agent left 2 for a person and fixed 1 wrong: it joined alembic's command onto one line and left the old lines under it. On dev, it fixed llm's `schema dsl` to `schemas dsl`, as the usage line above it says.
+
 ## Reproduce
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
@@ -57,6 +65,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python scripts/run_sandbox.py          # the sandbox's flags and scores, from its kept runs
 .venv/bin/python scripts/run_values.py           # the changed-value search
 .venv/bin/python scripts/run_model.py            # the model's scores, from its kept answers
+.venv/bin/python scripts/run_fixes.py            # the fixes and their scores, from the kept runs and answers
 ```
 
 To ask the models again (Ollama, with qwen3:8b and granite4:3b, about 15 minutes): `.venv/bin/python scripts/run_model.py --ask`. It asks only for answers that aren't kept yet, so first delete `data/results/model-answers.jsonl`.
@@ -65,7 +74,10 @@ To run the commands again, with Docker (about 20 minutes on a 10-core Mac; the i
 ```bash
 .venv/bin/python scripts/build_sandbox.py        # Python 3.14 and the 26 programs, at the versions in data/sandbox/pins/
 .venv/bin/python scripts/run_sandbox.py --run    # runs every documented command, as pinned and after each change
+.venv/bin/python scripts/run_fixes.py --run      # runs the rules' fixed commands, after each change
 ```
+
+To run the agent again (Ollama and Docker, about 15 minutes), delete `data/results/agent-answers.jsonl`, then run `.venv/bin/python scripts/run_fixes.py --agent dev` (every setting) and `--agent test` (the setting chosen on dev). Its fixes for the doc lines step 2 found out of date are judged by hand in `data/hand_check.json`, and the scores aren't written until every new fix is judged.
 
 ## License
 MIT for the code in this repository. The repositories used for measurement keep their own licenses; they're cloned at a pinned commit when the measurement runs, and never copied here.
