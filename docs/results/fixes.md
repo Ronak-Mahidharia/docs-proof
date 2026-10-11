@@ -12,12 +12,12 @@ The answer key's fix is the planted change made in the doc line: every mention o
 
 | Split | Lines | Made wrong | Fixed right | Fixed wrong | Declined | False alarms | Given a fix |
 |---|---|---|---|---|---|---|---|
-| dev | renamed names | 208 | 208 | 0 | 0 | 5 | 1 |
-| dev | changed values | 18 | 14 | 2 | 2 | 3 | 3 |
-| test | renamed names | 350 | 346 | 0 | 4 | 7 | 5 |
+| dev | renamed names | 207 | 207 | 0 | 0 | 5 | 1 |
+| dev | changed values | 17 | 13 | 2 | 2 | 3 | 3 |
+| test | renamed names | 338 | 334 | 0 | 4 | 7 | 5 |
 | test | changed values | 25 | 24 | 0 | 1 | 10 | 9 |
 
-**In the sandbox:** of the lines the rules fixed, 20 in dev and 52 in test are part of a documented command. Each fixed command was run after the change, and the program took 20 and 52 of them: it accepted the fixed command, or refused it just as it refused the documented one before the change (for a file the sandbox doesn't have).
+**In the sandbox:** of the lines the rules fixed, 20 in dev and 51 in test are part of a documented command. Each fixed command was run after the change, and the program took 20 and 51 of them: it accepted the fixed command, or refused it just as it refused the documented one before the change (for a file the sandbox doesn't have).
 
 ## The agent
 
@@ -63,9 +63,9 @@ The agent's fixes for the doc lines that the sandbox found out of date in the re
 
 | Split | Lines | Made wrong | Fixed right | Fixed wrong | Left for a person | False alarms | Given a fix |
 |---|---|---|---|---|---|---|---|
-| dev | renamed names | 208 | 208 | 0 | 0 | 5 | 5 |
-| dev | changed values | 18 | 16 | 2 | 0 | 3 | 3 |
-| test | renamed names | 350 | 348 | 1 | 1 | 7 | 7 |
+| dev | renamed names | 207 | 207 | 0 | 0 | 5 | 5 |
+| dev | changed values | 17 | 15 | 2 | 0 | 3 | 3 |
+| test | renamed names | 338 | 336 | 1 | 1 | 7 | 7 |
 | test | changed values | 25 | 25 | 0 | 0 | 10 | 10 |
 
 ## Limits

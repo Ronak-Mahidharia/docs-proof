@@ -9,14 +9,14 @@ Docs drift is common, even in well-run projects. In GitHub's 2017 Open Source Su
 
 ## An answer key from planted changes
 To measure a checker, I needed changes whose wrong doc lines were known in advance.
-- **The key:** 246 changes planted one at a time in 30 popular Python projects with permissive licenses, each pinned to a commit: a renamed option, function, environment variable, or file, a changed default, or a raised minimum Python version. Each case records the doc lines it makes wrong, 601 in all. The projects are split by repository: 116 cases for choosing settings (dev) and 130 for the final score (test).
-- **Exact checks first, with no AI:** a search for names the change removed. On test it found all 350 rename lines, with 7 false alarms (precision 98.0%), and none of the 25 changed-value lines.
+- **The key:** 246 changes planted one at a time in 30 popular Python projects with permissive licenses, each pinned to a commit: a renamed option, function, environment variable, or file, a changed default, or a raised minimum Python version. Each case records the doc lines it makes wrong, 587 in all. The projects are split by repository: 116 cases for choosing settings (dev) and 130 for the final score (test).
+- **Exact checks first, with no AI:** a search for names the change removed. On test it found all 338 rename lines, with 7 false alarms (precision 98.0%), and none of the 25 changed-value lines.
 - **That 100% is by design.** A rename case's expected lines are the doc lines that still name the old name, so a search for removed names finds all of them. Those cases really test false alarms.
 - **Reading the "false alarms" one by one paid off.** Several turned out to name the project's own class through a short module name. The key had missed them, so I fixed the key and corrected the numbers I'd published.
 
 ## Commands in the docs, read and then run
-- **Read the way a shell reads them:** documented commands' options were compared with the options the code declares. On test it flagged 48 of the 175 renamed-option lines, with no false alarms. An audit of the projects as they are found 2,868 documented commands, and its 5 findings were all false alarms on a closer look.
-- **Then run in a sandbox:** each command ran in Docker with no network, and the program stopped right after reading its command line, so nothing it would do was done. On test it flagged 29 of the 175 lines, with no false alarms, and its proof is the program's own error message.
+- **Read the way a shell reads them:** documented commands' options were compared with the options the code declares. On test it flagged 47 of the 174 renamed-option lines, with no false alarms. An audit of the projects as they are found 2,855 documented commands, and its 5 findings were all false alarms on a closer look.
+- **Then run in a sandbox:** each command ran in Docker with no network, and the program stopped right after reading its command line, so nothing it would do was done. On test it flagged 28 of the 174 lines, with no false alarms, and its proof is the program's own error message.
 - **Running finds fewer lines than reading, for a real reason.** argparse and optparse accept a unique prefix of an option's name, so after `--x` became `--x2`, a command with `--x` still works. Reading finds every stale name; running proves which commands break.
 - **The audit found real errors:** of 1,678 distinct command lines, 7 doc lines in 5 projects were out of date, each confirmed on the project's main branch.
 
@@ -26,12 +26,12 @@ A changed default keeps every name, so exact checks can't see it.
 - **A local model** (qwen3:8b through Ollama, chosen on dev from 2 models and 4 prompts) then read each line in context. It kept 23 of the 25, with 7 false alarms (precision 76.7%). F1 went from 0.833 to 0.837: an 8B local model barely helped here, and I report it that way.
 
 ## Suggested fixes, and why each one needs a yes
-- **Rules first:** a rename puts the new name where the old one was, and a changed value puts the new value where the old one was. On test they fixed 370 of the 375 lines the change made wrong, all of them right, and declined 5. Every fixed line in a documented command was run again in the sandbox, and the program took all 52 of them.
+- **Rules first:** a rename puts the new name where the old one was, and a changed value puts the new value where the old one was. On test they fixed 358 of the 363 lines the change made wrong, all of them right, and declined 5. Every fixed line in a documented command was run again in the sandbox, and the program took all 51 of them.
 - **An agent for the rest:** qwen3:8b, working only through read-only tools, with a turn limit and loop detection. Of the 5 lines, it fixed 3 right and 1 wrong, and left 1 for a person.
 - **Every false alarm got a fix too** (17 of 17). A fix is only as right as the flag behind it, so the fixes become one patch, and nothing changes until a person says yes to that exact patch.
 
 ## Three ways to use it
-- **A command:** on all 246 cases, it flags exactly the 626 lines the measured steps flag, and offers exactly their 612 rule fixes.
+- **A command:** on all 246 cases, it flags exactly the 612 lines the measured steps flag, and offers exactly their 598 rule fixes.
 - **A GitHub Action:** it reports in the job summary and with a warning on each flagged line, needs no write permission, and comments on a pull request only when asked.
 - **An MCP server:** two read-only tools that give assistants such as Claude Code the command's findings.
 

@@ -375,3 +375,15 @@ def test_the_readmes_sample_output_is_what_the_command_prints():
     readme = (SRC.parent / "README.md").read_text(encoding="utf-8")
     sample = readme.split("(one of the planted changes):\n\n```\n", 1)[1].split("\n```", 1)[0]
     assert sample.split("\n") == cli.text([finding], "base", "head").split("\n")[2:6]
+
+
+def test_a_doc_that_links_another_is_flagged_once_and_the_patch_applies(tmp_path, capsys):
+    root = repo(tmp_path)
+    (root / "docs" / "index.md").symlink_to("../README.md")  # as python-dotenv's MkDocs home page does
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "docs/index.md links the README")
+    rename_limit(root)
+    out = tmp_path / "fixes.patch"
+    assert cli.main(["--repo", str(root), "--base", "HEAD", "--json", "--patch", str(out)]) == 1
+    assert [(x["file"], x["line"]) for x in json.loads(capsys.readouterr().out)["findings"]] == [("README.md", 6)]
+    git(root, "apply", "--check", str(out))  # before, the same line came twice, and the patch didn't apply

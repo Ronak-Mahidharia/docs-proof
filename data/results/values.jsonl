@@ -20,7 +20,7 @@
 {"id": "cookiecutter/cookiecutter:rename_env_var:1", "predicted": []}
 {"id": "cookiecutter/cookiecutter:rename_env_var:2", "predicted": []}
 {"id": "cookiecutter/cookiecutter:rename_file:1", "predicted": []}
-{"id": "cookiecutter/cookiecutter:raise_python:1", "predicted": [{"file": "README.md", "line": 36}, {"file": "docs/README.md", "line": 36}]}
+{"id": "cookiecutter/cookiecutter:raise_python:1", "predicted": [{"file": "README.md", "line": 36}]}
 {"id": "cookiecutter/cookiecutter:rename_private:1", "predicted": []}
 {"id": "cookiecutter/cookiecutter:rename_unmentioned_option:1", "predicted": []}
 {"id": "coveragepy/coveragepy:rename_option:1", "predicted": []}

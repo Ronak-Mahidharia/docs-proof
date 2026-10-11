@@ -8,7 +8,7 @@ A changed value is a new default for an option (a number in the code) or a highe
 
 | Split | Cases | Lines | Flagged | False alarms | Precision | Recall | F1 |
 |---|---|---|---|---|---|---|---|
-| dev | 9 | 18 | 21 | 3 | 85.7% | 100.0% | 0.923 |
+| dev | 9 | 17 | 20 | 3 | 85.0% | 100.0% | 0.919 |
 | test | 11 | 25 | 35 | 10 | 71.4% | 100.0% | 0.833 |
 
 No control case had a candidate: no value changed in them.
@@ -17,14 +17,14 @@ No control case had a candidate: no value changed in them.
 
 | Model | Prompt | Right lines kept | False alarms | F1 | Quote not found | Seconds |
 |---|---|---|---|---|---|---|
-| qwen3:8b | v1 | 16 of 18 | 1 | 0.914 | 0 | 96.1 |
-| qwen3:8b | v2 | 0 of 18 | 0 | n/a | 0 | 91.7 |
-| qwen3:8b | v3 | 17 of 18 | 3 | 0.895 | 1 | 82.0 |
-| qwen3:8b | v4 | 13 of 18 | 3 | 0.764 | 1 | 93.8 |
-| granite4:3b | v1 | 15 of 18 | 3 | 0.833 | 1 | 49.9 |
-| granite4:3b | v2 | 3 of 18 | 0 | 0.286 | 0 | 43.9 |
-| granite4:3b | v3 | 16 of 18 | 3 | 0.865 | 2 | 46.2 |
-| granite4:3b | v4 | 5 of 18 | 2 | 0.400 | 2 | 48.5 |
+| qwen3:8b | v1 | 15 of 17 | 1 | 0.909 | 0 | 92.0 |
+| qwen3:8b | v2 | 0 of 17 | 0 | n/a | 0 | 86.7 |
+| qwen3:8b | v3 | 16 of 17 | 3 | 0.889 | 1 | 78.2 |
+| qwen3:8b | v4 | 12 of 17 | 3 | 0.750 | 1 | 89.1 |
+| granite4:3b | v1 | 14 of 17 | 3 | 0.824 | 1 | 47.8 |
+| granite4:3b | v2 | 2 of 17 | 0 | 0.211 | 0 | 41.9 |
+| granite4:3b | v3 | 15 of 17 | 3 | 0.857 | 2 | 44.0 |
+| granite4:3b | v4 | 5 of 17 | 2 | 0.416 | 2 | 46.3 |
 
 The prompts: v1 asks whether the line states the old value "as true now". v2 adds a list of lines that only look like the value (another program, a log, a requirement marker, a past release). v3 asks what the line says, whether or not it's still true. v4 has the model first say what the line is about, from a fixed list, and which value it states.
 
@@ -45,7 +45,7 @@ Exact checks (step 1) find renames, and the changed-value search finds values.
 
 | Split | Names: precision | Names: recall | Values: precision | Values: recall | Controls with a false alarm |
 |---|---|---|---|---|---|
-| dev, with the search alone | 97.7% | 100.0% | 85.7% | 100.0% | 0 of 26 |
+| dev, with the search alone | 97.6% | 100.0% | 85.0% | 100.0% | 0 of 26 |
 | test, with the search alone | 98.0% | 100.0% | 71.4% | 100.0% | 0 of 28 |
-| dev, with qwen3:8b | 97.7% | 100.0% | 94.1% | 88.9% | 0 of 26 |
+| dev, with qwen3:8b | 97.6% | 100.0% | 93.8% | 88.2% | 0 of 26 |
 | test, with qwen3:8b | 98.0% | 100.0% | 76.7% | 92.0% | 0 of 28 |
