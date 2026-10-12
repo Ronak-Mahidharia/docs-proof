@@ -232,4 +232,4 @@ To check my own projects again (a few seconds; it fetches their history): `.venv
 - **A name that could be an ordinary word** counts only where the doc marks it as code, and neither answer key can measure what that costs.
 
 ## License
-MIT for the code in this repository. The repositories used for measurement keep their own licenses; they're cloned at a pinned commit when the measurement runs, and never copied here.
+MIT for the code in this repository. The 30 repositories used for measurement keep their own licenses, all permissive: MIT, Apache-2.0, BSD, or the Unlicense, each recorded in [data/repos.json](data/repos.json). They're cloned at a pinned commit when the measurement runs, and never copied here. The results quote short excerpts from them as evidence, such as a flagged doc line, a documented command, or a program's error message.
