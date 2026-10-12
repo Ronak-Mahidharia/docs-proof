@@ -31,6 +31,14 @@ def test_repositories_are_pinned_permissive_and_split_evenly():
     assert sum(r["split"] == "dev" for r in REPOS) == sum(r["split"] == "test" for r in REPOS) == 15
 
 
+def test_the_readme_names_the_licenses_and_what_is_quoted():
+    section = README.split("\n## License\n", 1)[1]
+    assert f"The {len(REPOS)} repositories used for measurement" in section
+    assert "[data/repos.json](data/repos.json)" in section and "short excerpts" in section
+    for license in {r["license"] for r in REPOS}:  # BSD-2-Clause and BSD-3-Clause both as "BSD"
+        assert re.search(rf"\b{re.escape(license.split('-')[0])}\b", section), license
+
+
 def test_every_case_follows_its_repositorys_split_and_kind():
     split = {r["repo"]: r["split"] for r in REPOS}
     assert len({c["id"] for c in CASES}) == len(CASES)
