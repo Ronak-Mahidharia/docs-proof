@@ -1,0 +1,4 @@
+# Drawing the walkthrough's GIF (scripts/walkthrough.py): Pillow 12.3.0 (MIT-CMU), which has no dependencies of its
+# own. Writing the text page, docs/walkthrough.md, needs nothing beyond Python. Install with:
+# pip install -r requirements-walkthrough.txt
+pillow==12.3.0
