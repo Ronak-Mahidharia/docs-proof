@@ -2,6 +2,10 @@
 
 Finds the lines in your docs that a code change made wrong, and proves each one: it runs the documented command, or it quotes the code line that contradicts the doc. It suggests a fix and changes nothing without your approval. Its accuracy is measured against two answer keys built from real open-source repositories, and every result is published.
 
+![An animated walkthrough: a tiny project's option is renamed, docs-proof finds the two doc lines that still use the old name and proves each one, its fixes are saved as a patch and applied with git, and a changed default is then found the same way](docs/walkthrough.gif)
+
+**New here?** The animation above shows docs-proof on a tiny project, one step at a time, and all of its output is from a real run. The same steps are also [written out as text](docs/walkthrough.md).
+
 **Try it:** clone this repository and run `pip install -e .`, then run `docs-proof` in a Python project's git repository ([how](#use-it)). It uses no AI unless you ask for it, and sends nothing anywhere.
 
 [![CI](https://github.com/Ronak-Mahidharia/docs-proof/actions/workflows/ci.yml/badge.svg)](https://github.com/Ronak-Mahidharia/docs-proof/actions/workflows/ci.yml)
@@ -214,14 +218,16 @@ The mining stops if it finds a case that hasn't been checked by hand, and the sc
 
 To check my own projects again (a few seconds; it fetches their history): `.venv/bin/python scripts/check_own.py --run`. The scores aren't written until every flagged line has a hand verdict.
 
+To make the walkthrough again (a few seconds): `.venv/bin/python scripts/walkthrough.py`. It writes `docs/walkthrough.md`, and drawing `docs/walkthrough.gif` needs Pillow (`.venv/bin/pip install -r requirements-walkthrough.txt`). A test checks that a fresh run still prints what both show.
+
 ## Project structure
 | Folder | What's in it |
 |---|---|
 | [`src/docsproof/`](src/docsproof) | The Python package: the checks, the fixes, the command, the GitHub Action's script, and the MCP server, plus the sandbox runner and the agent used in the measurements |
-| [`scripts/`](scripts) | One command per measurement, plus fetching the repositories and their history |
+| [`scripts/`](scripts) | One command per measurement, plus fetching the repositories and their history, and making the demo and the walkthrough |
 | [`tests/`](tests) | The tests (pytest), including that every published number reproduces |
 | [`data/`](data) | The two answer keys, the hand checks, the pinned repositories, and every kept run and model answer (`data/results/`) |
-| [`docs/`](docs) | The results pages, the write-up, the demo, and the plan |
+| [`docs/`](docs) | The results pages, the write-up, the demo, the walkthrough, and the plan |
 | [`action.yml`](action.yml) | The GitHub Action |
 
 ## Limits
