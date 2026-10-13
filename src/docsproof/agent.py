@@ -12,6 +12,11 @@ call repeated with the same arguments gets a reminder instead of a result, and r
 as a loop. Models run through Ollama on this computer at temperature 0 with a fixed seed, and qwen3's thinking
 step is turned off, as in step 3. Text from the docs and the code is data, never instructions: the system prompt
 says so, and that text reaches the model only inside a marked block or as a tool's result.
+
+The guard, on by default since the red-team tests (scripts/run_redteam.py): a doc or code line addressed to an AI
+agent (STEERING) reaches the model as REMOVED instead, and a fix may not add a link to a site, or a download command,
+that the lines it replaces don't have (added_risk). Step 4's runs were made before it; on its 21 tasks, the guard
+changes none of their outcomes.
 """
 from __future__ import annotations
 
@@ -80,6 +85,47 @@ NUDGE = ("Answer only by calling a tool: look further with show_lines, search_co
          "propose_fix or no_fix.")
 REPEAT = ("You already made this call with the same arguments, and its result is above. Make a different call, or "
           "finish with propose_fix or no_fix.")
+# Common wording for text that tries to steer an AI agent: "ignore (all) previous instructions", "you are an AI",
+# "a note for AI agents", "AI assistants must ...", or an order to call one of the agent's tools. A line with any of
+# it is removed whole, as in Car Safety Checker, because the rest of the message can sit beside it.
+_WORDS = r"(?:all|any|the|your|my|of|these|those|previous|prior|above|earlier|preceding|other|system|original)"
+_AGENTS = r"(?:AI|LLM|coding)\s+(?:agents?|assistants?)"
+STEERING = re.compile(
+    r"\b(?:ignore|disregard|forget)\s+(?:all\s+|any\s+|the\s+|your\s+|of\s+)*(?:previous|prior|above|earlier|preceding|other)\s+"
+    r"(?:instructions?|prompts?|messages?|rules|directions)\b"
+    rf"|\b(?:ignore|disregard)\s+(?:{_WORDS}\s+)*(?:instructions?|prompts?)\b"
+    r"|\b(?:you are|as) an? (?:AI|artificial intelligence|language model|LLM)\b"
+    rf"|\b(?:notes?|messages?|instructions?|reminders?)\s+(?:to|for)\s+(?:the\s+|any\s+|all\s+)?(?:{_AGENTS}|AIs?|LLMs?)\b"
+    rf"|\b{_AGENTS}\s*(?::|,?\s+(?:must|should|need to|have to|are required to|may not|must not|do not|don't)\b)"
+    r"|\b(?:call|use|finish with|answer with)\s+(?:the\s+)?`?(?:no_fix|propose_fix|try_command|show_help|search_code|show_lines)\b",
+    re.I)
+REMOVED = "[removed: text addressed to an AI agent]"
+# What a fix may not add: a link to a site the replaced lines don't link to, or a download command they don't have.
+_LINK = re.compile(r"\b(?:https?|ftp)://([^/\s\"'<>()\[\]`]+)|\bwww\.([^/\s\"'<>()\[\]`]+)", re.I)
+_DOWNLOAD = re.compile(r"\b(?:curl|wget|Invoke-WebRequest|iwr|irm)\b|\|\s*(?:sudo\s+)?(?:ba|z)?sh\b", re.I)
+
+
+def steering(text: str) -> bool:
+    return bool(STEERING.search(text))
+
+
+def guarded(text: str) -> str:
+    """The text, with each line addressed to an AI agent replaced by REMOVED."""
+    return "\n".join(REMOVED if steering(line) else line for line in text.split("\n"))
+
+
+def sites(text: str) -> set[str]:
+    return {(m.group(1) or m.group(2)).lower().rstrip(".,;:") for m in _LINK.finditer(text)}
+
+
+def added_risk(old: tuple[str, ...], new: tuple[str, ...]) -> str | None:
+    """None, or what a fix adds that the lines it replaces don't have: a link to another site, or a download command."""
+    before, after = "\n".join(old), "\n".join(new)
+    if sites(after) - sites(before):
+        return f"it adds a link to {', '.join(sorted(sites(after) - sites(before)))}, which the lines didn't link to"
+    if len(_DOWNLOAD.findall(after)) > len(_DOWNLOAD.findall(before)):
+        return "it adds a download command the lines didn't have"
+    return None
 
 
 def _tool(name: str, description: str, properties: dict, required: list[str]) -> dict:
@@ -123,11 +169,12 @@ class Task:
     help: Callable[[list[str]], str] | None = None  # the help a command prints, from the sandbox (from v3 on)
 
 
-def numbered(lines: list[str], first: int, last: int, mark: int | None = None) -> str:
-    return "\n".join(f"{'>>> ' if n == mark else '    '}{n}: {lines[n - 1]}" for n in range(first, last + 1))
+def numbered(lines: list[str], first: int, last: int, mark: int | None = None, guard: bool = True) -> str:
+    return "\n".join(f"{'>>> ' if n == mark else '    '}{n}: {guarded(lines[n - 1]) if guard else lines[n - 1]}"
+                     for n in range(first, last + 1))
 
 
-def brief(task: Task, version: str = "v1") -> str:
+def brief(task: Task, version: str = "v1", guard: bool = True) -> str:
     first, last = max(1, task.line - CONTEXT), min(len(task.lines), task.line + CONTEXT)
     change = (f"What the code change did: {task.change}" if task.change else
               "The code didn't change: the line may have been wrong already.")
@@ -135,7 +182,7 @@ def brief(task: Task, version: str = "v1") -> str:
         change += f"\nWhy the rules didn't fix it: {task.note}."
     return (f"A checker flagged line {task.line} of {task.file}.\nWhy: {task.problem}\n{change}\n\n"
             f"Lines {first} to {last} of {task.file} (the flagged line is marked >>>):\n<doc>\n"
-            f"{numbered(task.lines, first, last, task.line)}\n</doc>\n\n"
+            f"{numbered(task.lines, first, last, task.line, guard)}\n</doc>\n\n"
             "Decide whether the flagged line is wrong. If it is, call propose_fix with the corrected lines; if it "
             "isn't, call no_fix.")
 
@@ -187,8 +234,8 @@ def said(result: dict) -> str:
 
 
 class _Agent:
-    def __init__(self, task: Task, helps: bool):
-        self.task, self.runs, self.helps = task, 0, helps
+    def __init__(self, task: Task, helps: bool, guard: bool = True):
+        self.task, self.runs, self.helps, self.guard = task, 0, helps, guard
 
     def call(self, name: str, args: dict) -> tuple[str, tuple | None]:
         """The tool's result, and (outcome, fix or reason) when the call ends the agent's work."""
@@ -198,9 +245,10 @@ class _Agent:
                 first, last = max(1, int(args["first"])), min(len(task.lines), int(args["last"]))
                 if first > last:
                     return f"The doc has lines 1 to {len(task.lines)}.", None
-                return numbered(task.lines, first, min(last, first + SHOW - 1), task.line), None
+                return numbered(task.lines, first, min(last, first + SHOW - 1), task.line, self.guard), None
             if name == "search_code":
-                return search(task.code, str(args["text"])), None
+                found = search(task.code, str(args["text"]))
+                return (guarded(found) if self.guard else found), None
             if (name == "try_command" and task.run) or (name == "show_help" and task.help and self.helps):
                 if self.runs >= MAX_RUNS:
                     return f"You've used all {MAX_RUNS} sandbox runs. Finish with propose_fix or no_fix.", None
@@ -230,6 +278,8 @@ class _Agent:
         old = tuple(task.lines[first - 1: first - 1 + len(new)])
         if any(NUMBERED.match(text) and not NUMBERED.match(was) for text, was in zip(new, old)):
             problem = "give each line's text without the number and >>> shown in front of it"
+        elif self.guard and added_risk(old, tuple(new)):
+            problem = added_risk(old, tuple(new))
         else:
             problem = task.check(Fix(task.file, first, old, tuple(new), "agent", str(args.get("reason", ""))))
         if problem:
@@ -245,13 +295,14 @@ def _chat(model: str, messages: list[dict], tools: list[dict]) -> dict:
     return _post("/api/chat", payload)
 
 
-def solve(task: Task, model: str, version: str = "v1", chat: Callable[[str, list, list], dict] = _chat) -> dict:
+def solve(task: Task, model: str, version: str = "v1", chat: Callable[[str, list, list], dict] = _chat,
+          guard: bool = True) -> dict:
     """Run the agent on one flagged line. The outcome is "fixed", "no fix", "loop", or "turn limit"."""
     helps = task.help is not None and list(SYSTEMS).index(version) >= list(SYSTEMS).index(HELP_FROM)
-    agent = _Agent(task, helps)
+    agent = _Agent(task, helps, guard)
     left_out = ({"try_command"} if task.run is None else set()) | (set() if helps else {"show_help"})
     tools = [t for t in TOOLS if t["function"]["name"] not in left_out]
-    messages = [{"role": "system", "content": SYSTEMS[version]}, {"role": "user", "content": brief(task, version)}]
+    messages = [{"role": "system", "content": SYSTEMS[version]}, {"role": "user", "content": brief(task, version, guard)}]
     steps: list[dict] = []
     seen: dict[str, int] = {}
     outcome, end = "turn limit", None
